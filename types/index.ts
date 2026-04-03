@@ -1,0 +1,38 @@
+export interface Project {
+  id: string;
+  name: string;
+  color: string;
+  archived: boolean;
+  createdAt: number;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  name: string;
+  notes: string;
+  archived: boolean;
+  createdAt: number;
+}
+
+export interface TimeEntry {
+  id: string;
+  taskId: string | null;
+  projectId: string | null;
+  startedAt: number;
+  stoppedAt: number | null;
+  notes: string;
+  tags: string[];
+}
+
+export interface AppSettings {
+  theme: "light" | "dark" | "system";
+  weekStartsOn: 0 | 1;
+  defaultView: "timer" | "log" | "reports";
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  theme: "system",
+  weekStartsOn: 1,
+  defaultView: "timer",
+};

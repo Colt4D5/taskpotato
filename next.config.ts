@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "static",
+  output: "export",
   trailingSlash: true,
   images: {
     unoptimized: true,
