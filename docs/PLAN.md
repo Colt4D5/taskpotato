@@ -144,33 +144,33 @@ types/
 
 ### Phase 1 — Core Timer (Night 1–2)
 - [x] Project scaffolding, static export config
-- [ ] Data model + types
-- [ ] localStorage hooks (useStorage, useProjects, useTasks, useEntries)
-- [ ] App shell with tab navigation
-- [ ] Timer widget: start/stop, live tick, assign to project/task
-- [ ] Running entry persistence (survives page refresh)
+- [x] Data model + types
+- [x] localStorage hooks (useStorage, useProjects, useTasks, useEntries)
+- [x] App shell with tab navigation
+- [x] Timer widget: start/stop, live tick, assign to project/task
+- [x] Running entry persistence (survives page refresh)
 
 ### Phase 2 — Log View (Night 3)
-- [ ] Entry list grouped by day
-- [ ] Edit entry (time, notes, project/task)
-- [ ] Delete entry
-- [ ] Duration display (formatted)
+- [x] Entry list grouped by day
+- [x] Edit entry (time, notes, project/task)
+- [x] Delete entry
+- [x] Duration display (formatted)
 
 ### Phase 3 — Projects & Tasks (Night 3–4)
-- [ ] Project CRUD with color picker
-- [ ] Task CRUD nested under projects
-- [ ] Archive/unarchive
+- [x] Project CRUD with color picker
+- [x] Task CRUD nested under projects
+- [x] Archive/unarchive
 
 ### Phase 4 — Reports (Night 4–5)
-- [ ] Weekly bar chart (hours per day)
-- [ ] Project breakdown (pie/donut)
+- [x] Weekly bar chart (hours per day)
+- [x] Project breakdown (bar)
 - [ ] Task totals table
 - [ ] Date range picker
 
 ### Phase 5 — Polish & Portability (Night 5–6)
 - [ ] Theme toggle (light/dark/system)
 - [ ] JSON export / import
-- [ ] Settings page
+- [x] Settings page
 - [ ] GitHub Pages CI/CD (GitHub Actions deploy workflow)
 - [ ] Responsive mobile layout
 

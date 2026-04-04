@@ -25,3 +25,26 @@ All notable changes to TaskPotato are documented here.
 - `components/timer/TimerWidget.tsx` — full timer UI: clock, description input, project/task selector, start/stop, Enter key shortcut
 - App routes: `/timer`, `/log`, `/reports`, `/settings`
 - Dark zinc color scheme throughout
+
+## [0.2.0] — 2026-04-04
+
+### Added
+- **Log view** (`/log`) — time entries grouped by calendar day, reverse chronological; day totals shown per group
+- `EntryRow` — entry display with project badge, duration, start/stop times; hover-revealed edit/delete actions
+- `EntryEditor` modal — edit entry notes, start time, stop time, project, and task in a modal
+- `EntryList` — drives the log view with grouped day rendering and empty state
+- **Projects management** — full CRUD via `ProjectList` in Settings; expand/collapse to view tasks
+- `ProjectForm` modal — create/edit projects with name + `ColorPicker` (16 swatches)
+- **Tasks management** — `TaskList` nested under projects; add, edit, archive, restore, delete
+- `TaskForm` modal — create/edit tasks with name + optional notes
+- **Reports page** (`/reports`) — weekly total, bar chart (hours per day), project breakdown with duration + percentage bars
+- **Settings page** (`/settings`) — preferences (week start, default view), inline project management, JSON export
+- `Modal` component — keyboard-dismissible (Escape), overlay-click-dismissible
+- `Input` component — styled text input with label and error support
+- `Badge` component — color-coded label badge for projects
+- `ColorPicker` component — 16-swatch color selector
+
+### Changed
+- Log page placeholder replaced with full implementation
+- Settings page placeholder replaced with full implementation
+- Reports page placeholder replaced with full implementation

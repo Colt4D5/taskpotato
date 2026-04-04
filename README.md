@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 1 complete**
+🚧 **Active Development — Night 2 complete**
 
 ## Features
 
@@ -23,13 +23,21 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Timer widget — start/stop, live tick, project + task selector
 - ✅ Running entry survives page refresh (stored in localStorage)
 - ✅ Enter key shortcut to start/stop timer
-- ⬜ Log view (entry list grouped by day)
-- ⬜ Edit/delete entries
-- ⬜ Project CRUD with color picker
-- ⬜ Reports (charts, summaries)
-- ⬜ Theme toggle
-- ⬜ JSON export/import
-- ⬜ GitHub Actions deploy workflow
+- ✅ Log view — entries grouped by day, day totals
+- ✅ Edit entries (time, notes, project, task)
+- ✅ Delete entries
+- ✅ Project CRUD — create, edit, archive, delete with color picker
+- ✅ Task CRUD — nested under projects, archive/restore/delete
+- ✅ Reports — weekly bar chart, project breakdown with duration bars
+- ✅ Settings — preferences (week start, default view), JSON export
+- ✅ UI components: Modal, Input, Badge, ColorPicker
+- ⬜ Theme toggle (light/dark/system)
+- ⬜ Task totals table in reports
+- ⬜ Date range picker for reports
+- ⬜ JSON import
+- ⬜ Responsive mobile polish
+- ⬜ Tags on entries
+- ⬜ Pomodoro mode
 
 ## Tech Stack
 
