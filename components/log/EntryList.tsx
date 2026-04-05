@@ -11,6 +11,8 @@ interface EntryListProps {
   tasks: Task[];
   onUpdate: (id: string, patch: Partial<Omit<TimeEntry, "id">>) => void;
   onDelete: (id: string) => void;
+  onResume?: (entry: TimeEntry) => void;
+  hasRunning?: boolean;
 }
 
 export function EntryList({
@@ -19,6 +21,8 @@ export function EntryList({
   tasks,
   onUpdate,
   onDelete,
+  onResume,
+  hasRunning,
 }: EntryListProps) {
   const completed = entries.filter((e) => e.stoppedAt !== null);
   const grouped = groupByDay(completed);
@@ -70,6 +74,8 @@ export function EntryList({
                   onDelete={onDelete}
                   projects={projects}
                   tasks={tasks}
+                  onResume={onResume}
+                  hasRunning={hasRunning}
                 />
               ))}
             </div>
