@@ -2,6 +2,13 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [0.3.0] — 2026-04-05
+
+### Added
+- **Daily Summary on Timer Page** — compact panel below the timer showing today's total tracked time, a horizontal bar chart broken down by project, and a list of each completed entry with description, project badge, and duration. Only renders when there are completed entries today.
+- **Inline Project Creation** — "+ New Project" button next to the project dropdown on the timer page. Opens `ProjectForm` modal; on save, auto-selects the new project in the dropdown without navigating away.
+- **Resume Entry** — "▶ Resume" ghost button on each completed entry in the Log view. Starts a new timer pre-filled with the same project, task, and notes. Button is hidden when a timer is already running.
+
 ## [0.1.0] — 2026-04-03
 
 ### Added
