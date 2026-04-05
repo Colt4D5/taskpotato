@@ -16,6 +16,8 @@ interface EntryRowProps {
   onDelete: (id: string) => void;
   projects: Project[];
   tasks: Task[];
+  onResume?: (entry: TimeEntry) => void;
+  hasRunning?: boolean;
 }
 
 export function EntryRow({
@@ -26,6 +28,8 @@ export function EntryRow({
   onDelete,
   projects,
   tasks,
+  onResume,
+  hasRunning,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
   const duration = elapsedMs(entry.startedAt, entry.stoppedAt);
@@ -65,6 +69,16 @@ export function EntryRow({
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {!hasRunning && onResume && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onResume(entry)}
+              className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+            >
+              ▶ Resume
+            </Button>
+          )}
           <Button
             size="sm"
             variant="ghost"
