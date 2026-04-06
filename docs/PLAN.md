@@ -164,12 +164,12 @@ types/
 ### Phase 4 — Reports (Night 4–5)
 - [x] Weekly bar chart (hours per day)
 - [x] Project breakdown (bar)
-- [ ] Task totals table
-- [ ] Date range picker
+- [x] Task totals table
+- [x] Date range picker (week navigation)
 
 ### Phase 5 — Polish & Portability (Night 5–6)
 - [ ] Theme toggle (light/dark/system)
-- [ ] JSON export / import
+- [x] JSON export / import
 - [x] Settings page
 - [ ] GitHub Pages CI/CD (GitHub Actions deploy workflow)
 - [ ] Responsive mobile layout
