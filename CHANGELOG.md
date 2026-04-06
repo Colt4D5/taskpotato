@@ -2,6 +2,17 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [0.4.0] — 2026-04-06
+
+### Added
+- **Week navigation on Reports** — ← / → buttons to browse any prior week; "Back to this week" shortcut; next-week button disabled on current week.
+- **Task Totals table on Reports** — ranked table of tasks tracked during the selected week, showing task name, parent project badge, and duration. Only renders when tasks have logged time.
+- **Full JSON export** — export now includes entries in addition to projects and tasks (versioned format).
+- **JSON import** — new Import button on Settings page; restores projects, tasks, and entries from a previous export file; overwrites in place with success/error feedback.
+- **No-project row in project breakdown** — unassigned time now shows as "No project" in the Reports project chart.
+
+---
+
 ## [0.3.0] — 2026-04-05
 
 ### Added

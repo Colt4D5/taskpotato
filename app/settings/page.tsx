@@ -1,22 +1,36 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
+import { useEntries } from "@/hooks/useEntries";
 import { useStorage } from "@/hooks/useStorage";
-import { AppSettings, DEFAULT_SETTINGS } from "@/types";
+import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { Button } from "@/components/ui/Button";
 
 export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
+  const { entries, updateEntry, deleteEntry } = useEntries();
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
+  const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
+  const [, setStoredProjects] = useStorage<Project[]>("projects", []);
+  const [, setStoredTasks] = useStorage<Task[]>("tasks", []);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  // suppress unused warning — updateEntry/deleteEntry consumed by EntryList elsewhere
+  void updateEntry; void deleteEntry;
 
   const handleExport = () => {
     const data = {
       exportedAt: new Date().toISOString(),
+      version: 1,
       projects,
       tasks,
+      entries,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -27,6 +41,32 @@ export default function SettingsPage() {
     a.download = `taskpotato-export-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportError(null);
+    setImportSuccess(false);
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const raw = ev.target?.result as string;
+        const data = JSON.parse(raw);
+        if (!data.projects || !Array.isArray(data.projects)) throw new Error("Missing projects array");
+        if (!data.tasks || !Array.isArray(data.tasks)) throw new Error("Missing tasks array");
+        if (data.entries && !Array.isArray(data.entries)) throw new Error("Invalid entries field");
+        setStoredProjects(data.projects as Project[]);
+        setStoredTasks(data.tasks as Task[]);
+        if (data.entries) setStoredEntries(data.entries as TimeEntry[]);
+        setImportSuccess(true);
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : "Invalid JSON file");
+      }
+    };
+    reader.readAsText(file);
+    // reset so same file can be re-imported if needed
+    e.target.value = "";
   };
 
   return (
@@ -101,12 +141,42 @@ export default function SettingsPage() {
             <div>
               <p className="text-sm font-medium text-zinc-200">Export data</p>
               <p className="text-xs text-zinc-500">
-                Download your projects and tasks as JSON
+                Download all projects, tasks, and entries as JSON
               </p>
             </div>
             <Button variant="ghost" size="sm" onClick={handleExport}>
               Export
             </Button>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-zinc-200">Import data</p>
+              <p className="text-xs text-zinc-500">
+                Restore from a previous export — overwrites current data
+              </p>
+              {importError && (
+                <p className="text-xs text-red-400 mt-1">{importError}</p>
+              )}
+              {importSuccess && (
+                <p className="text-xs text-green-400 mt-1">Import successful.</p>
+              )}
+            </div>
+            <div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={handleImportFile}
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => fileRef.current?.click()}
+              >
+                Import
+              </Button>
+            </div>
           </div>
         </div>
       </section>
