@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useStorage } from "./useStorage";
 import { TimeEntry } from "@/types";
 import { uuid } from "@/lib/uuid";
+import { elapsedMs } from "@/lib/duration";
 
 export function useEntries() {
   const [entries, setEntries] = useStorage<TimeEntry[]>("entries", []);
@@ -21,6 +22,25 @@ export function useEntries() {
       };
       setEntries((prev) => [...prev, entry]);
       return entry;
+    },
+    [setEntries]
+  );
+
+  // Resume an existing entry — mark it running again with offsetMs from prior duration
+  const resumeEntry = useCallback(
+    (id: string) => {
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (e.id !== id || e.stoppedAt === null) return e;
+          const prior = elapsedMs(e.startedAt, e.stoppedAt);
+          return {
+            ...e,
+            stoppedAt: null,
+            resumedAt: Date.now(),
+            offsetMs: (e.offsetMs ?? 0) + prior,
+          };
+        })
+      );
     },
     [setEntries]
   );
@@ -65,6 +85,7 @@ export function useEntries() {
     runningEntry,
     completedEntries,
     startEntry,
+    resumeEntry,
     stopEntry,
     updateEntry,
     deleteEntry,

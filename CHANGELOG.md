@@ -66,3 +66,18 @@ All notable changes to TaskPotato are documented here.
 - Log page placeholder replaced with full implementation
 - Settings page placeholder replaced with full implementation
 - Reports page placeholder replaced with full implementation
+
+## [Night 5] — 2026-04-07
+
+### Fixed
+- **Reactive state** — project creation and timer stop now update all consumers immediately without page reload
+  - `lib/storage.ts`: dispatch `taskpotato:storage-update` custom event on every `storageSet()` call
+  - `hooks/useStorage.ts`: listen for `taskpotato:storage-update` and re-read from localStorage so all hook instances in the same page re-render on writes from sibling components
+
+### Added
+- **Log page filters** — filter bar above the entry list with project dropdown ("All Projects" default) and task name text search (case-insensitive); filters hide entire day groups when no entries remain; "Clear" button when any filter is active
+- **Resume timer with accumulated time** — resuming a stopped entry continues the timer from its prior duration instead of restarting at 00:00:00
+  - `TimeEntry` type gains optional `resumedAt` and `offsetMs` fields
+  - `useEntries.resumeEntry()` marks the entry running again, storing the prior elapsed ms in `offsetMs`
+  - `useTimer` elapsed calculation accounts for `offsetMs` + time since `resumedAt`
+  - Stopping a resumed entry writes a single updated `stoppedAt` — no duplicate entries created

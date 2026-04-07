@@ -23,6 +23,8 @@ export interface TimeEntry {
   stoppedAt: number | null;
   notes: string;
   tags: string[];
+  resumedAt?: number;   // timestamp when last resumed (for in-progress resume)
+  offsetMs?: number;    // accumulated ms from previous runs before this resume
 }
 
 export interface AppSettings {

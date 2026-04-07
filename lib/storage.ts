@@ -15,6 +15,7 @@ export function storageSet<T>(key: string, value: T): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(PREFIX + key, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("taskpotato:storage-update", { detail: { key } }));
   } catch {
     // quota exceeded or private browsing — fail silently but honestly
     console.error(`[taskpotato] Failed to write localStorage key: ${key}`);
