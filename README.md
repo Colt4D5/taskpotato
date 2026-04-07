@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 4 complete**
+🚧 **Active Development — Night 5 complete**
 
 ## Features
 
@@ -33,7 +33,8 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Settings — preferences (week start, default view), full JSON export (projects + tasks + entries), JSON import
 - ✅ Daily summary panel on timer page (total time, project bar chart, entry list)
 - ✅ Inline project creation from timer page (+ New Project button → auto-select)
-- ✅ Resume a stopped entry from the log (▶ Resume button)
+- ✅ Resume a stopped entry from the log — continues from accumulated time (no duplicate entries)
+- ✅ Log page filters — by project and task name
 - ⬜ Theme toggle (light/dark/system)
 - ⬜ Responsive mobile polish
 - ⬜ Tags on entries
@@ -70,3 +71,4 @@ npm run build
 All data lives in `localStorage` under `taskpotato:*` keys. No server, no cloud, no nonsense.
 
 See [`docs/PLAN.md`](docs/PLAN.md) for the full architecture.
+- ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)

@@ -21,7 +21,9 @@ export function useTimer() {
   // Tick every second when running
   useEffect(() => {
     if (isRunning && runningEntry) {
-      const tick = () => setElapsed(Date.now() - runningEntry.startedAt);
+      const offset = runningEntry.offsetMs ?? 0;
+      const base = runningEntry.resumedAt ?? runningEntry.startedAt;
+      const tick = () => setElapsed(offset + (Date.now() - base));
       tick(); // immediate
       intervalRef.current = setInterval(tick, 1000);
     } else {

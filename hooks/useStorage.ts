@@ -17,15 +17,25 @@ export function useStorage<T>(key: string, fallback: T) {
     [key]
   );
 
-  // Sync across tabs
+  // Sync across tabs (StorageEvent) and within the same page (custom event)
   useEffect(() => {
-    const handler = (e: StorageEvent) => {
+    const handleStorage = (e: StorageEvent) => {
       if (e.key === "taskpotato:" + key) {
         setValue(e.newValue ? JSON.parse(e.newValue) : fallback);
       }
     };
-    window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
+    const handleCustom = (e: Event) => {
+      const detail = (e as CustomEvent<{ key: string }>).detail;
+      if (detail?.key === key) {
+        setValue(storageGet(key, fallback));
+      }
+    };
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("taskpotato:storage-update", handleCustom);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("taskpotato:storage-update", handleCustom);
+    };
   }, [key, fallback]);
 
   return [value, set] as const;
