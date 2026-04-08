@@ -81,3 +81,12 @@ All notable changes to TaskPotato are documented here.
   - `useEntries.resumeEntry()` marks the entry running again, storing the prior elapsed ms in `offsetMs`
   - `useTimer` elapsed calculation accounts for `offsetMs` + time since `resumedAt`
   - Stopping a resumed entry writes a single updated `stoppedAt` — no duplicate entries created
+
+## [Night 6] — 2026-04-08
+
+### Changed
+- **EntryEditor: full date+time editing** — replaced time-only inputs with separate date + time fields (HH:MM:SS) for both start and stop
+  - `toDateInput()` / `toTimeInput()` helpers extract local date and time strings from epoch ms
+  - `combineDateTime()` reconstructs a full epoch ms from a date string + time string, interpreted as local time
+  - Validation: both start fields required; stop fields required when entry is completed; stop must be strictly after start — inline error message displayed on failure
+  - Entries automatically appear under the correct day group after date change (existing reactivity via `taskpotato:storage-update`)
