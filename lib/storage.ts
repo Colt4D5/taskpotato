@@ -1,44 +1,22 @@
-const PREFIX = "taskpotato:";
-
-export function storageGet<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
+export function getStorage<T>(key: string): T | null {
+  if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(PREFIX + key);
-    if (raw === null) return fallback;
+    const raw = localStorage.getItem(key);
+    if (raw === null) return null;
     return JSON.parse(raw) as T;
   } catch {
-    return fallback;
+    return null;
   }
 }
 
-export function storageSet<T>(key: string, value: T): void {
+export function setStorage<T>(key: string, value: T): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(PREFIX + key, JSON.stringify(value));
-    window.dispatchEvent(new CustomEvent("taskpotato:storage-update", { detail: { key } }));
+    localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // quota exceeded or private browsing — fail silently but honestly
-    console.error(`[taskpotato] Failed to write localStorage key: ${key}`);
+    // quota exceeded or private mode — silently fail
   }
 }
 
-export function storageRemove(key: string): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(PREFIX + key);
-}
-
-export function storageExportAll(): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  if (typeof window === "undefined") return result;
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith(PREFIX)) {
-      try {
-        result[k.slice(PREFIX.length)] = JSON.parse(localStorage.getItem(k)!);
-      } catch {
-        // skip malformed
-      }
-    }
-  }
-  return result;
-}
+export const TASKS_KEY = "taskpotato_tasks";
+export const ACTIVE_KEY = "taskpotato_active";

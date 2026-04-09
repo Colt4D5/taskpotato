@@ -1,50 +1,143 @@
 "use client";
 
-import { useCallback } from "react";
-import { useStorage } from "./useStorage";
-import { Task } from "@/types";
-import { uuid } from "@/lib/uuid";
+import { useState, useEffect, useCallback } from "react";
+import { Task, ActiveTimer } from "@/types";
+import { getStorage, setStorage, TASKS_KEY, ACTIVE_KEY } from "@/lib/storage";
 
 export function useTasks() {
-  const [tasks, setTasks] = useStorage<Task[]>("tasks", []);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [activeTimer, setActiveTimer] = useState<ActiveTimer | null>(null);
+  const [tick, setTick] = useState(0);
 
-  const addTask = useCallback(
-    (projectId: string, name: string, notes = "") => {
+  // Load from localStorage on mount
+  useEffect(() => {
+    const storedTasks = getStorage<Task[]>(TASKS_KEY) ?? [];
+    const storedActive = getStorage<ActiveTimer | null>(ACTIVE_KEY);
+    setTasks(storedTasks);
+    setActiveTimer(storedActive);
+  }, []);
+
+  // Live tick every second when timer is active
+  useEffect(() => {
+    if (!activeTimer) return;
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [activeTimer]);
+
+  const saveTasks = useCallback((next: Task[]) => {
+    setTasks(next);
+    setStorage(TASKS_KEY, next);
+  }, []);
+
+  const createTask = useCallback(
+    (title: string, description: string) => {
+      const today = new Date().toISOString().slice(0, 10);
+      const dayTasks = tasks.filter((t) => t.createdAt.slice(0, 10) === today);
+      const maxOrder = dayTasks.reduce((m, t) => Math.max(m, t.order), -1);
       const task: Task = {
-        id: uuid(),
-        projectId,
-        name: name.trim(),
-        notes,
-        archived: false,
-        createdAt: Date.now(),
+        id: crypto.randomUUID(),
+        title,
+        description,
+        totalMs: 0,
+        createdAt: new Date().toISOString(),
+        order: maxOrder + 1,
       };
-      setTasks((prev) => [...prev, task]);
-      return task;
+      saveTasks([...tasks, task]);
     },
-    [setTasks]
+    [tasks, saveTasks]
   );
 
   const updateTask = useCallback(
-    (id: string, patch: Partial<Omit<Task, "id" | "createdAt">>) => {
-      setTasks((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, ...patch } : t))
-      );
+    (id: string, patch: Partial<Task>) => {
+      saveTasks(tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)));
     },
-    [setTasks]
+    [tasks, saveTasks]
   );
 
   const deleteTask = useCallback(
     (id: string) => {
-      setTasks((prev) => prev.filter((t) => t.id !== id));
+      if (activeTimer?.taskId === id) {
+        setActiveTimer(null);
+        setStorage(ACTIVE_KEY, null);
+      }
+      saveTasks(tasks.filter((t) => t.id !== id));
     },
-    [setTasks]
+    [tasks, activeTimer, saveTasks]
   );
 
-  const getTasksForProject = useCallback(
-    (projectId: string) =>
-      tasks.filter((t) => t.projectId === projectId && !t.archived),
-    [tasks]
+  const startTimer = useCallback(
+    (id: string) => {
+      // Stop existing timer if any
+      if (activeTimer) {
+        const elapsed = Date.now() - activeTimer.startedAt;
+        saveTasks(
+          tasks.map((t) =>
+            t.id === activeTimer.taskId
+              ? { ...t, totalMs: t.totalMs + elapsed }
+              : t
+          )
+        );
+      }
+      const timer: ActiveTimer = { taskId: id, startedAt: Date.now() };
+      setActiveTimer(timer);
+      setStorage(ACTIVE_KEY, timer);
+    },
+    [tasks, activeTimer, saveTasks]
   );
 
-  return { tasks, addTask, updateTask, deleteTask, getTasksForProject };
+  const stopTimer = useCallback(() => {
+    if (!activeTimer) return;
+    const elapsed = Date.now() - activeTimer.startedAt;
+    saveTasks(
+      tasks.map((t) =>
+        t.id === activeTimer.taskId
+          ? { ...t, totalMs: t.totalMs + elapsed }
+          : t
+      )
+    );
+    setActiveTimer(null);
+    setStorage(ACTIVE_KEY, null);
+  }, [tasks, activeTimer, saveTasks]);
+
+  const reorderTasks = useCallback(
+    (dayKey: string, fromIndex: number, toIndex: number) => {
+      if (fromIndex === toIndex) return;
+      const dayTasks = tasks
+        .filter((t) => t.createdAt.slice(0, 10) === dayKey)
+        .sort((a, b) => a.order - b.order);
+      const [moved] = dayTasks.splice(fromIndex, 1);
+      dayTasks.splice(toIndex, 0, moved);
+      const reordered = dayTasks.map((t, i) => ({ ...t, order: i }));
+      const otherTasks = tasks.filter(
+        (t) => t.createdAt.slice(0, 10) !== dayKey
+      );
+      saveTasks([...otherTasks, ...reordered]);
+    },
+    [tasks, saveTasks]
+  );
+
+  const getLiveMs = useCallback(
+    (taskId: string): number => {
+      const task = tasks.find((t) => t.id === taskId);
+      if (!task) return 0;
+      if (activeTimer?.taskId === taskId) {
+        return task.totalMs + (Date.now() - activeTimer.startedAt);
+      }
+      return task.totalMs;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tasks, activeTimer, tick]
+  );
+
+  return {
+    tasks,
+    activeTimer,
+    createTask,
+    updateTask,
+    deleteTask,
+    startTimer,
+    stopTimer,
+    reorderTasks,
+    getLiveMs,
+  };
 }
