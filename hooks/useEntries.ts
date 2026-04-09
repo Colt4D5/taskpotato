@@ -10,7 +10,7 @@ export function useEntries() {
   const [entries, setEntries] = useStorage<TimeEntry[]>("entries", []);
 
   const startEntry = useCallback(
-    (projectId: string | null, taskId: string | null, notes = "") => {
+    (projectId: string | null, taskId: string | null, notes = "", tags: string[] = []) => {
       const entry: TimeEntry = {
         id: uuid(),
         projectId,
@@ -18,7 +18,7 @@ export function useEntries() {
         startedAt: Date.now(),
         stoppedAt: null,
         notes,
-        tags: [],
+        tags,
       };
       setEntries((prev) => [...prev, entry]);
       return entry;

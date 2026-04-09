@@ -5,6 +5,7 @@ import { TimeEntry, Project, Task } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { TagInput } from "@/components/ui/TagInput";
 
 interface EntryEditorProps {
   open: boolean;
@@ -59,6 +60,7 @@ export function EntryEditor({
     entry.stoppedAt ? toTimeInput(entry.stoppedAt) : ""
   );
   const [error, setError] = useState<string | null>(null);
+  const [tags, setTags] = useState<string[]>(entry.tags ?? []);
 
   useEffect(() => {
     if (open) {
@@ -69,6 +71,7 @@ export function EntryEditor({
       setStartTime(toTimeInput(entry.startedAt));
       setStopDate(entry.stoppedAt ? toDateInput(entry.stoppedAt) : "");
       setStopTime(entry.stoppedAt ? toTimeInput(entry.stoppedAt) : "");
+      setTags(entry.tags ?? []);
       setError(null);
     }
   }, [open, entry]);
@@ -109,6 +112,7 @@ export function EntryEditor({
       taskId: taskId || null,
       startedAt: newStartedAt,
       stoppedAt: newStoppedAt,
+      tags,
     });
   };
 
@@ -124,6 +128,11 @@ export function EntryEditor({
           onChange={(e) => setNotes(e.target.value)}
           placeholder="What were you working on?"
         />
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-400">Tags</label>
+          <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" />
+        </div>
 
         {/* Start date/time */}
         <div className="flex flex-col gap-1.5">

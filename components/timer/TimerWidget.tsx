@@ -11,6 +11,8 @@ import { ProjectForm } from "@/components/projects/ProjectForm";
 import { formatDurationShort, elapsedMs } from "@/lib/duration";
 import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
+import { TagInput } from "@/components/ui/TagInput";
+
 export function TimerWidget() {
   const {
     isRunning,
@@ -21,6 +23,8 @@ export function TimerWidget() {
     setSelectedTaskId,
     notes,
     setNotes,
+    tags,
+    setTags,
     toggle,
     activeProjects,
     tasks,
@@ -120,6 +124,16 @@ export function TimerWidget() {
             ))}
           </select>
         )}
+      </div>
+
+      {/* Tags */}
+      <div className="w-full">
+        <TagInput
+          tags={tags}
+          onChange={setTags}
+          disabled={isRunning}
+          placeholder="Add tags (Enter or comma)…"
+        />
       </div>
 
       {/* Start / Stop */}
