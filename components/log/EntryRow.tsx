@@ -55,6 +55,9 @@ export function EntryRow({
             {task && (
               <span className="text-xs text-zinc-500">{task.name}</span>
             )}
+            {entry.tags && entry.tags.length > 0 && entry.tags.map((tag) => (
+              <span key={tag} className="text-xs bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded-full">#{tag}</span>
+            ))}
           </div>
           <div className="text-xs text-zinc-500 mt-0.5">
             {formatTime(entry.startedAt)}

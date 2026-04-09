@@ -92,6 +92,15 @@ export default function ReportsPage() {
 
   const noProjectMs = projectMs.get("__none__") ?? 0;
 
+  // Tag totals this week
+  const tagMs = new Map<string, number>();
+  for (const e of weekEntries) {
+    for (const tag of (e.tags ?? [])) {
+      tagMs.set(tag, (tagMs.get(tag) ?? 0) + elapsedMs(e.startedAt, e.stoppedAt));
+    }
+  }
+  const sortedTags = Array.from(tagMs.entries()).sort((a, b) => b[1] - a[1]);
+
   const sortedTasks = Array.from(taskMs.entries()).sort((a, b) => b[1] - a[1]);
 
   const isCurrentWeek = weekOffset === 0;
@@ -274,6 +283,37 @@ export default function ReportsPage() {
               })}
             </tbody>
           </table>
+        </section>
+      )}
+
+      {/* Tag totals */}
+      {sortedTags.length > 0 && (
+        <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4">
+          <h2 className="text-sm font-semibold text-zinc-400 mb-4 uppercase tracking-wider">
+            Tag Totals
+          </h2>
+          <div className="flex flex-col gap-3">
+            {sortedTags.map(([tag, ms]) => {
+              const pct = totalWeekMs > 0 ? Math.round((ms / totalWeekMs) * 100) : 0;
+              return (
+                <div key={tag}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-zinc-300">#{tag}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-zinc-500">{pct}%</span>
+                      <span className="text-sm font-mono text-zinc-300">{formatDurationShort(ms)}</span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-orange-400/60 transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </section>
       )}
     </div>

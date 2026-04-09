@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 6 complete**
+🚧 **Active Development — Night 7 complete**
 
 ## Features
 
@@ -38,7 +38,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
 - ⬜ Theme toggle (light/dark/system)
 - ⬜ Responsive mobile polish
-- ⬜ Tags on entries
+- ✅ Tags on entries — add tags while tracking, edit in entry editor, filter log by tag, tag breakdown in reports
 - ⬜ Pomodoro mode
 
 ## Tech Stack

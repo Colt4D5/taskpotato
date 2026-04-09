@@ -90,3 +90,15 @@ All notable changes to TaskPotato are documented here.
   - `combineDateTime()` reconstructs a full epoch ms from a date string + time string, interpreted as local time
   - Validation: both start fields required; stop fields required when entry is completed; stop must be strictly after start — inline error message displayed on failure
   - Entries automatically appear under the correct day group after date change (existing reactivity via `taskpotato:storage-update`)
+
+## [Night 7] — 2026-04-09
+
+### Added
+- **Tags on entries** — full tag support across the entire app
+  - `useTimer` / `useEntries.startEntry()` — tag state in timer hook, passed into new entry on start
+  - `TagInput` component (`components/ui/TagInput.tsx`) — chip-based tag input; press Enter, comma, or Tab to commit; Backspace removes last tag; tags normalized to lowercase kebab-case
+  - `TimerWidget` — tag input field below description; disabled while timer is running
+  - `EntryRow` — tag chips displayed inline with project badge and task name
+  - `EntryEditor` — full tag editing via `TagInput` in the edit modal; tags saved on entry update
+  - Log page — tag filter dropdown (only shown when entries have tags); "All Tags" default; works alongside existing project and task name filters; Clear button updated to reset tag filter too
+  - Reports page — "Tag Totals" section at bottom; bar chart breakdown by tag with percentage and duration; sorted by time descending
