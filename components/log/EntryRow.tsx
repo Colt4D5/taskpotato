@@ -29,7 +29,7 @@ export function EntryRow({
   projects,
   tasks,
   onResume,
-  hasRunning,
+  hasRunning = false,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
   const duration = elapsedMs(entry.startedAt, entry.stoppedAt);
@@ -74,7 +74,7 @@ export function EntryRow({
               size="sm"
               variant="ghost"
               onClick={() => onResume(entry)}
-              className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+              className="text-xs px-2 py-1 text-orange-400 hover:text-orange-300 hover:bg-orange-500/10"
             >
               ▶ Resume
             </Button>

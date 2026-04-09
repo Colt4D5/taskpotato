@@ -1,6 +1,6 @@
-import { TimerWidget } from "@/components/timer/TimerWidget";
+"use client";
 
-export const metadata = { title: "Timer — TaskPotato" };
+import { TimerWidget } from "@/components/timer/TimerWidget";
 
 export default function TimerPage() {
   return <TimerWidget />;

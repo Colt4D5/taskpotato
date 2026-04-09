@@ -1,78 +1,25 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { EntryList } from "@/components/log/EntryList";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry } = useEntries();
+  const { completedEntries, updateEntry, deleteEntry, startEntry, runningEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
 
-  const [filterProjectId, setFilterProjectId] = useState<string>("");
-  const [filterTaskName, setFilterTaskName] = useState<string>("");
-
-  const taskMap = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks]);
-
-  const filteredEntries = useMemo(() => {
-    return completedEntries.filter((e) => {
-      if (filterProjectId && e.projectId !== filterProjectId) return false;
-      if (filterTaskName.trim()) {
-        const taskName = e.taskId ? (taskMap.get(e.taskId)?.name ?? "") : "";
-        if (!taskName.toLowerCase().includes(filterTaskName.trim().toLowerCase())) return false;
-      }
-      return true;
-    });
-  }, [completedEntries, filterProjectId, filterTaskName, taskMap]);
-
-  const handleResume = (entry: { id: string }) => {
-    resumeEntry(entry.id);
-  };
-
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold text-zinc-100 mb-4">Time Log</h1>
-
-      {/* Filter bar */}
-      <div className="flex gap-2 mb-6">
-        <select
-          value={filterProjectId}
-          onChange={(e) => setFilterProjectId(e.target.value)}
-          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-        >
-          <option value="">All Projects</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Filter by task name…"
-          value={filterTaskName}
-          onChange={(e) => setFilterTaskName(e.target.value)}
-          className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-        />
-        {(filterProjectId || filterTaskName) && (
-          <button
-            onClick={() => { setFilterProjectId(""); setFilterTaskName(""); }}
-            className="px-3 py-2 text-xs text-zinc-500 hover:text-orange-400 border border-zinc-800 rounded-lg transition-colors"
-          >
-            Clear
-          </button>
-        )}
-      </div>
-
+      <h1 className="text-2xl font-semibold text-zinc-100 mb-6">Time Log</h1>
       <EntryList
-        entries={filteredEntries}
+        entries={completedEntries}
         projects={projects}
         tasks={tasks}
         onUpdate={updateEntry}
         onDelete={deleteEntry}
-        onResume={handleResume}
+        onResume={(entry) => startEntry(entry.projectId, entry.taskId, entry.notes)}
         hasRunning={runningEntry !== null}
       />
     </div>

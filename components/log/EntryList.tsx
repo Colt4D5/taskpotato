@@ -22,7 +22,7 @@ export function EntryList({
   onUpdate,
   onDelete,
   onResume,
-  hasRunning,
+  hasRunning = false,
 }: EntryListProps) {
   const completed = entries.filter((e) => e.stoppedAt !== null);
   const grouped = groupByDay(completed);
