@@ -36,7 +36,8 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Resume a stopped entry from the log — continues from accumulated time (no duplicate entries)
 - ✅ Log page filters — by project and task name
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
-- ⬜ Theme toggle (light/dark/system)
+- ✅ Theme toggle (light/dark/system)
+- ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, ? for help modal
 - ⬜ Responsive mobile polish
 - ✅ Tags on entries — add tags while tracking, edit in entry editor, filter log by tag, tag breakdown in reports
 - ⬜ Pomodoro mode

@@ -102,3 +102,17 @@ All notable changes to TaskPotato are documented here.
   - `EntryEditor` — full tag editing via `TagInput` in the edit modal; tags saved on entry update
   - Log page — tag filter dropdown (only shown when entries have tags); "All Tags" default; works alongside existing project and task name filters; Clear button updated to reset tag filter too
   - Reports page — "Tag Totals" section at bottom; bar chart breakdown by tag with percentage and duration; sorted by time descending
+
+## [Night 8] — 2026-04-10
+
+### Added
+- **Theme toggle (light/dark/system)** — functional theme switching, no longer hardcoded dark
+  - `ThemeProvider` component (`components/layout/ThemeProvider.tsx`) — reads `settings.theme` from localStorage, applies `dark`/`light` class to `<html>`, and subscribes to `prefers-color-scheme` media query change events when `system` is selected
+  - `app/layout.tsx` — wraps app in `ThemeProvider`; removes hardcoded `className="dark"` from `<html>`
+  - Settings page — new "Theme" preference row (System / Dark / Light selector) above "Week starts on"
+- **Keyboard shortcuts** — navigate and control the timer without touching the mouse
+  - `useKeyboardShortcuts` hook (`hooks/useKeyboardShortcuts.ts`) — `T` → Timer, `L` → Log, `R` → Reports, `Space` → toggle timer (when not in an input), `?` → show shortcuts help modal
+  - `KeyboardShortcutsHelp` modal (`components/ui/KeyboardShortcutsHelp.tsx`) — floating shortcut reference card, triggered by `?` key or nav button, dismissed with Esc or click outside
+  - `Shell` — mounts global nav shortcuts (T/L/R/?)
+  - `TimerWidget` — mounts Space shortcut for timer toggle
+  - `Nav` — `?` button at bottom of sidebar (desktop only) to trigger the shortcuts modal
