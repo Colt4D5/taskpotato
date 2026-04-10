@@ -79,6 +79,26 @@ export default function SettingsPage() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl divide-y divide-zinc-800">
           <div className="flex items-center justify-between px-4 py-3">
             <div>
+              <p className="text-sm font-medium text-zinc-200">Theme</p>
+              <p className="text-xs text-zinc-500">Appearance preference</p>
+            </div>
+            <select
+              value={settings.theme}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  theme: e.target.value as AppSettings["theme"],
+                }))
+              }
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            >
+              <option value="system">System</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
               <p className="text-sm font-medium text-zinc-200">Week starts on</p>
               <p className="text-xs text-zinc-500">Used in reports</p>
             </div>

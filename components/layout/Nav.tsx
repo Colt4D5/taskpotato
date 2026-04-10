@@ -37,6 +37,15 @@ export function Nav() {
           );
         })}
       </ul>
+      <div className="hidden md:flex md:flex-col md:mt-auto md:mb-4 md:px-2">
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent("taskpotato:shortcuts-help"))}
+          title="Keyboard shortcuts (?)"
+          className="flex flex-col items-center px-3 py-3 rounded-lg text-xs text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
+        >
+          <span className="text-base font-mono">?</span>
+        </button>
+      </div>
     </nav>
   );
 }

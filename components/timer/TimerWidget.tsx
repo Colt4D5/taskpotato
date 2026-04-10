@@ -13,6 +13,8 @@ import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
 import { TagInput } from "@/components/ui/TagInput";
 
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+
 export function TimerWidget() {
   const {
     isRunning,
@@ -29,6 +31,8 @@ export function TimerWidget() {
     activeProjects,
     tasks,
   } = useTimer();
+
+  useKeyboardShortcuts({ onToggleTimer: toggle });
 
   const { completedEntries } = useEntries();
   const { addProject } = useProjects();

@@ -168,7 +168,7 @@ types/
 - [x] Date range picker (week navigation)
 
 ### Phase 5 — Polish & Portability (Night 5–6)
-- [ ] Theme toggle (light/dark/system)
+- [x] Theme toggle (light/dark/system)
 - [x] JSON export / import
 - [x] Settings page
 - [ ] GitHub Pages CI/CD (GitHub Actions deploy workflow)
@@ -177,7 +177,7 @@ types/
 ### Phase 6 — Extras (if time)
 - [ ] Tags on entries
 - [ ] Pomodoro mode
-- [ ] Keyboard shortcuts
+- [x] Keyboard shortcuts
 - [ ] CSV export
 
 ---
