@@ -8,6 +8,7 @@ import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { Button } from "@/components/ui/Button";
+import { exportCSV } from "@/lib/csvExport";
 
 export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
@@ -24,7 +25,7 @@ export default function SettingsPage() {
   // suppress unused warning — updateEntry/deleteEntry consumed by EntryList elsewhere
   void updateEntry; void deleteEntry;
 
-  const handleExport = () => {
+  const handleExportJSON = () => {
     const data = {
       exportedAt: new Date().toISOString(),
       version: 1,
@@ -41,6 +42,10 @@ export default function SettingsPage() {
     a.download = `taskpotato-export-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const handleExportCSV = () => {
+    exportCSV(entries, projects, tasks);
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,13 +164,24 @@ export default function SettingsPage() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl divide-y divide-zinc-800">
           <div className="flex items-center justify-between px-4 py-3">
             <div>
-              <p className="text-sm font-medium text-zinc-200">Export data</p>
+              <p className="text-sm font-medium text-zinc-200">Export as JSON</p>
               <p className="text-xs text-zinc-500">
                 Download all projects, tasks, and entries as JSON
               </p>
             </div>
-            <Button variant="ghost" size="sm" onClick={handleExport}>
-              Export
+            <Button variant="ghost" size="sm" onClick={handleExportJSON}>
+              Export JSON
+            </Button>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-zinc-200">Export as CSV</p>
+              <p className="text-xs text-zinc-500">
+                Download completed entries as a spreadsheet
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleExportCSV}>
+              Export CSV
             </Button>
           </div>
           <div className="flex items-center justify-between px-4 py-3">

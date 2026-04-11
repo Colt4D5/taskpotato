@@ -175,10 +175,10 @@ types/
 - [ ] Responsive mobile layout
 
 ### Phase 6 — Extras (if time)
-- [ ] Tags on entries
-- [ ] Pomodoro mode
+- [x] Tags on entries
+- [x] Pomodoro mode
 - [x] Keyboard shortcuts
-- [ ] CSV export
+- [x] CSV export
 
 ---
 

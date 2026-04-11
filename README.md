@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 7 complete**
+🚧 **Active Development — Night 8 complete**
 
 ## Features
 
@@ -38,6 +38,9 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
 - ✅ Theme toggle (light/dark/system)
 - ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, ? for help modal
+- ✅ Tags on entries — tag input on timer, filter by tag on log page, tag breakdown on reports
+- ✅ CSV export — download all completed entries as a spreadsheet (Settings > Data)
+- ✅ Pomodoro mode — 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
 - ⬜ Responsive mobile polish
 - ✅ Tags on entries — add tags while tracking, edit in entry editor, filter log by tag, tag breakdown in reports
 - ⬜ Pomodoro mode
