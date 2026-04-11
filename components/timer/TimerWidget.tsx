@@ -12,7 +12,7 @@ import { formatDurationShort, elapsedMs } from "@/lib/duration";
 import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
 import { TagInput } from "@/components/ui/TagInput";
-
+import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 export function TimerWidget() {
@@ -34,6 +34,7 @@ export function TimerWidget() {
 
   useKeyboardShortcuts({ onToggleTimer: toggle });
 
+  const [showPomodoro, setShowPomodoro] = useState(false);
   const { completedEntries } = useEntries();
   const { addProject } = useProjects();
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -150,10 +151,24 @@ export function TimerWidget() {
         {isRunning ? "Stop" : "Start"}
       </Button>
 
-      {/* Keyboard hint */}
-      <p className="text-xs text-zinc-600">
-        Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400">Enter</kbd> to start/stop
-      </p>
+      {/* Keyboard hint + Pomodoro toggle */}
+      <div className="flex items-center justify-between w-full">
+        <p className="text-xs text-zinc-600">
+          Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400">Enter</kbd> to start/stop
+        </p>
+        <button
+          onClick={() => setShowPomodoro((s) => !s)}
+          className="text-xs text-zinc-500 hover:text-orange-400 transition-colors"
+          title="Toggle Pomodoro timer"
+        >
+          🍅 Pomodoro
+        </button>
+      </div>
+
+      {/* Pomodoro widget */}
+      {showPomodoro && (
+        <PomodoroWidget onClose={() => setShowPomodoro(false)} />
+      )}
 
       {/* Today's Summary */}
       {todayEntries.length > 0 && (

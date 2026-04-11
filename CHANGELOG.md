@@ -2,6 +2,12 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [0.7.0] — 2026-04-11
+
+### Added
+- **Pomodoro mode** — 🍅 toggle on the timer page launches a configurable Pomodoro widget with a circular ring countdown, phase progression (Focus → Short Break → Long Break), session dot tracker, and settings panel (work/break durations, sessions-until-long-break). Runs independently alongside the main timer.
+- **CSV export** — Settings > Data now offers "Export CSV" in addition to JSON export. Generates a spreadsheet with Date, Start, End, Duration, Duration (ms), Project, Task, Description, and Tags columns for all completed entries.
+
 ## [0.4.0] — 2026-04-06
 
 ### Added
