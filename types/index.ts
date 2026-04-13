@@ -31,10 +31,12 @@ export interface AppSettings {
   theme: "light" | "dark" | "system";
   weekStartsOn: 0 | 1;
   defaultView: "timer" | "log" | "reports";
+  idleAlertHours: 0 | 1 | 2 | 4 | 8;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: "system",
   weekStartsOn: 1,
   defaultView: "timer",
+  idleAlertHours: 2,
 };

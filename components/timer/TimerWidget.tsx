@@ -13,12 +13,17 @@ import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
 import { TagInput } from "@/components/ui/TagInput";
 import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
+import { IdleAlert } from "@/components/timer/IdleAlert";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { useIdleDetection } from "@/hooks/useIdleDetection";
+import { useStorage } from "@/hooks/useStorage";
+import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
 export function TimerWidget() {
   const {
     isRunning,
     elapsed,
+    runningEntry,
     selectedProjectId,
     setSelectedProjectId,
     selectedTaskId,
@@ -27,6 +32,7 @@ export function TimerWidget() {
     setNotes,
     tags,
     setTags,
+    stop,
     toggle,
     activeProjects,
     tasks,
@@ -35,8 +41,18 @@ export function TimerWidget() {
   useKeyboardShortcuts({ onToggleTimer: toggle });
 
   const [showPomodoro, setShowPomodoro] = useState(false);
-  const { completedEntries } = useEntries();
+  const [showIdleAlert, setShowIdleAlert] = useState(false);
+  const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
+  const { completedEntries, updateEntry } = useEntries();
   const { addProject } = useProjects();
+
+  const idleThresholdMs = (settings.idleAlertHours ?? 2) * 3_600_000;
+
+  useIdleDetection(
+    runningEntry ?? null,
+    idleThresholdMs,
+    () => setShowIdleAlert(true)
+  );
   const [showProjectForm, setShowProjectForm] = useState(false);
 
   // Today's summary
@@ -228,6 +244,23 @@ export function TimerWidget() {
             })}
           </div>
         </div>
+      )}
+
+      {/* Idle Alert */}
+      {showIdleAlert && runningEntry && (
+        <IdleAlert
+          elapsedMs={elapsed}
+          startedAt={runningEntry.startedAt}
+          onDismiss={() => setShowIdleAlert(false)}
+          onStop={() => {
+            stop();
+            setShowIdleAlert(false);
+          }}
+          onAdjustStart={(newStartMs) => {
+            updateEntry(runningEntry.id, { startedAt: newStartMs });
+            setShowIdleAlert(false);
+          }}
+        />
       )}
 
       {/* New Project Modal */}
