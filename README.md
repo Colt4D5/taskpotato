@@ -41,6 +41,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Tags on entries — tag input on timer, filter by tag on log page, tag breakdown on reports
 - ✅ CSV export — download all completed entries as a spreadsheet (Settings > Data)
 - ✅ Pomodoro mode — 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
+- ✅ Idle detection — configurable alert (1/2/4/8h) if timer runs too long; dismiss, stop, or adjust start time
 - ⬜ Responsive mobile polish
 - ✅ Tags on entries — add tags while tracking, edit in entry editor, filter log by tag, tag breakdown in reports
 - ⬜ Pomodoro mode

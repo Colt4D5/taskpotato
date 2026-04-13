@@ -2,6 +2,16 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [0.8.0] — 2026-04-13
+
+### Added
+- **Idle detection** — timer warns the user if it has been running past a configurable threshold
+  - `useIdleDetection` hook (`hooks/useIdleDetection.ts`) — polls every 30 seconds; fires once per entry id; threshold of 0 disables detection entirely
+  - `IdleAlert` modal (`components/timer/IdleAlert.tsx`) — three actions: dismiss (keep running), stop the timer, or adjust the start time inline with a datetime-local picker and validation
+  - `TimerWidget` — mounts `useIdleDetection` and renders `IdleAlert` when triggered; passes `stop` and `updateEntry` through for the modal actions
+  - Settings page — new "Idle alert" preference row (Disabled / 1h / 2h / 4h / 8h, default 2h); persisted to `AppSettings.idleAlertHours`
+  - `AppSettings` type — `idleAlertHours: 0 | 1 | 2 | 4 | 8` field added; `DEFAULT_SETTINGS` defaults to 2
+
 ## [0.7.0] — 2026-04-11
 
 ### Added
