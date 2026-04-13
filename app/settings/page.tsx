@@ -104,6 +104,28 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between px-4 py-3">
             <div>
+              <p className="text-sm font-medium text-zinc-200">Idle alert</p>
+              <p className="text-xs text-zinc-500">Warn if timer runs longer than</p>
+            </div>
+            <select
+              value={settings.idleAlertHours ?? 2}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  idleAlertHours: Number(e.target.value) as AppSettings["idleAlertHours"],
+                }))
+              }
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            >
+              <option value={0}>Disabled</option>
+              <option value={1}>1 hour</option>
+              <option value={2}>2 hours</option>
+              <option value={4}>4 hours</option>
+              <option value={8}>8 hours</option>
+            </select>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
               <p className="text-sm font-medium text-zinc-200">Week starts on</p>
               <p className="text-xs text-zinc-500">Used in reports</p>
             </div>
