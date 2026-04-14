@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskPotato</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #1a1a1a; --card: #242424; --card-hover: #2c2c2c;
+    --accent: #E8763A; --accent-dim: rgba(232,118,58,0.15);
+    --text: #e8e8e8; --text-muted: #888; --border: #333; --danger: #e85a3a;
+  }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; }
+  #summary-bar { position: sticky; top: 0; z-index: 100; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; gap: 16px; }
+  #summary-bar .logo { font-weight: 700; font-size: 16px; color: var(--accent); letter-spacing: -0.3px; flex-shrink: 0; }
+  #summary-bar .stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; align-items: flex-end; }
+  .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .stat-value { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  #add-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; flex-shrink: 0; }
+  #add-btn:hover { opacity: 0.85; }
+  #main { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+  #chart-section { margin-bottom: 24px; }
+  #chart-toggle { background: none; border: 1px solid var(--border); color: var(--text-muted); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer; transition: border-color 0.15s, color 0.15s; width: 100%; text-align: left; }
+  #chart-toggle:hover { border-color: var(--accent); color: var(--text); }
+  #chart-container { margin-top: 12px; background: var(--card); border-radius: 8px; padding: 20px; display: none; }
+  #chart-container.visible { display: block; }
+  #pie-chart { max-width: 320px; margin: 0 auto; display: block; }
+  #empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  #empty-state .potato { font-size: 48px; margin-bottom: 12px; }
+  #empty-state h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  #empty-state p { font-size: 13px; }
+  #empty-state kbd { display: inline-block; background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 12px; font-family: monospace; }
+  .day-section { margin-bottom: 24px; }
+  .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .day-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .day-total { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .task-card { background: var(--card); border-radius: 8px; padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; transition: border-color 0.15s, background 0.15s; cursor: grab; user-select: none; }
+  .task-card:hover { background: var(--card-hover); }
+  .task-card.active { border-color: var(--accent); background: var(--accent-dim); }
+  .task-card.drag-over { border-color: var(--accent); opacity: 0.7; }
+  .drag-handle { color: var(--border); font-size: 16px; flex-shrink: 0; line-height: 1; padding: 0 2px; }
+  .drag-handle:hover { color: var(--text-muted); }
+  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: pulse 1.5s infinite; }
+  .pulse-dot.hidden { visibility: hidden; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+  .task-info { flex: 1; min-width: 0; }
+  .task-title { font-weight: 500; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .task-desc { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .task-time { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-muted); flex-shrink: 0; min-width: 64px; text-align: right; }
+  .task-card.active .task-time { color: var(--accent); }
+  .task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .icon-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px 6px; border-radius: 4px; font-size: 13px; transition: background 0.1s, color 0.1s; line-height: 1; }
+  .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+  .icon-btn.start { color: var(--accent); }
+  .icon-btn.stop { color: var(--accent); }
+  .icon-btn.danger:hover { background: rgba(232,90,58,0.15); color: var(--danger); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .modal-overlay.visible { opacity: 1; pointer-events: all; }
+  .modal { background: var(--card); border-radius: 10px; padding: 24px; width: 100%; max-width: 420px; border: 1px solid var(--border); transform: translateY(8px); transition: transform 0.15s; }
+  .modal-overlay.visible .modal { transform: translateY(0); }
+  .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .field input, .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 8px 10px; font-size: 14px; font-family: inherit; transition: border-color 0.15s; outline: none; }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field input.error { border-color: var(--danger); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .btn { border: none; border-radius: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: rgba(255,255,255,0.07); color: var(--text); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  #confirm-overlay { z-index: 300; }
+</style>
+</head>
+<body>
+
+<div id="summary-bar">
+  <div class="logo">&#x1F954; TaskPotato</div>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-label">Today</span>
+      <span class="stat-value" id="stat-today">0:00:00</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">All Time</span>
+      <span class="stat-value" id="stat-alltime">0:00:00</span>
+    </div>
+  </div>
+  <button id="add-btn" onclick="openNewTaskModal()">+ New Task</button>
+</div>
+
+<div id="main">
+  <div id="chart-section">
+    <button id="chart-toggle" onclick="toggleChart()">&#9658; Time Distribution</button>
+    <div id="chart-container">
+      <canvas id="pie-chart"></canvas>
+    </div>
+  </div>
+  <div id="task-list"></div>
+  <div id="empty-state" style="display:none">
+    <div class="potato">&#x1F954;</div>
+    <h2>No tasks yet</h2>
+    <p>Press <kbd>N</kbd> or click <strong>+ New Task</strong> to get started.</p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="task-modal" onclick="handleModalOverlayClick(event)">
+  <div class="modal">
+    <h2 id="modal-title">New Task</h2>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" id="input-title" placeholder="What are you working on?" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Description <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+      <textarea id="input-desc" placeholder="Brief description..."></textarea>
+    </div>
+    <div class="field" id="field-time" style="display:none">
+      <label>Elapsed Time (HH:MM:SS)</label>
+      <input type="text" id="input-time" placeholder="0:00:00">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeTaskModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveTask()">Create Task</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="confirm-overlay">
+  <div class="modal">
+    <h2 id="confirm-title">Delete Task?</h2>
+    <p id="confirm-body" style="color:var(--text-muted);font-size:13px;margin-bottom:18px"></p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmAction()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TASKS_KEY = 'taskpotato_tasks';
+const ACTIVE_KEY = 'taskpotato_active';
+let tasks = [], active = null, editingTaskId = null, confirmCallback = null, chartInstance = null, tickInterval = null;
+
+function loadData() {
+  try { tasks = JSON.parse(localStorage.getItem(TASKS_KEY)) || []; } catch(e) { tasks = []; }
+  try { active = JSON.parse(localStorage.getItem(ACTIVE_KEY)); } catch(e) { active = null; }
+  if (active) {
+    const task = tasks.find(t => t.id === active.taskId);
+    if (task) {
+      task.totalMs += Date.now() - active.startedAt;
+      active.startedAt = Date.now();
+      saveTasks(); saveActive();
+    } else { active = null; localStorage.removeItem(ACTIVE_KEY); }
+  }
+}
+function saveTasks() { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); }
+function saveActive() { if (active) localStorage.setItem(ACTIVE_KEY, JSON.stringify(active)); else localStorage.removeItem(ACTIVE_KEY); }
+
+function msToHMS(ms) {
+  const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return h + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+function hmsToMs(str) {
+  const parts = str.trim().split(':').map(Number);
+  if (parts.some(isNaN)) return null;
+  if (parts.length === 3) return ((parts[0]*3600)+(parts[1]*60)+parts[2])*1000;
+  if (parts.length === 2) return ((parts[0]*60)+parts[1])*1000;
+  if (parts.length === 1) return parts[0]*1000;
+  return null;
+}
+function formatDate(isoStr) {
+  const d = new Date(isoStr), today = new Date(), yesterday = new Date(today);
+  yesterday.setDate(today.getDate()-1);
+  if (d.toDateString()===today.toDateString()) return 'Today';
+  if (d.toDateString()===yesterday.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+}
+function dayKey(isoStr) { return isoStr.slice(0,10); }
+function todayKey() { return new Date().toISOString().slice(0,10); }
+function liveMs(task) { let ms = task.totalMs; if (active && active.taskId===task.id) ms += Date.now()-active.startedAt; return ms; }
+
+function updateSummary() {
+  const tKey = todayKey(); let allTime = 0, todayTime = 0;
+  for (const t of tasks) { const ms = liveMs(t); allTime += ms; if (dayKey(t.createdAt)===tKey) todayTime += ms; }
+  document.getElementById('stat-alltime').textContent = msToHMS(allTime);
+  document.getElementById('stat-today').textContent = msToHMS(todayTime);
+}
+function updateTitle() {
+  if (active) { const task = tasks.find(t=>t.id===active.taskId); if (task) { document.title = '\u23F1 '+task.title+' \u2014 '+msToHMS(liveMs(task))+' | TaskPotato'; return; } }
+  document.title = 'TaskPotato';
+}
+function startTick() {
+  if (tickInterval) return;
+  tickInterval = setInterval(() => {
+    updateSummary(); updateTitle();
+    if (active) { const el = document.querySelector('[data-id="'+active.taskId+'"] .task-time'); if (el) { const task = tasks.find(t=>t.id===active.taskId); if (task) el.textContent = msToHMS(liveMs(task)); } }
+  }, 1000);
+}
+function stopTick() { if (tickInterval) { clearInterval(tickInterval); tickInterval = null; } }
+
+function startTimer(taskId) {
+  if (active) stopTimer();
+  active = { taskId, startedAt: Date.now() };
+  saveActive(); startTick(); renderTaskList(); updateSummary();
+}
+function stopTimer() {
+  if (!active) return;
+  const task = tasks.find(t=>t.id===active.taskId);
+  if (task) { task.totalMs += Date.now()-active.startedAt; saveTasks(); }
+  active = null; saveActive(); stopTick(); updateTitle();
+}
+
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderTaskList() {
+  const container = document.getElementById('task-list'), empty = document.getElementById('empty-state');
+  if (tasks.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; updateChart(); return; }
+  empty.style.display = 'none';
+  const groups = {};
+  for (const t of tasks) { const k = dayKey(t.createdAt); if (!groups[k]) groups[k]=[]; groups[k].push(t); }
+  const sortedDays = Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  let html = '';
+  for (const day of sortedDays) {
+    const dayTasks = groups[day].sort((a,b)=>a.order-b.order);
+    const dayMs = dayTasks.reduce((sum,t)=>sum+liveMs(t),0);
+    html += '<div class="day-section" data-day="'+day+'"><div class="day-header"><span class="day-label">'+formatDate(dayTasks[0].createdAt)+'</span><span class="day-total">'+msToHMS(dayMs)+'</span></div><div class="day-tasks" data-day="'+day+'">';
+    for (const t of dayTasks) { const isActive = active && active.taskId===t.id; html += renderCard(t, isActive); }
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
+  attachDragHandlers();
+  updateChart();
+}
+
+function renderCard(t, isActive) {
+  const ms = liveMs(t);
+  return '<div class="task-card'+(isActive?' active':'')+'" data-id="'+t.id+'" draggable="true">'
+    +'<span class="drag-handle">&#10783;</span>'
+    +'<span class="pulse-dot'+(isActive?'':' hidden')+'"></span>'
+    +'<div class="task-info"><div class="task-title">'+esc(t.title)+'</div>'+(t.description?'<div class="task-desc">'+esc(t.description)+'</div>':'')+'</div>'
+    +'<span class="task-time">'+msToHMS(ms)+'</span>'
+    +'<div class="task-actions">'
+    +(isActive?'<button class="icon-btn stop" title="Stop" onclick="handleStop(event,\''+t.id+'\')">&#9209;</button>':'<button class="icon-btn start" title="Start" onclick="handleStart(event,\''+t.id+'\')">&#9654;</button>')
+    +'<button class="icon-btn" title="Edit" onclick="openEditModal(event,\''+t.id+'\')">&#9998;</button>'
+    +'<button class="icon-btn danger" title="Delete" onclick="openDelete(event,\''+t.id+'\')">&#128465;</button>'
+    +'</div></div>';
+}
+
+function handleStart(e, taskId) { e.stopPropagation(); startTimer(taskId); }
+function handleStop(e, taskId) { e.stopPropagation(); stopTimer(); renderTaskList(); updateSummary(); }
+
+let dragSrcId = null;
+function attachDragHandlers() {
+  document.querySelectorAll('.task-card').forEach(card => {
+    card.addEventListener('dragstart', e => { dragSrcId = card.dataset.id; e.dataTransfer.effectAllowed='move'; setTimeout(()=>card.style.opacity='0.4',0); });
+    card.addEventListener('dragend', () => { card.style.opacity=''; document.querySelectorAll('.task-card').forEach(c=>c.classList.remove('drag-over')); });
+    card.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect='move'; if (card.dataset.id!==dragSrcId) card.classList.add('drag-over'); });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault(); card.classList.remove('drag-over');
+      if (!dragSrcId || dragSrcId===card.dataset.id) return;
+      const srcTask = tasks.find(t=>t.id===dragSrcId), dstTask = tasks.find(t=>t.id===card.dataset.id);
+      if (!srcTask || !dstTask || dayKey(srcTask.createdAt)!==dayKey(dstTask.createdAt)) return;
+      const tmp = srcTask.order; srcTask.order = dstTask.order; dstTask.order = tmp;
+      saveTasks(); renderTaskList();
+    });
+  });
+}
+
+function toggleChart() {
+  const container = document.getElementById('chart-container'), btn = document.getElementById('chart-toggle');
+  container.classList.toggle('visible');
+  btn.textContent = container.classList.contains('visible') ? '\u25BC Time Distribution' : '\u25B6 Time Distribution';
+  if (container.classList.contains('visible')) updateChart();
+}
+function updateChart() {
+  if (!document.getElementById('chart-container').classList.contains('visible')) return;
+  const filtered = tasks.filter(t=>liveMs(t)>0), canvas = document.getElementById('pie-chart');
+  if (filtered.length === 0) { if (chartInstance) { chartInstance.destroy(); chartInstance=null; } canvas.style.display='none'; return; }
+  canvas.style.display='block';
+  const labels=filtered.map(t=>t.title), data=filtered.map(t=>liveMs(t)), colors=filtered.map((_,i)=>'hsl('+(i*47+20)%360+',65%,55%)');
+  if (chartInstance) { chartInstance.data.labels=labels; chartInstance.data.datasets[0].data=data; chartInstance.data.datasets[0].backgroundColor=colors; chartInstance.update(); }
+  else {
+    chartInstance = new Chart(canvas, {
+      type:'pie', data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#1a1a1a',borderWidth:2}]},
+      options:{responsive:true,plugins:{legend:{labels:{color:'#e8e8e8',font:{size:12}}},tooltip:{callbacks:{label:ctx=>' '+ctx.label+': '+msToHMS(ctx.raw)}}}}
+    });
+  }
+}
+
+function openNewTaskModal() {
+  editingTaskId = null;
+  document.getElementById('modal-title').textContent='New Task';
+  document.getElementById('input-title').value='';
+  document.getElementById('input-desc').value='';
+  document.getElementById('field-time').style.display='none';
+  document.getElementById('modal-save-btn').textContent='Create Task';
+  document.getElementById('input-title').classList.remove('error');
+  document.getElementById('task-modal').classList.add('visible');
+  setTimeout(()=>document.getElementById('input-title').focus(),50);
+}
+function openEditModal(e, taskId) {
+  e.stopPropagation();
+  const task = tasks.find(t=>t.id===taskId); if (!task) return;
+  editingTaskId = taskId;
+  document.getElementById('modal-title').textContent='Edit Task';
+  document.getElementById('input-title').value=task.title;
+  document.getElementById('input-desc').value=task.description||'';
+  document.getElementById('input-time').value=msToHMS(task.totalMs);
+  document.getElementById('field-time').style.display='block';
+  document.getElementById('modal-save-btn').textContent='Save';
+  document.getElementById('input-title').classList.remove('error');
+  document.getElementById('task-modal').classList.add('visible');
+  setTimeout(()=>document.getElementById('input-title').focus(),50);
+}
+function closeTaskModal() { document.getElementById('task-modal').classList.remove('visible'); }
+function handleModalOverlayClick(e) { if (e.target===document.getElementById('task-modal')) closeTaskModal(); }
+function saveTask() {
+  const title = document.getElementById('input-title').value.trim(), desc = document.getElementById('input-desc').value.trim(), titleInput = document.getElementById('input-title');
+  if (!title) { titleInput.classList.add('error'); titleInput.focus(); return; }
+  titleInput.classList.remove('error');
+  if (editingTaskId) {
+    const task = tasks.find(t=>t.id===editingTaskId);
+    if (task) { task.title=title; task.description=desc; const ms=hmsToMs(document.getElementById('input-time').value); if (ms!==null) task.totalMs=ms; saveTasks(); }
+  } else {
+    const maxOrder = tasks.length>0 ? Math.max(...tasks.map(t=>t.order))+1 : 0;
+    tasks.push({ id:crypto.randomUUID(), title, description:desc, totalMs:0, createdAt:new Date().toISOString(), order:maxOrder });
+    saveTasks();
+  }
+  closeTaskModal(); renderTaskList(); updateSummary();
+}
+
+function openDelete(e, taskId) {
+  e.stopPropagation();
+  const task = tasks.find(t=>t.id===taskId); if (!task) return;
+  document.getElementById('confirm-title').textContent='Delete Task?';
+  document.getElementById('confirm-body').textContent='"'+task.title+'" will be permanently deleted.';
+  confirmCallback = ()=>deleteTask(taskId);
+  document.getElementById('confirm-overlay').classList.add('visible');
+}
+function closeConfirm() { document.getElementById('confirm-overlay').classList.remove('visible'); confirmCallback=null; }
+function confirmAction() { if (confirmCallback) confirmCallback(); closeConfirm(); }
+function deleteTask(taskId) {
+  if (active && active.taskId===taskId) { active=null; saveActive(); stopTick(); updateTitle(); }
+  tasks = tasks.filter(t=>t.id!==taskId);
+  saveTasks(); renderTaskList(); updateSummary();
+}
+
+document.addEventListener('keydown', e => {
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag==='INPUT'||tag==='TEXTAREA') return;
+  if (e.key==='n'||e.key==='N') { e.preventDefault(); openNewTaskModal(); }
+  if (e.key==='Escape') { closeTaskModal(); closeConfirm(); }
+});
+document.getElementById('input-title').addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); saveTask(); } });
+
+loadData(); renderTaskList(); updateSummary(); updateTitle();
+if (active) startTick();
+</script>
+</body>
+</html>
