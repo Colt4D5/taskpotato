@@ -61,6 +61,7 @@ export function EntryEditor({
   );
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>(entry.tags ?? []);
+  const [billable, setBillable] = useState(entry.billable ?? true);
 
   useEffect(() => {
     if (open) {
@@ -72,6 +73,7 @@ export function EntryEditor({
       setStopDate(entry.stoppedAt ? toDateInput(entry.stoppedAt) : "");
       setStopTime(entry.stoppedAt ? toTimeInput(entry.stoppedAt) : "");
       setTags(entry.tags ?? []);
+      setBillable(entry.billable ?? true);
       setError(null);
     }
   }, [open, entry]);
@@ -113,6 +115,7 @@ export function EntryEditor({
       startedAt: newStartedAt,
       stoppedAt: newStoppedAt,
       tags,
+      billable,
     });
   };
 
@@ -132,6 +135,25 @@ export function EntryEditor({
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Tags</label>
           <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" />
+        </div>
+
+        {/* Billable toggle */}
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-zinc-400">Billable</label>
+          <button
+            type="button"
+            onClick={() => setBillable((b) => !b)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+              billable ? "bg-orange-500" : "bg-zinc-700"
+            }`}
+            aria-label="Toggle billable"
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                billable ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
         </div>
 
         {/* Start date/time */}

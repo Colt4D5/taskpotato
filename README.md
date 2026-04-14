@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 8 complete**
+🚧 **Active Development — Night 9 complete**
 
 ## Features
 
@@ -42,9 +42,8 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ CSV export — download all completed entries as a spreadsheet (Settings > Data)
 - ✅ Pomodoro mode — 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
 - ✅ Idle detection — configurable alert (1/2/4/8h) if timer runs too long; dismiss, stop, or adjust start time
+- ✅ Billable / non-billable flag on entries — toggle on timer, edit in entry editor, badge in log, breakdown in reports, column in CSV export
 - ⬜ Responsive mobile polish
-- ✅ Tags on entries — add tags while tracking, edit in entry editor, filter log by tag, tag breakdown in reports
-- ⬜ Pomodoro mode
 
 ## Tech Stack
 

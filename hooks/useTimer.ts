@@ -15,6 +15,7 @@ export function useTimer() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [billable, setBillable] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const isRunning = runningEntry !== null;
@@ -38,7 +39,7 @@ export function useTimer() {
 
   const start = () => {
     if (isRunning) return;
-    startEntry(selectedProjectId, selectedTaskId, notes, tags);
+    startEntry(selectedProjectId, selectedTaskId, notes, tags, billable);
   };
 
   const stop = () => {
@@ -46,6 +47,7 @@ export function useTimer() {
     stopEntry(runningEntry.id);
     setNotes("");
     setTags([]);
+    setBillable(true);
   };
 
   const toggle = () => (isRunning ? stop() : start());
@@ -64,6 +66,8 @@ export function useTimer() {
     setNotes,
     tags,
     setTags,
+    billable,
+    setBillable,
     start,
     stop,
     toggle,
