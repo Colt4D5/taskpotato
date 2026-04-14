@@ -58,6 +58,9 @@ export function EntryRow({
             {entry.tags && entry.tags.length > 0 && entry.tags.map((tag) => (
               <span key={tag} className="text-xs bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded-full">#{tag}</span>
             ))}
+            {!entry.billable && (
+              <span className="text-xs bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full border border-zinc-700">non-billable</span>
+            )}
           </div>
           <div className="text-xs text-zinc-500 mt-0.5">
             {formatTime(entry.startedAt)}

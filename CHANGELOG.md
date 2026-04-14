@@ -2,6 +2,18 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [0.9.0] — 2026-04-14
+
+### Added
+- **Billable / non-billable tracking** — mark time entries as billable or non-billable at every stage of the workflow
+  - `TimeEntry.billable` — new `boolean` field (defaults `true` for all new entries; legacy entries without the field treated as billable at render time)
+  - `useTimer` / `useEntries.startEntry()` — `billable` state in timer hook; passed into new entry on start; reset to `true` on stop
+  - `TimerWidget` — toggle switch ("Billable") above the Start/Stop button; disabled while timer is running
+  - `EntryRow` — "non-billable" pill badge shown inline next to tags when entry is non-billable
+  - `EntryEditor` — billable toggle switch in the edit modal; saved on update
+  - Reports page — new **Billable vs Non-Billable** section below the week total card; stacked horizontal bar + per-row breakdown with percentage and formatted duration; only renders when there is tracked time
+  - CSV export — new `Billable` column (Yes/No) appended to each row
+
 ## [0.8.0] — 2026-04-13
 
 ### Added

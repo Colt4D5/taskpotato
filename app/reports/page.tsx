@@ -101,6 +101,12 @@ export default function ReportsPage() {
   }
   const sortedTags = Array.from(tagMs.entries()).sort((a, b) => b[1] - a[1]);
 
+  // Billable breakdown
+  const billableMs = weekEntries
+    .filter((e) => e.billable !== false)
+    .reduce((sum, e) => sum + elapsedMs(e.startedAt, e.stoppedAt), 0);
+  const nonBillableMs = totalWeekMs - billableMs;
+
   const sortedTasks = Array.from(taskMs.entries()).sort((a, b) => b[1] - a[1]);
 
   const isCurrentWeek = weekOffset === 0;
@@ -153,6 +159,58 @@ export default function ReportsPage() {
         </div>
         <p className="text-xs text-zinc-600">{weekLabel}</p>
       </div>
+
+      {/* Billable vs Non-billable */}
+      {totalWeekMs > 0 && (
+        <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">
+          <h2 className="text-sm font-semibold text-zinc-400 mb-4 uppercase tracking-wider">
+            Billable vs Non-Billable
+          </h2>
+          <div className="flex flex-col gap-3">
+            {/* Stacked bar */}
+            <div className="flex h-3 rounded-full overflow-hidden bg-zinc-800 w-full">
+              {billableMs > 0 && (
+                <div
+                  className="h-full bg-orange-500 transition-all"
+                  style={{ width: `${(billableMs / totalWeekMs) * 100}%` }}
+                />
+              )}
+              {nonBillableMs > 0 && (
+                <div
+                  className="h-full bg-zinc-600 transition-all"
+                  style={{ width: `${(nonBillableMs / totalWeekMs) * 100}%` }}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500" />
+                <span className="text-sm text-zinc-300">Billable</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-zinc-500">
+                  {totalWeekMs > 0 ? Math.round((billableMs / totalWeekMs) * 100) : 0}%
+                </span>
+                <span className="text-sm font-mono text-zinc-300">{formatDurationShort(billableMs)}</span>
+              </div>
+            </div>
+            {nonBillableMs > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-zinc-600" />
+                  <span className="text-sm text-zinc-300">Non-Billable</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-zinc-500">
+                    {Math.round((nonBillableMs / totalWeekMs) * 100)}%
+                  </span>
+                  <span className="text-sm font-mono text-zinc-300">{formatDurationShort(nonBillableMs)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Bar chart */}
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">

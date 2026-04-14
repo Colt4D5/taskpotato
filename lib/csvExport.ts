@@ -30,6 +30,7 @@ export function exportCSV(
     "Task",
     "Description",
     "Tags",
+    "Billable",
   ];
 
   const rows = entries
@@ -49,6 +50,7 @@ export function exportCSV(
         task?.name ?? "",
         e.notes ?? "",
         (e.tags ?? []).join("; "),
+        e.billable === false ? "No" : "Yes",
       ].map(escapeCSV).join(",");
     });
 

@@ -32,6 +32,8 @@ export function TimerWidget() {
     setNotes,
     tags,
     setTags,
+    billable,
+    setBillable,
     stop,
     toggle,
     activeProjects,
@@ -155,6 +157,26 @@ export function TimerWidget() {
           disabled={isRunning}
           placeholder="Add tags (Enter or comma)…"
         />
+      </div>
+
+      {/* Billable toggle */}
+      <div className="w-full flex items-center justify-between">
+        <span className="text-sm text-zinc-400">Billable</span>
+        <button
+          type="button"
+          onClick={() => !isRunning && setBillable((b) => !b)}
+          disabled={isRunning}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+            billable ? "bg-orange-500" : "bg-zinc-700"
+          }`}
+          aria-label="Toggle billable"
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+              billable ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
       </div>
 
       {/* Start / Stop */}
