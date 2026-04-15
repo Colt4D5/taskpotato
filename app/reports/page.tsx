@@ -8,6 +8,8 @@ import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { startOfWeek } from "@/lib/dateUtils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { computeStreaks } from "@/lib/streaks";
+import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
 
 function getWeekDays(weekStart: Date): { label: string; date: Date }[] {
   const days = [];
@@ -109,6 +111,9 @@ export default function ReportsPage() {
 
   const sortedTasks = Array.from(taskMs.entries()).sort((a, b) => b[1] - a[1]);
 
+  // Streak stats (all-time, not week-scoped)
+  const streakStats = computeStreaks(completedEntries);
+
   const isCurrentWeek = weekOffset === 0;
 
   const weekLabel = `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(weekEnd.getTime() - 1).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
@@ -116,6 +121,35 @@ export default function ReportsPage() {
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-semibold text-zinc-100 mb-6">Reports</h1>
+
+      {/* Streak stats */}
+      {streakStats.totalActiveDays > 0 && (
+        <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">
+          <h2 className="text-sm font-semibold text-zinc-400 mb-4 uppercase tracking-wider">
+            Activity
+          </h2>
+          <div className="flex items-center gap-6 mb-5">
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-orange-400">
+                {streakStats.currentStreak}
+                <span className="text-lg ml-0.5">🔥</span>
+              </p>
+              <p className="text-xs text-zinc-500 mt-0.5">Current streak</p>
+            </div>
+            <div className="w-px h-10 bg-zinc-800" />
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-zinc-200">{streakStats.longestStreak}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Longest streak</p>
+            </div>
+            <div className="w-px h-10 bg-zinc-800" />
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-zinc-200">{streakStats.totalActiveDays}</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Active days</p>
+            </div>
+          </div>
+          <ActivityHeatmap stats={streakStats} />
+        </section>
+      )}
 
       {/* Week navigator */}
       <div className="flex items-center justify-between mb-6">

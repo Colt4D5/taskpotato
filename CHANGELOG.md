@@ -2,7 +2,15 @@
 
 All notable changes to TaskPotato are documented here.
 
-## [0.9.0] — 2026-04-14
+## [1.0.0] — 2026-04-15
+
+### Added
+- **Streak tracking & activity heatmap** — all-time tracking habit visualization on the Reports page
+  - `lib/streaks.ts` — `computeStreaks()` utility; derives `currentStreak`, `longestStreak`, total active days, and a `dailyMs` map (YYYY-MM-DD → ms) from all completed entries; handles streak starting from today or yesterday (so logging yesterday doesn't break a streak on days where nothing has been tracked yet today)
+  - `components/reports/ActivityHeatmap.tsx` — GitHub-style 16-week contribution heatmap; 5-level orange intensity scale (none → <30 min → <2h → <4h → 4h+); day-of-week row labels; month column labels; hover tooltip shows date + formatted duration
+  - Reports page — new **Activity** section at the top (only renders when at least one entry exists); shows current streak with 🔥 icon, longest streak, and total active days as stat cards above the heatmap
+
+
 
 ### Added
 - **Billable / non-billable tracking** — mark time entries as billable or non-billable at every stage of the workflow

@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 9 complete**
+🚧 **Active Development — Night 10 complete**
 
 ## Features
 
@@ -43,6 +43,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Pomodoro mode — 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
 - ✅ Idle detection — configurable alert (1/2/4/8h) if timer runs too long; dismiss, stop, or adjust start time
 - ✅ Billable / non-billable flag on entries — toggle on timer, edit in entry editor, badge in log, breakdown in reports, column in CSV export
+- ✅ Streak tracking — current streak, longest streak, active days, and a 16-week activity heatmap on the Reports page
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
