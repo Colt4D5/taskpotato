@@ -2,6 +2,17 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.1.0] — 2026-04-16
+
+### Added
+- **Time rounding on stop** — automatically round stop time to the nearest 5, 10, or 15 minutes when the timer is stopped
+  - `roundTimestamp(ts, minutes)` utility added to `lib/duration.ts` — rounds a Unix timestamp to the nearest interval; no-op when `minutes === 0`
+  - `AppSettings.timeRounding: 0 | 5 | 10 | 15` — new preference field; default `0` (disabled); legacy settings without the field fall back to disabled
+  - `useEntries.stopEntry()` — accepts an optional `stoppedAt` override so callers control the final timestamp
+  - `useTimer.stop()` — reads `settings.timeRounding`, computes the rounded stop timestamp, and passes it to `stopEntry`
+  - `TimerWidget` — subtle hint text below the Stop button when rounding is active ("⏱ Stop time rounds to nearest N min")
+  - Settings page — new **Time rounding** preference row (Disabled / 5 minutes / 10 minutes / 15 minutes) in the Preferences section
+
 ## [1.0.0] — 2026-04-15
 
 ### Added

@@ -104,6 +104,27 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between px-4 py-3">
             <div>
+              <p className="text-sm font-medium text-zinc-200">Time rounding</p>
+              <p className="text-xs text-zinc-500">Round stop time to nearest interval on stop</p>
+            </div>
+            <select
+              value={settings.timeRounding ?? 0}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  timeRounding: Number(e.target.value) as AppSettings["timeRounding"],
+                }))
+              }
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            >
+              <option value={0}>Disabled</option>
+              <option value={5}>5 minutes</option>
+              <option value={10}>10 minutes</option>
+              <option value={15}>15 minutes</option>
+            </select>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
               <p className="text-sm font-medium text-zinc-200">Idle alert</p>
               <p className="text-xs text-zinc-500">Warn if timer runs longer than</p>
             </div>

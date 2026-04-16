@@ -4,11 +4,15 @@ import { useState, useEffect, useRef } from "react";
 import { useEntries } from "./useEntries";
 import { useProjects } from "./useProjects";
 import { useTasks } from "./useTasks";
+import { useStorage } from "./useStorage";
+import { AppSettings, DEFAULT_SETTINGS } from "@/types";
+import { roundTimestamp } from "@/lib/duration";
 
 export function useTimer() {
   const { runningEntry, startEntry, stopEntry } = useEntries();
   const { activeProjects } = useProjects();
   const { getTasksForProject } = useTasks();
+  const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
 
   const [elapsed, setElapsed] = useState(0);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
@@ -44,7 +48,9 @@ export function useTimer() {
 
   const stop = () => {
     if (!runningEntry) return;
-    stopEntry(runningEntry.id);
+    const rounding = settings.timeRounding ?? 0;
+    const stoppedAt = roundTimestamp(Date.now(), rounding);
+    stopEntry(runningEntry.id, stoppedAt);
     setNotes("");
     setTags([]);
     setBillable(true);
@@ -73,5 +79,6 @@ export function useTimer() {
     toggle,
     activeProjects,
     tasks,
+    timeRounding: settings.timeRounding ?? 0,
   };
 }
