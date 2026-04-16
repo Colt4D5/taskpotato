@@ -22,3 +22,13 @@ export function formatDurationShort(ms: number): string {
 export function elapsedMs(startedAt: number, stoppedAt: number | null): number {
   return (stoppedAt ?? Date.now()) - startedAt;
 }
+
+/**
+ * Round a timestamp to the nearest `minutes` boundary.
+ * Pass 0 to skip rounding.
+ */
+export function roundTimestamp(ts: number, minutes: 0 | 5 | 10 | 15): number {
+  if (minutes === 0) return ts;
+  const intervalMs = minutes * 60 * 1000;
+  return Math.round(ts / intervalMs) * intervalMs;
+}

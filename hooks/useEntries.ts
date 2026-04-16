@@ -47,11 +47,12 @@ export function useEntries() {
   );
 
   const stopEntry = useCallback(
-    (id: string) => {
+    (id: string, stoppedAt?: number) => {
+      const ts = stoppedAt ?? Date.now();
       setEntries((prev) =>
         prev.map((e) =>
           e.id === id && e.stoppedAt === null
-            ? { ...e, stoppedAt: Date.now() }
+            ? { ...e, stoppedAt: ts }
             : e
         )
       );

@@ -38,6 +38,7 @@ export function TimerWidget() {
     toggle,
     activeProjects,
     tasks,
+    timeRounding,
   } = useTimer();
 
   useKeyboardShortcuts({ onToggleTimer: toggle });
@@ -188,6 +189,13 @@ export function TimerWidget() {
       >
         {isRunning ? "Stop" : "Start"}
       </Button>
+
+      {/* Rounding indicator */}
+      {timeRounding > 0 && (
+        <p className="text-xs text-zinc-500 -mt-3">
+          ⏱ Stop time rounds to nearest {timeRounding} min
+        </p>
+      )}
 
       {/* Keyboard hint + Pomodoro toggle */}
       <div className="flex items-center justify-between w-full">

@@ -33,6 +33,7 @@ export interface AppSettings {
   weekStartsOn: 0 | 1;
   defaultView: "timer" | "log" | "reports";
   idleAlertHours: 0 | 1 | 2 | 4 | 8;
+  timeRounding: 0 | 5 | 10 | 15;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -40,4 +41,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   weekStartsOn: 1,
   defaultView: "timer",
   idleAlertHours: 2,
+  timeRounding: 0,
 };
