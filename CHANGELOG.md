@@ -2,7 +2,16 @@
 
 All notable changes to TaskPotato are documented here.
 
-## [1.1.0] — 2026-04-16
+## [1.2.0] — 2026-04-17
+
+### Added
+- **Weekly goal tracking** — set a target hours/week and track progress on the Reports page
+  - `AppSettings.weeklyGoalHours: number` — new preference field; default `0` (disabled); any positive value enables the feature
+  - `WeeklyGoalProgress` component (`components/reports/WeeklyGoalProgress.tsx`) — progress bar that fills as the week's logged time approaches the goal; turns green on completion; shows time remaining (current week) or "goal not reached" (past weeks); displays overage when exceeded; renders percentage complete below the bar
+  - Reports page — `WeeklyGoalProgress` card inserted between the week total and the billable breakdown; only rendered when a goal is set
+  - Settings page — new **Weekly goal** preference row in the Preferences section; numeric input (0–168h); `0` disables the feature
+
+
 
 ### Added
 - **Time rounding on stop** — automatically round stop time to the nearest 5, 10, or 15 minutes when the timer is stopped

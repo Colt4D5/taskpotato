@@ -104,6 +104,27 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between px-4 py-3">
             <div>
+              <p className="text-sm font-medium text-zinc-200">Weekly goal</p>
+              <p className="text-xs text-zinc-500">Target hours per week (shown in Reports)</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={0}
+                max={168}
+                step={1}
+                value={settings.weeklyGoalHours ?? 0}
+                onChange={(e) => {
+                  const val = Math.max(0, Math.min(168, Number(e.target.value)));
+                  setSettings((s) => ({ ...s, weeklyGoalHours: val }));
+                }}
+                className="w-20 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-zinc-100 text-sm text-right focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+              />
+              <span className="text-sm text-zinc-500">h</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
               <p className="text-sm font-medium text-zinc-200">Time rounding</p>
               <p className="text-xs text-zinc-500">Round stop time to nearest interval on stop</p>
             </div>
