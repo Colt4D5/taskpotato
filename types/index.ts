@@ -34,6 +34,7 @@ export interface AppSettings {
   defaultView: "timer" | "log" | "reports";
   idleAlertHours: 0 | 1 | 2 | 4 | 8;
   timeRounding: 0 | 5 | 10 | 15;
+  weeklyGoalHours: number; // 0 = disabled
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -42,4 +43,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   defaultView: "timer",
   idleAlertHours: 2,
   timeRounding: 0,
+  weeklyGoalHours: 0,
 };

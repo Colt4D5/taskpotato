@@ -10,6 +10,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { computeStreaks } from "@/lib/streaks";
 import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
+import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
+import { useStorage } from "@/hooks/useStorage";
+import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
 function getWeekDays(weekStart: Date): { label: string; date: Date }[] {
   const days = [];
@@ -34,6 +37,7 @@ export default function ReportsPage() {
   const { completedEntries } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
+  const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
 
   const [weekOffset, setWeekOffset] = useState(0);
 
@@ -193,6 +197,15 @@ export default function ReportsPage() {
         </div>
         <p className="text-xs text-zinc-600">{weekLabel}</p>
       </div>
+
+      {/* Weekly goal progress */}
+      {(settings.weeklyGoalHours ?? 0) > 0 && (
+        <WeeklyGoalProgress
+          totalMs={totalWeekMs}
+          goalHours={settings.weeklyGoalHours}
+          isCurrentWeek={isCurrentWeek}
+        />
+      )}
 
       {/* Billable vs Non-billable */}
       {totalWeekMs > 0 && (
