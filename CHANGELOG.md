@@ -2,6 +2,15 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.3.0] — 2026-04-18
+
+### Added
+- **Entry duplication** — copy any completed entry to today with one click
+  - `useEntries.duplicateEntry(id)` — clones a completed entry: preserves project, task, notes, tags, and billable flag; calculates original duration and stamps new `startedAt`/`stoppedAt` relative to now so it lands in today's log
+  - `EntryRow` — new **⊙ Copy** ghost button in the hover action bar; appears alongside Resume/Edit/Delete
+  - `EntryList` — threads `onDuplicate` prop down to `EntryRow`
+  - Log page — wires `handleDuplicate` → `duplicateEntry`; duplicated entry appears immediately under today's date group
+
 ## [1.2.0] — 2026-04-17
 
 ### Added

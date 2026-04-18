@@ -34,6 +34,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Daily summary panel on timer page (total time, project bar chart, entry list)
 - ✅ Inline project creation from timer page (+ New Project button → auto-select)
 - ✅ Resume a stopped entry from the log — continues from accumulated time (no duplicate entries)
+- ✅ Duplicate any completed entry to today — copies project, task, notes, tags, and billable flag in one click
 - ✅ Log page filters — by project and task name
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
 - ✅ Theme toggle (light/dark/system)

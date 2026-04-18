@@ -69,6 +69,28 @@ export function useEntries() {
     [setEntries]
   );
 
+  const duplicateEntry = useCallback(
+    (id: string) => {
+      const source = entries.find((e) => e.id === id);
+      if (!source || source.stoppedAt === null) return;
+      const durationMs = elapsedMs(source.startedAt, source.stoppedAt) + (source.offsetMs ?? 0);
+      const now = Date.now();
+      const newEntry: TimeEntry = {
+        id: uuid(),
+        projectId: source.projectId,
+        taskId: source.taskId,
+        startedAt: now - durationMs,
+        stoppedAt: now,
+        notes: source.notes,
+        tags: source.tags ? [...source.tags] : [],
+        billable: source.billable ?? true,
+      };
+      setEntries((prev) => [...prev, newEntry]);
+      return newEntry;
+    },
+    [entries, setEntries]
+  );
+
   const deleteEntry = useCallback(
     (id: string) => {
       setEntries((prev) => prev.filter((e) => e.id !== id));
@@ -91,5 +113,6 @@ export function useEntries() {
     stopEntry,
     updateEntry,
     deleteEntry,
+    duplicateEntry,
   };
 }
