@@ -11,6 +11,7 @@ interface EntryListProps {
   tasks: Task[];
   onUpdate: (id: string, patch: Partial<Omit<TimeEntry, "id">>) => void;
   onDelete: (id: string) => void;
+  onDuplicate?: (entry: TimeEntry) => void;
   onResume?: (entry: TimeEntry) => void;
   hasRunning?: boolean;
 }
@@ -21,6 +22,7 @@ export function EntryList({
   tasks,
   onUpdate,
   onDelete,
+  onDuplicate,
   onResume,
   hasRunning,
 }: EntryListProps) {
@@ -72,6 +74,7 @@ export function EntryList({
                   task={entry.taskId ? taskMap.get(entry.taskId) : undefined}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
+                  onDuplicate={onDuplicate}
                   projects={projects}
                   tasks={tasks}
                   onResume={onResume}

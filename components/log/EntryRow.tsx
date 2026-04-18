@@ -17,6 +17,7 @@ interface EntryRowProps {
   projects: Project[];
   tasks: Task[];
   onResume?: (entry: TimeEntry) => void;
+  onDuplicate?: (entry: TimeEntry) => void;
   hasRunning?: boolean;
 }
 
@@ -29,6 +30,7 @@ export function EntryRow({
   projects,
   tasks,
   onResume,
+  onDuplicate,
   hasRunning,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
@@ -75,6 +77,17 @@ export function EntryRow({
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onDuplicate && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onDuplicate(entry)}
+              className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+              title="Duplicate to today"
+            >
+              ⧉ Copy
+            </Button>
+          )}
           {!hasRunning && onResume && (
             <Button
               size="sm"

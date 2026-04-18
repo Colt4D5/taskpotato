@@ -7,7 +7,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { EntryList } from "@/components/log/EntryList";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry } = useEntries();
+  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry, duplicateEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
 
@@ -36,6 +36,10 @@ export default function LogPage() {
       return true;
     });
   }, [completedEntries, filterProjectId, filterTaskName, filterTag, taskMap]);
+
+  const handleDuplicate = (entry: { id: string }) => {
+    duplicateEntry(entry.id);
+  };
 
   const handleResume = (entry: { id: string }) => {
     resumeEntry(entry.id);
@@ -94,6 +98,7 @@ export default function LogPage() {
         tasks={tasks}
         onUpdate={updateEntry}
         onDelete={deleteEntry}
+        onDuplicate={handleDuplicate}
         onResume={handleResume}
         hasRunning={runningEntry !== null}
       />
