@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 12 complete**
+🚧 **Active Development — Night 13 complete**
 
 ## Features
 
@@ -47,6 +47,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Streak tracking — current streak, longest streak, active days, and a 16-week activity heatmap on the Reports page
 - ✅ Time rounding on stop — round stop time to nearest 5/10/15 minutes (configurable in Settings)
 - ✅ Weekly goal tracking — set a target hours/week in Settings; Reports page shows a progress bar, time remaining, and completion status
+- ✅ Collapsible day sections in the log — click any day header to expand/collapse; today expands by default, older days collapse
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
