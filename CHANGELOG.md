@@ -2,6 +2,17 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.4.0] — 2026-04-19
+
+### Added
+- **Collapsible day sections in the Log** — click any day header to expand or collapse that day's entries
+  - Day headers are now full-width interactive buttons with a chevron indicator
+  - Today's section starts expanded; all prior days start collapsed by default
+  - Collapsed headers show an entry count hint (e.g. "3 entries") alongside the day total so context is preserved without taking up space
+  - Collapse state is ephemeral per-session — no storage pollution
+  - Smooth chevron rotation animation on toggle; subtle hover state on the header row
+  - Fully accessible: `aria-expanded` attribute on each header button
+
 ## [1.3.0] — 2026-04-18
 
 ### Added
