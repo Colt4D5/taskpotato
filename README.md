@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 13 complete**
+🚧 **Active Development — Night 14 complete**
 
 ## Features
 
@@ -48,6 +48,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Time rounding on stop — round stop time to nearest 5/10/15 minutes (configurable in Settings)
 - ✅ Weekly goal tracking — set a target hours/week in Settings; Reports page shows a progress bar, time remaining, and completion status
 - ✅ Collapsible day sections in the log — click any day header to expand/collapse; today expands by default, older days collapse
+- ✅ Date range filter on the log page — preset quick-selects (Today, This Week, Last Week, Last 7 Days, This Month, Last Month, Last 30 Days) plus custom from/to date pickers; integrates with existing project/task/tag filters
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
