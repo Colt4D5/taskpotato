@@ -2,6 +2,14 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.5.0] — 2026-04-20
+
+### Added
+- **Date range filter on the Log page** — quickly scope the log to any time period
+  - `DateRangeFilter` component (`components/log/DateRangeFilter.tsx`) — preset quick-select dropdown (Today, This Week, Last Week, Last 7 Days, This Month, Last Month, Last 30 Days) that fills from/to date fields automatically; custom date pickers appear when any range is active and allow manual override; preset label is highlighted automatically when date pickers match a known preset
+  - Log page — mounts `DateRangeFilter` above the existing project/task/tag filter row; `filteredEntries` now also filters by `startedAt` against the selected range's start-of-day / end-of-day boundaries; active entry count hint shown when a date range is selected; "Clear all" button resets all five filter dimensions at once
+  - `startOfDay` / `endOfDay` utilities already present in `lib/dateUtils.ts` reused for precise day boundary calculations (local time)
+
 ## [1.4.0] — 2026-04-19
 
 ### Added
