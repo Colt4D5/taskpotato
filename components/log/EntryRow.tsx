@@ -7,6 +7,7 @@ import { formatTime } from "@/lib/dateUtils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EntryEditor } from "./EntryEditor";
+import { renderMarkdown, hasMarkdown } from "@/lib/markdown";
 
 interface EntryRowProps {
   entry: TimeEntry;
@@ -34,7 +35,9 @@ export function EntryRow({
   hasRunning,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const duration = elapsedMs(entry.startedAt, entry.stoppedAt);
+  const notesHasMd = entry.notes ? hasMarkdown(entry.notes) : false;
 
   return (
     <>
@@ -49,9 +52,19 @@ export function EntryRow({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {entry.notes ? (
-              <span className="text-sm text-zinc-100 truncate">{entry.notes}</span>
+              <button
+                type="button"
+                onClick={() => notesHasMd && setExpanded((x) => !x)}
+                className={`text-sm text-zinc-100 text-left ${notesHasMd ? "cursor-pointer hover:text-orange-300" : ""} ${expanded ? "" : "truncate max-w-xs"}`}
+                title={notesHasMd ? (expanded ? "Collapse preview" : "Expand markdown preview") : undefined}
+              >
+                {entry.notes}
+              </button>
             ) : (
               <span className="text-sm text-zinc-500 italic">No description</span>
+            )}
+            {notesHasMd && (
+              <span className="text-xs text-zinc-600 px-1 py-0.5 rounded bg-zinc-800 border border-zinc-700 font-mono">md</span>
             )}
             {project && <Badge label={project.name} color={project.color} />}
             {task && (
@@ -68,6 +81,12 @@ export function EntryRow({
             {formatTime(entry.startedAt)}
             {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
           </div>
+          {expanded && notesHasMd && (
+            <div
+              className="mt-2 text-sm text-zinc-300 prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-code:text-orange-300 prose-code:bg-zinc-800 prose-code:px-1 prose-code:rounded"
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(entry.notes) }}
+            />
+          )}
         </div>
 
         {/* Duration */}

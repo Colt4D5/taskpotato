@@ -2,6 +2,16 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.6.0] — 2026-04-21
+
+### Added
+- **Markdown notes with preview** — entry descriptions now support full Markdown syntax with live preview
+  - `lib/markdown.ts` — `renderMarkdown(md)` converts Markdown to HTML via `marked`; custom renderer applies `target="_blank"` + `rel="noopener noreferrer"` to all links; `hasMarkdown(text)` detects whether a string contains Markdown syntax worth rendering
+  - `@tailwindcss/typography` — installed and registered as a v4 `@plugin` in `globals.css`; `prose prose-invert prose-sm` classes used for all rendered output to ensure readable typographic defaults against the dark theme
+  - `EntryEditor` — description field replaced with a **Write / Preview** tab toggle; Preview tab renders the markdown HTML using the `prose` classes; write mode uses a resizable `<textarea>`; preview resets to Write mode when the modal reopens
+  - `EntryRow` — notes that contain Markdown syntax display a small `md` badge; clicking the description text toggles an inline expanded view that renders the full Markdown HTML beneath the entry row metadata
+  - Markdown support is fully additive — plain text entries behave identically to before; no forced formatting
+
 ## [1.5.0] — 2026-04-20
 
 ### Added

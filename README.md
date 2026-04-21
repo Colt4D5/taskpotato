@@ -49,6 +49,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Weekly goal tracking — set a target hours/week in Settings; Reports page shows a progress bar, time remaining, and completion status
 - ✅ Collapsible day sections in the log — click any day header to expand/collapse; today expands by default, older days collapse
 - ✅ Date range filter on the log page — preset quick-selects (Today, This Week, Last Week, Last 7 Days, This Month, Last Month, Last 30 Days) plus custom from/to date pickers; integrates with existing project/task/tag filters
+- ✅ Markdown notes — entry descriptions support full Markdown syntax; Write/Preview tab toggle in the entry editor; inline markdown rendering in the log view with an `md` badge indicator; powered by `marked` + `@tailwindcss/typography`
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
