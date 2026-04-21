@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { TagInput } from "@/components/ui/TagInput";
+import { renderMarkdown } from "@/lib/markdown";
 
 interface EntryEditorProps {
   open: boolean;
@@ -62,6 +63,7 @@ export function EntryEditor({
   const [error, setError] = useState<string | null>(null);
   const [tags, setTags] = useState<string[]>(entry.tags ?? []);
   const [billable, setBillable] = useState(entry.billable ?? true);
+  const [notesPreview, setNotesPreview] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -74,6 +76,7 @@ export function EntryEditor({
       setStopTime(entry.stoppedAt ? toTimeInput(entry.stoppedAt) : "");
       setTags(entry.tags ?? []);
       setBillable(entry.billable ?? true);
+      setNotesPreview(false);
       setError(null);
     }
   }, [open, entry]);
@@ -125,12 +128,47 @@ export function EntryEditor({
   return (
     <Modal open={open} onClose={onClose} title="Edit Entry">
       <div className="flex flex-col gap-4">
-        <Input
-          label="Description"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="What were you working on?"
-        />
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-zinc-400">Description</label>
+            <div className="flex gap-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setNotesPreview(false)}
+                className={`px-2 py-0.5 rounded transition-colors ${
+                  !notesPreview ? "bg-zinc-700 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Write
+              </button>
+              <button
+                type="button"
+                onClick={() => setNotesPreview(true)}
+                className={`px-2 py-0.5 rounded transition-colors ${
+                  notesPreview ? "bg-zinc-700 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Preview
+              </button>
+            </div>
+          </div>
+          {notesPreview ? (
+            <div
+              className="min-h-[80px] bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-300 prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:text-zinc-200 prose-code:text-orange-300 prose-code:bg-zinc-900 prose-code:px-1 prose-code:rounded"
+              dangerouslySetInnerHTML={{
+                __html: notes ? renderMarkdown(notes) : '<span class="text-zinc-600 italic">Nothing to preview</span>',
+              }}
+            />
+          ) : (
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="What were you working on? Markdown supported."
+              rows={3}
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 w-full resize-none"
+            />
+          )}
+        </div>
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Tags</label>
