@@ -38,7 +38,8 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Log page filters — by project and task name
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
 - ✅ Theme toggle (light/dark/system)
-- ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, ? for help modal
+- ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, ? for help modal, ⌘K for command palette
+- ✅ Command palette — ⌘K (or Ctrl+K) to open a global search palette; search entries by notes, project, task, and tags; keyboard-navigable with ↑↓ and ↵; shows duration, tags, and billable status per result
 - ✅ Tags on entries — tag input on timer, filter by tag on log page, tag breakdown on reports
 - ✅ CSV export — download all completed entries as a spreadsheet (Settings > Data)
 - ✅ Pomodoro mode — 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
