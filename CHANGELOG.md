@@ -2,7 +2,21 @@
 
 All notable changes to TaskPotato are documented here.
 
-## [1.6.0] — 2026-04-21
+## [1.7.0] — 2026-04-22
+
+### Added
+- **Command palette** — `⌘K` (or `Ctrl+K` on Windows/Linux) opens a global search overlay accessible from any page
+  - `components/ui/CommandPalette.tsx` — full-featured palette: fuzzy-substring search across all completed entries (notes, project, task, tags), all projects, all tasks, and built-in nav items; arrow-key navigation; `Enter` to select; `Esc` to dismiss; click backdrop to dismiss
+  - `hooks/useCommandPalette.ts` — manages open/close state and registers the `⌘K`/`Ctrl+K` keyboard listener
+  - `Shell` — mounts the palette globally so it's available on every page; passes `entries`, `projects`, and `tasks` down for live search
+  - `Nav` — new `⌘` icon button in the desktop sidebar that opens the palette via `onOpenCommandPalette` prop
+  - Results display entry duration (formatted short), tag chips, and non-billable badge inline
+  - Query highlighting — matched substring is highlighted in amber within each result label
+  - No-query state shows nav items only as quick-jump shortcuts
+  - Results capped at 50; entry results filtered to completed entries only
+  - `KeyboardShortcutsHelp` — `⌘K` added as the first shortcut in the reference modal
+
+
 
 ### Added
 - **Markdown notes with preview** — entry descriptions now support full Markdown syntax with live preview

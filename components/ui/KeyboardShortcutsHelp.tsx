@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 const SHORTCUTS = [
+  { key: "⌘K", description: "Open command palette" },
   { key: "T", description: "Go to Timer" },
   { key: "L", description: "Go to Log" },
   { key: "R", description: "Go to Reports" },

@@ -11,7 +11,11 @@ const NAV_ITEMS = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function Nav() {
+interface NavProps {
+  onOpenCommandPalette?: () => void;
+}
+
+export function Nav({ onOpenCommandPalette }: NavProps = {}) {
   const pathname = usePathname();
 
   return (
@@ -37,7 +41,16 @@ export function Nav() {
           );
         })}
       </ul>
-      <div className="hidden md:flex md:flex-col md:mt-auto md:mb-4 md:px-2">
+      <div className="hidden md:flex md:flex-col md:mt-auto md:mb-4 md:px-2 md:gap-1">
+        {onOpenCommandPalette && (
+          <button
+            onClick={onOpenCommandPalette}
+            title="Command palette (⌘K)"
+            className="flex flex-col items-center px-3 py-3 rounded-lg text-xs text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
+          >
+            <span className="text-base font-mono">⌘</span>
+          </button>
+        )}
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("taskpotato:shortcuts-help"))}
           title="Keyboard shortcuts (?)"
