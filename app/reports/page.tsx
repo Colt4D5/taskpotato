@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { computeStreaks } from "@/lib/streaks";
 import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
 import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
+import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
@@ -421,6 +422,8 @@ export default function ReportsPage() {
           </div>
         </section>
       )}
+
+      <ProjectBudgetCard projects={projects} entries={completedEntries} />
     </div>
   );
 }

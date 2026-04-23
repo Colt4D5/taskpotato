@@ -4,6 +4,7 @@ export interface Project {
   color: string;
   archived: boolean;
   createdAt: number;
+  budgetHours?: number; // 0 or undefined = no budget
 }
 
 export interface Task {

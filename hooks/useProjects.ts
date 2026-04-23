@@ -14,13 +14,14 @@ export function useProjects() {
   const [projects, setProjects] = useStorage<Project[]>("projects", []);
 
   const addProject = useCallback(
-    (name: string, color?: string) => {
+    (name: string, color?: string, budgetHours?: number) => {
       const project: Project = {
         id: uuid(),
         name: name.trim(),
         color: color ?? PROJECT_COLORS[Math.floor(Math.random() * PROJECT_COLORS.length)],
         archived: false,
         createdAt: Date.now(),
+        ...(budgetHours && budgetHours > 0 ? { budgetHours } : {}),
       };
       setProjects((prev) => [...prev, project]);
       return project;
