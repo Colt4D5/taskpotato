@@ -2,6 +2,21 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [1.8.0] — 2026-04-23
+
+### Added
+- **Project time budgets** — set an optional hour cap per project and track burn across the app
+  - `Project.budgetHours?: number` — new optional field on the `Project` type; `undefined` or `0` means no budget
+  - `ProjectForm` — new "Budget (hours)" numeric input in the create/edit modal; optional; accepts decimals (e.g. 40, 12.5); validation rejects non-positive values; help text explains all-time scope
+  - `useProjects.addProject()` — updated signature accepts optional `budgetHours`; stored on the project record
+  - `ProjectList` / `TimerWidget` inline project creation — both thread `budgetHours` through from form to hook
+  - `ProjectBudgetCard` component (`components/reports/ProjectBudgetCard.tsx`) — renders a "Project Budgets" section on the Reports page for all active projects with a budget set; each row shows a color-keyed progress bar with amber fill at 80%+, red fill when over budget, "over budget" / "near limit" badges, formatted duration vs. budget, percentage used, and remaining or over-budget time
+  - Reports page — `ProjectBudgetCard` mounted at the bottom of the Reports page; hidden when no projects have budgets configured
+  - `TimerWidget` — inline warning banner below the project selector when the selected project is at ≥80% of its budget; amber for near-limit, red for exceeded; shows percentage, tracked time, and budget cap; hidden when no budget is set or utilization is under 80%
+  - Budget burn is calculated from all-time tracked entries (not scoped to a week) so it reflects total project spend
+
+
+
 ## [1.7.0] — 2026-04-22
 
 ### Added

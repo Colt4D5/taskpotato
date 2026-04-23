@@ -9,7 +9,7 @@ import { TaskList } from "@/components/tasks/TaskList";
 interface ProjectListProps {
   projects: Project[];
   tasks: Task[];
-  onAddProject: (name: string, color: string) => void;
+  onAddProject: (name: string, color: string, budgetHours?: number) => void;
   onUpdateProject: (id: string, patch: Partial<Omit<Project, "id" | "createdAt">>) => void;
   onDeleteProject: (id: string) => void;
   onAddTask: (projectId: string, name: string, notes: string) => void;
@@ -166,8 +166,8 @@ export function ProjectList({
 
       <ProjectForm
         open={addOpen}
-        onSave={({ name, color }) => {
-          onAddProject(name, color);
+        onSave={({ name, color, budgetHours }) => {
+          onAddProject(name, color, budgetHours);
           setAddOpen(false);
         }}
         onClose={() => setAddOpen(false)}
@@ -178,8 +178,8 @@ export function ProjectList({
           open={!!editingProject}
           initial={editingProject}
           title="Edit Project"
-          onSave={({ name, color }) => {
-            onUpdateProject(editingProject.id, { name, color });
+          onSave={({ name, color, budgetHours }) => {
+            onUpdateProject(editingProject.id, { name, color, budgetHours });
             setEditingProject(null);
           }}
           onClose={() => setEditingProject(null)}

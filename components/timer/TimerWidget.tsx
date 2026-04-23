@@ -78,8 +78,21 @@ export function TimerWidget() {
   }
   const projectMap = new Map(activeProjects.map((p) => [p.id, p]));
 
-  const handleNewProject = (data: { name: string; color: string }) => {
-    const project = addProject(data.name, data.color);
+  // Project budget burn — all-time tracked hours for selected project
+  const selectedProjectBudget = selectedProjectId
+    ? projectMap.get(selectedProjectId)?.budgetHours
+    : undefined;
+  const selectedProjectTotalMs = selectedProjectId
+    ? completedEntries
+        .filter((e) => e.projectId === selectedProjectId)
+        .reduce((sum, e) => sum + elapsedMs(e.startedAt, e.stoppedAt), 0)
+    : 0;
+  const budgetMs = selectedProjectBudget ? selectedProjectBudget * 3_600_000 : 0;
+  const budgetPct = budgetMs > 0 ? selectedProjectTotalMs / budgetMs : 0;
+  const budgetWarning = budgetMs > 0 && budgetPct >= 0.8;
+
+  const handleNewProject = (data: { name: string; color: string; budgetHours?: number }) => {
+    const project = addProject(data.name, data.color, data.budgetHours);
     setSelectedProjectId(project.id);
     setSelectedTaskId(null);
     setShowProjectForm(false);
@@ -149,6 +162,23 @@ export function TimerWidget() {
           </select>
         )}
       </div>
+
+      {/* Budget warning */}
+      {budgetWarning && (
+        <div className={`w-full rounded-lg px-3 py-2 text-xs flex items-center gap-2 ${
+          budgetPct >= 1
+            ? "bg-red-900/40 border border-red-700/50 text-red-300"
+            : "bg-amber-900/40 border border-amber-700/50 text-amber-300"
+        }`}>
+          <span>{budgetPct >= 1 ? "🚨" : "⚠️"}</span>
+          <span>
+            {budgetPct >= 1
+              ? `Budget exceeded — ${formatDurationShort(selectedProjectTotalMs)} logged of ${selectedProjectBudget}h budget`
+              : `${Math.round(budgetPct * 100)}% of budget used — ${formatDurationShort(selectedProjectTotalMs)} of ${selectedProjectBudget}h`
+            }
+          </span>
+        </div>
+      )}
 
       {/* Tags */}
       <div className="w-full">
