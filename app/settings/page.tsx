@@ -5,8 +5,10 @@ import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useEntries } from "@/hooks/useEntries";
 import { useStorage } from "@/hooks/useStorage";
-import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry } from "@/types";
+import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry, EntryTemplate } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
+import { TemplateList } from "@/components/timer/TemplateList";
+import { useTemplates } from "@/hooks/useTemplates";
 import { Button } from "@/components/ui/Button";
 import { exportCSV } from "@/lib/csvExport";
 
@@ -14,10 +16,12 @@ export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
   const { entries, updateEntry, deleteEntry } = useEntries();
+  const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
   const [, setStoredProjects] = useStorage<Project[]>("projects", []);
   const [, setStoredTasks] = useStorage<Task[]>("tasks", []);
+  const [, setStoredTemplates] = useStorage<EntryTemplate[]>("templates", []);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -32,6 +36,7 @@ export default function SettingsPage() {
       projects,
       tasks,
       entries,
+      templates,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -64,6 +69,7 @@ export default function SettingsPage() {
         setStoredProjects(data.projects as Project[]);
         setStoredTasks(data.tasks as Task[]);
         if (data.entries) setStoredEntries(data.entries as TimeEntry[]);
+        if (data.templates) setStoredTemplates(data.templates as EntryTemplate[]);
         setImportSuccess(true);
       } catch (err) {
         setImportError(err instanceof Error ? err.message : "Invalid JSON file");
@@ -219,6 +225,18 @@ export default function SettingsPage() {
           onAddTask={(projectId, name, notes) => addTask(projectId, name, notes)}
           onUpdateTask={updateTask}
           onDeleteTask={deleteTask}
+        />
+      </section>
+
+      {/* Templates */}
+      <section className="mb-10">
+        <TemplateList
+          templates={templates}
+          projects={projects}
+          tasks={tasks}
+          onAdd={addTemplate}
+          onUpdate={updateTemplate}
+          onDelete={deleteTemplate}
         />
       </section>
 

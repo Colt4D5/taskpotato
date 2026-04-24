@@ -2,7 +2,21 @@
 
 All notable changes to TaskPotato are documented here.
 
-## [1.8.0] — 2026-04-23
+## [1.9.0] — 2026-04-24
+
+### Added
+- **Entry templates** — save frequently-used timer configurations as named presets and start them with one click
+  - `EntryTemplate` type (`types/index.ts`) — new interface with `id`, `name`, `projectId`, `taskId`, `notes`, `tags`, `billable`, and `createdAt` fields
+  - `useTemplates` hook (`hooks/useTemplates.ts`) — localStorage-backed CRUD for templates: `addTemplate`, `updateTemplate`, `deleteTemplate`; templates stored under `taskpotato:templates`
+  - `TemplateForm` component (`components/timer/TemplateForm.tsx`) — modal for creating and editing templates; fields: name (required), project selector, task selector (filtered to selected project's active tasks), description textarea, `TagInput`, billable toggle; validation rejects empty names
+  - `TemplateQuickStart` component (`components/timer/TemplateQuickStart.tsx`) — horizontal strip of pill-shaped template buttons rendered at the top of the TimerWidget; clicking a pill instantly loads its project/task/notes/tags/billable values into the timer fields; disabled while a timer is running; color-dot indicator matches the template's project color; hover tooltip shows the full template configuration; hidden when no templates exist
+  - `TemplateList` component (`components/timer/TemplateList.tsx`) — Settings section listing all templates with project badge, task name, non-billable indicator, tags, and truncated description preview; Edit and Delete actions per row; "+ New template" button opens `TemplateForm`
+  - `TimerWidget` — imports `useTemplates` and `TemplateQuickStart`; `applyTemplate()` populates all five timer fields from the selected template without starting the timer
+  - Settings page — `TemplateList` section added between Projects and Data
+  - JSON export/import — `templates` array included in export payload and restored on import (backward-compatible: import silently skips if field absent)
+
+
+
 
 ### Added
 - **Project time budgets** — set an optional hour cap per project and track burn across the app

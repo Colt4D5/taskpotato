@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 15 complete**
+🚧 **Active Development — Night 16 complete**
 
 ## Features
 
@@ -52,6 +52,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Date range filter on the log page — preset quick-selects (Today, This Week, Last Week, Last 7 Days, This Month, Last Month, Last 30 Days) plus custom from/to date pickers; integrates with existing project/task/tag filters
 - ✅ Markdown notes — entry descriptions support full Markdown syntax; Write/Preview tab toggle in the entry editor; inline markdown rendering in the log view with an `md` badge indicator; powered by `marked` + `@tailwindcss/typography`
 - ✅ Project time budgets — set an optional hour cap on any project; burn progress bars on the Reports page with over-budget / near-limit badges; warning banner in the timer when selected project is at ≥80% capacity
+- ✅ Entry templates — save named timer presets (project, task, notes, tags, billable flag); one-click apply from quick-start chips on the timer page; full CRUD in Settings; included in JSON export/import
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
