@@ -14,12 +14,28 @@ import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 import { TagInput } from "@/components/ui/TagInput";
 import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { IdleAlert } from "@/components/timer/IdleAlert";
+import { TemplateQuickStart } from "@/components/timer/TemplateQuickStart";
+import { useTemplates } from "@/hooks/useTemplates";
+import { EntryTemplate } from "@/types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useIdleDetection } from "@/hooks/useIdleDetection";
 import { useStorage } from "@/hooks/useStorage";
+import { useTasks } from "@/hooks/useTasks";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
 export function TimerWidget() {
+  const { templates } = useTemplates();
+  const { tasks: projectTasksList } = useTasks();
+
+  const applyTemplate = (tpl: EntryTemplate) => {
+    if (isRunning) return;
+    setSelectedProjectId(tpl.projectId);
+    setSelectedTaskId(tpl.taskId);
+    setNotes(tpl.notes);
+    setTags(tpl.tags);
+    setBillable(tpl.billable);
+  };
+
   const {
     isRunning,
     elapsed,
@@ -104,6 +120,15 @@ export function TimerWidget() {
       <DurationDisplay
         ms={elapsed}
         className="text-7xl md:text-8xl text-zinc-100 tracking-tight"
+      />
+
+      {/* Template quick-start */}
+      <TemplateQuickStart
+        templates={templates}
+        projects={activeProjects}
+        tasks={projectTasksList}
+        onApply={applyTemplate}
+        disabled={isRunning}
       />
 
       {/* Description input */}

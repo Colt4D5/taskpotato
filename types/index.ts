@@ -29,6 +29,17 @@ export interface TimeEntry {
   offsetMs?: number;    // accumulated ms from previous runs before this resume
 }
 
+export interface EntryTemplate {
+  id: string;
+  name: string;
+  projectId: string | null;
+  taskId: string | null;
+  notes: string;
+  tags: string[];
+  billable: boolean;
+  createdAt: number;
+}
+
 export interface AppSettings {
   theme: "light" | "dark" | "system";
   weekStartsOn: 0 | 1;
