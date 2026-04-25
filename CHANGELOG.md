@@ -2,6 +2,20 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [2.0.0] — 2026-04-25
+
+### Added
+- **Manual time entry (Quick Log)** — log past time directly without touching the running timer
+  - `useEntries.addEntry()` — new method that creates a fully completed entry from an `Omit<TimeEntry, "id">` payload and writes it to localStorage immediately
+  - `QuickEntryForm` component (`components/log/QuickEntryForm.tsx`) — full modal for creating a past entry; two input modes selectable via tab toggle:
+    - **Start → End** — pick date, start time, end time; auto-advances to next day when end ≤ start (handles midnight-spanning entries)
+    - **Start + Duration** — pick date, start time, and type a duration in natural format (`1h 30m`, `1:30`, `90` for minutes, `2h`, `45m`)
+  - All timer fields present: description, tags (`TagInput`), billable toggle, project selector, task selector (filtered to selected project)
+  - Inline validation errors surface before saving; modal resets on open
+  - Log page — `+ Log time` button in the page header opens `QuickEntryForm`; saved entry appears immediately in the correct day group via existing reactive storage
+  - **`N` keyboard shortcut** — press `N` on the Log page (when not in an input) to open the form without reaching for the mouse
+  - `KeyboardShortcutsHelp` — `N` shortcut added to the reference modal
+
 ## [1.9.0] — 2026-04-24
 
 ### Added

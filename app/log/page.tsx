@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { EntryList } from "@/components/log/EntryList";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
+import { QuickEntryForm } from "@/components/log/QuickEntryForm";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry, duplicateEntry } = useEntries();
+  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry, duplicateEntry, addEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
 
@@ -17,6 +18,21 @@ export default function LogPage() {
   const [filterTaskName, setFilterTaskName] = useState<string>("");
   const [filterTag, setFilterTag] = useState<string>("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
+  const [quickEntryOpen, setQuickEntryOpen] = useState(false);
+
+  // N shortcut: open quick entry form when not in an input
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "n" || e.key === "N") {
+        const tag = (e.target as HTMLElement).tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+        e.preventDefault();
+        setQuickEntryOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const taskMap = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks]);
 
@@ -69,7 +85,15 @@ export default function LogPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold text-zinc-100 mb-4">Time Log</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-semibold text-zinc-100">Time Log</h1>
+        <button
+          onClick={() => setQuickEntryOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-400 text-white rounded-lg transition-colors font-medium"
+        >
+          <span className="text-base leading-none">+</span> Log time
+        </button>
+      </div>
 
       {/* Date range filter */}
       <DateRangeFilter value={dateRange} onChange={setDateRange} />
@@ -125,6 +149,14 @@ export default function LogPage() {
             : `${filteredEntries.length} entr${filteredEntries.length === 1 ? "y" : "ies"} in selected range`}
         </p>
       )}
+
+      <QuickEntryForm
+        open={quickEntryOpen}
+        projects={projects}
+        tasks={tasks}
+        onSave={(entry) => addEntry(entry)}
+        onClose={() => setQuickEntryOpen(false)}
+      />
 
       <EntryList
         entries={filteredEntries}
