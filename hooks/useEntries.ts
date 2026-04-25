@@ -91,6 +91,15 @@ export function useEntries() {
     [entries, setEntries]
   );
 
+  const addEntry = useCallback(
+    (entry: Omit<TimeEntry, "id">) => {
+      const newEntry: TimeEntry = { ...entry, id: uuid() };
+      setEntries((prev) => [...prev, newEntry]);
+      return newEntry;
+    },
+    [setEntries]
+  );
+
   const deleteEntry = useCallback(
     (id: string) => {
       setEntries((prev) => prev.filter((e) => e.id !== id));
@@ -109,6 +118,7 @@ export function useEntries() {
     runningEntry,
     completedEntries,
     startEntry,
+    addEntry,
     resumeEntry,
     stopEntry,
     updateEntry,

@@ -7,6 +7,7 @@ const SHORTCUTS = [
   { key: "T", description: "Go to Timer" },
   { key: "L", description: "Go to Log" },
   { key: "R", description: "Go to Reports" },
+  { key: "N", description: "Log time manually (on Log page)" },
   { key: "Space", description: "Start / Stop timer (when not typing)" },
   { key: "Enter", description: "Start / Stop timer (from description field)" },
   { key: "?", description: "Show this help" },
