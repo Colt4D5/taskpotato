@@ -100,6 +100,22 @@ export function useEntries() {
     [setEntries]
   );
 
+  const updateAllTags = useCallback(
+    (oldTag: string, newTag: string | null) => {
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (!e.tags || !e.tags.includes(oldTag)) return e;
+          const next =
+            newTag === null
+              ? e.tags.filter((t) => t !== oldTag)
+              : e.tags.map((t) => (t === oldTag ? newTag : t));
+          return { ...e, tags: next };
+        })
+      );
+    },
+    [setEntries]
+  );
+
   const deleteEntry = useCallback(
     (id: string) => {
       setEntries((prev) => prev.filter((e) => e.id !== id));
@@ -122,6 +138,7 @@ export function useEntries() {
     resumeEntry,
     stopEntry,
     updateEntry,
+    updateAllTags,
     deleteEntry,
     duplicateEntry,
   };

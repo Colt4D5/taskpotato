@@ -7,6 +7,7 @@ import { useEntries } from "@/hooks/useEntries";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry, EntryTemplate } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
+import { TagManager } from "@/components/settings/TagManager";
 import { TemplateList } from "@/components/timer/TemplateList";
 import { useTemplates } from "@/hooks/useTemplates";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +16,7 @@ import { exportCSV } from "@/lib/csvExport";
 export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
-  const { entries, updateEntry, deleteEntry } = useEntries();
+  const { entries, updateEntry, deleteEntry, updateAllTags } = useEntries();
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
@@ -27,7 +28,7 @@ export default function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   // suppress unused warning — updateEntry/deleteEntry consumed by EntryList elsewhere
-  void updateEntry; void deleteEntry;
+  void updateEntry; void deleteEntry; void updateAllTags;
 
   const handleExportJSON = () => {
     const data = {
@@ -227,6 +228,9 @@ export default function SettingsPage() {
           onDeleteTask={deleteTask}
         />
       </section>
+
+      {/* Tags */}
+      <TagManager entries={entries} onUpdateAllTags={updateAllTags} />
 
       {/* Templates */}
       <section className="mb-10">
