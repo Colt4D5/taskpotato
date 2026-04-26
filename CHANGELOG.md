@@ -2,6 +2,18 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [2.1.0] — 2026-04-26
+
+### Added
+- **Tag manager** — Settings page gains a dedicated Tags section for post-hoc tag housekeeping
+  - `components/settings/TagManager.tsx` — lists all tags derived from completed and running entries, sorted by entry count descending; shows per-tag entry count
+  - **Rename** — inline text field; input is normalized to lowercase kebab-case on save; blocks rename to an already-existing tag name with an inline error (suggests using Merge instead)
+  - **Merge** — inline dropdown of all other existing tags; selecting a target and confirming re-tags every entry that carries the source tag with the target tag; source tag disappears from the list automatically
+  - **Delete** — two-click confirmation (`Delete` → `Confirm?`) strips the tag from all entries entirely; no entries are removed
+  - All operations call `useEntries.updateAllTags(oldTag, newTag | null)` — a single `setEntries` pass over the full entry array; reactive via existing `taskpotato:storage-update` event bus so the tag list refreshes instantly
+  - `useEntries.updateAllTags()` — new hook method; `null` for `newTag` removes the tag; rename/merge both collapse to the same code path
+  - Empty state message shown when no tags exist yet
+
 ## [2.0.0] — 2026-04-25
 
 ### Added
