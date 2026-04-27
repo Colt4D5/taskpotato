@@ -4,9 +4,11 @@ import { useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useEntries } from "@/hooks/useEntries";
+import { useClients } from "@/hooks/useClients";
 import { useStorage } from "@/hooks/useStorage";
-import { AppSettings, DEFAULT_SETTINGS, Project, Task, TimeEntry, EntryTemplate } from "@/types";
+import { AppSettings, DEFAULT_SETTINGS, Client, Project, Task, TimeEntry, EntryTemplate } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
+import { ClientList } from "@/components/clients/ClientList";
 import { TagManager } from "@/components/settings/TagManager";
 import { TemplateList } from "@/components/timer/TemplateList";
 import { useTemplates } from "@/hooks/useTemplates";
@@ -17,12 +19,14 @@ export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
   const { entries, updateEntry, deleteEntry, updateAllTags } = useEntries();
+  const { clients, addClient, updateClient, deleteClient } = useClients();
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
   const [, setStoredProjects] = useStorage<Project[]>("projects", []);
   const [, setStoredTasks] = useStorage<Task[]>("tasks", []);
   const [, setStoredTemplates] = useStorage<EntryTemplate[]>("templates", []);
+  const [, setStoredClients] = useStorage<Client[]>("clients", []);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -34,6 +38,7 @@ export default function SettingsPage() {
     const data = {
       exportedAt: new Date().toISOString(),
       version: 1,
+      clients,
       projects,
       tasks,
       entries,
@@ -71,6 +76,7 @@ export default function SettingsPage() {
         setStoredTasks(data.tasks as Task[]);
         if (data.entries) setStoredEntries(data.entries as TimeEntry[]);
         if (data.templates) setStoredTemplates(data.templates as EntryTemplate[]);
+        if (data.clients) setStoredClients(data.clients as Client[]);
         setImportSuccess(true);
       } catch (err) {
         setImportError(err instanceof Error ? err.message : "Invalid JSON file");
@@ -215,12 +221,21 @@ export default function SettingsPage() {
         </div>
       </section>
 
+      {/* Clients */}
+      <ClientList
+        clients={clients}
+        onAdd={addClient}
+        onUpdate={updateClient}
+        onDelete={deleteClient}
+      />
+
       {/* Projects */}
       <section className="mb-10">
         <ProjectList
           projects={projects}
           tasks={tasks}
-          onAddProject={addProject}
+          clients={clients}
+          onAddProject={(name, color, budgetHours, clientId) => addProject(name, color, budgetHours, clientId)}
           onUpdateProject={updateProject}
           onDeleteProject={deleteProject}
           onAddTask={(projectId, name, notes) => addTask(projectId, name, notes)}

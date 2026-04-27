@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Project } from "@/types";
+import { Project, Client } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -10,7 +10,8 @@ import { ColorPicker } from "@/components/ui/ColorPicker";
 interface ProjectFormProps {
   open: boolean;
   initial?: Partial<Project>;
-  onSave: (data: { name: string; color: string; budgetHours?: number }) => void;
+  clients?: Client[];
+  onSave: (data: { name: string; color: string; budgetHours?: number; clientId?: string | null }) => void;
   onClose: () => void;
   title?: string;
 }
@@ -20,6 +21,7 @@ const DEFAULT_COLOR = "#3b82f6";
 export function ProjectForm({
   open,
   initial,
+  clients = [],
   onSave,
   onClose,
   title = "New Project",
@@ -29,6 +31,7 @@ export function ProjectForm({
   const [budgetRaw, setBudgetRaw] = useState(
     initial?.budgetHours ? String(initial.budgetHours) : ""
   );
+  const [clientId, setClientId] = useState<string>(initial?.clientId ?? "");
   const [error, setError] = useState("");
 
   const handleSave = () => {
@@ -42,10 +45,11 @@ export function ProjectForm({
       setError("Budget must be a positive number.");
       return;
     }
-    onSave({ name: trimmed, color, budgetHours });
+    onSave({ name: trimmed, color, budgetHours, clientId: clientId || null });
     setName("");
     setColor(DEFAULT_COLOR);
     setBudgetRaw("");
+    setClientId("");
     setError("");
   };
 
@@ -65,6 +69,21 @@ export function ProjectForm({
           <label className="text-sm font-medium text-zinc-400">Color</label>
           <ColorPicker value={color} onChange={setColor} />
         </div>
+        {clients.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-zinc-400">Client <span className="text-zinc-500 font-normal">— optional</span></label>
+            <select
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              className="rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-orange-500 w-full"
+            >
+              <option value="">No client</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">
             Budget (hours) <span className="text-zinc-500 font-normal">— optional</span>

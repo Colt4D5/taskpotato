@@ -2,7 +2,24 @@
 
 All notable changes to TaskPotato are documented here.
 
-## [2.1.0] — 2026-04-26
+## [2.2.0] — 2026-04-27
+
+### Added
+- **Client management** — track billable relationships at the client level, above projects
+  - `Client` type (`types/index.ts`) — new interface with `id`, `name`, `color`, `notes?`, and `createdAt` fields
+  - `Project.clientId?: string | null` — new optional field linking a project to a client
+  - `useClients` hook (`hooks/useClients.ts`) — localStorage-backed CRUD for clients stored under `taskpotato:clients`; `addClient`, `updateClient`, `deleteClient`
+  - `ClientForm` component (`components/clients/ClientForm.tsx`) — modal for creating/editing clients; fields: name (required), color picker (8 swatches), optional notes textarea
+  - `ClientList` component (`components/clients/ClientList.tsx`) — Settings section listing all clients with color dot, name, truncated notes; per-row Edit and two-step Delete (Delete → Confirm?) actions; empty state message
+  - `ProjectForm` — new optional Client dropdown (hidden when no clients exist); selected client stored as `clientId` on the project
+  - `ProjectList` — passes `clients` prop into `ProjectForm`; renders a color-keyed client pill badge next to each project name when a client is assigned
+  - `useProjects.addProject()` — updated signature accepts optional `clientId`; stored on the project record
+  - `ClientBreakdown` component (`components/reports/ClientBreakdown.tsx`) — Reports page section showing total tracked time per client (this week) as color-coded progress bars with percentage and formatted duration; only renders when clients exist and entries have client-associated projects
+  - Reports page — `ClientBreakdown` inserted above the project breakdown section
+  - Log page — Client filter dropdown added to the filter bar (hidden when no clients exist); filters entries whose project is associated with the selected client; integrates with existing project/task/tag/date-range filters; `clearFilters()` resets client filter
+  - JSON export/import — `clients` array included in export payload and restored on import (backward-compatible: import silently skips if field absent)
+  - Settings page — `ClientList` section added above Projects
+
 
 ### Added
 - **Tag manager** — Settings page gains a dedicated Tags section for post-hoc tag housekeeping

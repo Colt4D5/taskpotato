@@ -1,3 +1,11 @@
+export interface Client {
+  id: string;
+  name: string;
+  color: string;
+  notes?: string;
+  createdAt: number;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -5,6 +13,7 @@ export interface Project {
   archived: boolean;
   createdAt: number;
   budgetHours?: number; // 0 or undefined = no budget
+  clientId?: string | null;
 }
 
 export interface Task {

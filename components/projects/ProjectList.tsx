@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Project, Task } from "@/types";
+import { Project, Task, Client } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { ProjectForm } from "./ProjectForm";
 import { TaskList } from "@/components/tasks/TaskList";
@@ -9,7 +9,8 @@ import { TaskList } from "@/components/tasks/TaskList";
 interface ProjectListProps {
   projects: Project[];
   tasks: Task[];
-  onAddProject: (name: string, color: string, budgetHours?: number) => void;
+  clients?: Client[];
+  onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null) => void;
   onUpdateProject: (id: string, patch: Partial<Omit<Project, "id" | "createdAt">>) => void;
   onDeleteProject: (id: string) => void;
   onAddTask: (projectId: string, name: string, notes: string) => void;
@@ -20,6 +21,7 @@ interface ProjectListProps {
 export function ProjectList({
   projects,
   tasks,
+  clients = [],
   onAddProject,
   onUpdateProject,
   onDeleteProject,
@@ -75,6 +77,14 @@ export function ProjectList({
                 <span className="text-xs text-zinc-600">
                   {projectTasks.filter((t) => !t.archived).length} tasks
                 </span>
+                {clients.length > 0 && project.clientId && (() => {
+                  const client = clients.find((c) => c.id === project.clientId);
+                  return client ? (
+                    <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: client.color + '22', color: client.color }}>
+                      {client.name}
+                    </span>
+                  ) : null;
+                })()}
                 <div className="flex gap-1">
                   <Button
                     size="sm"
@@ -166,8 +176,9 @@ export function ProjectList({
 
       <ProjectForm
         open={addOpen}
-        onSave={({ name, color, budgetHours }) => {
-          onAddProject(name, color, budgetHours);
+        clients={clients}
+        onSave={({ name, color, budgetHours, clientId }) => {
+          onAddProject(name, color, budgetHours, clientId);
           setAddOpen(false);
         }}
         onClose={() => setAddOpen(false)}
@@ -177,9 +188,10 @@ export function ProjectList({
         <ProjectForm
           open={!!editingProject}
           initial={editingProject}
+          clients={clients}
           title="Edit Project"
-          onSave={({ name, color, budgetHours }) => {
-            onUpdateProject(editingProject.id, { name, color, budgetHours });
+          onSave={({ name, color, budgetHours, clientId }) => {
+            onUpdateProject(editingProject.id, { name, color, budgetHours, clientId });
             setEditingProject(null);
           }}
           onClose={() => setEditingProject(null)}
