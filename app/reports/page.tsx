@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
+import { useClients } from "@/hooks/useClients";
 import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { startOfWeek } from "@/lib/dateUtils";
 import { Badge } from "@/components/ui/Badge";
@@ -12,6 +13,7 @@ import { computeStreaks } from "@/lib/streaks";
 import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
 import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
 import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
+import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
@@ -38,6 +40,7 @@ export default function ReportsPage() {
   const { completedEntries } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
+  const { clients } = useClients();
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
 
   const [weekOffset, setWeekOffset] = useState(0);
@@ -282,6 +285,14 @@ export default function ReportsPage() {
           ))}
         </div>
       </section>
+
+      {/* Client breakdown */}
+      <ClientBreakdown
+        clients={clients}
+        projects={projects}
+        entries={weekEntries}
+        totalMs={totalWeekMs}
+      />
 
       {/* Project breakdown */}
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">

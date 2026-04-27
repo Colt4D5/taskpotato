@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 18 complete**
+🚧 **Active Development — Night 19 complete**
 
 ## Features
 
@@ -55,6 +55,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Entry templates — save named timer presets (project, task, notes, tags, billable flag); one-click apply from quick-start chips on the timer page; full CRUD in Settings; included in JSON export/import
 - ✅ Manual time entry (Quick Log) — `+ Log time` button on the Log page (or press `N`) opens a form to log a completed past entry; two modes: Start→End time range or Start+Duration (flexible natural format: `1h 30m`, `1:30`, `90` min); midnight-spanning entries handled automatically; all timer fields supported (project, task, description, tags, billable)
 - ✅ Tag manager — Settings > Tags lists all tags with entry counts; rename (normalizes to lowercase kebab-case, blocks name collision), merge two tags into one, or delete a tag; all changes apply instantly across every entry
+- ✅ Client management — create named clients with color labels and optional notes; associate projects with clients; client breakdown section on Reports showing time distribution per client; client filter on the Log page; clients included in JSON export/import
 - ⬜ Responsive mobile polish
 
 ## Tech Stack

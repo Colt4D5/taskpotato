@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
+import { useClients } from "@/hooks/useClients";
 import { EntryList } from "@/components/log/EntryList";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
 import { QuickEntryForm } from "@/components/log/QuickEntryForm";
@@ -13,9 +14,11 @@ export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry, duplicateEntry, addEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
+  const { clients } = useClients();
 
-  const [filterProjectId, setFilterProjectId] = useState<string>("");
+  const [filterClientId, setFilterClientId] = useState<string>("");
   const [filterTaskName, setFilterTaskName] = useState<string>("");
+  const [filterProjectId, setFilterProjectId] = useState<string>("");
   const [filterTag, setFilterTag] = useState<string>("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
@@ -44,6 +47,12 @@ export default function LogPage() {
     return Array.from(set).sort();
   }, [completedEntries]);
 
+  const projectClientMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const p of projects) { if (p.clientId) map.set(p.id, p.clientId); }
+    return map;
+  }, [projects]);
+
   const filteredEntries = useMemo(() => {
     const fromMs = dateRange.from
       ? startOfDay(new Date(dateRange.from + "T00:00:00"))
@@ -53,6 +62,10 @@ export default function LogPage() {
       : null;
 
     return completedEntries.filter((e) => {
+      if (filterClientId) {
+        const cid = e.projectId ? projectClientMap.get(e.projectId) : undefined;
+        if (cid !== filterClientId) return false;
+      }
       if (filterProjectId && e.projectId !== filterProjectId) return false;
       if (filterTaskName.trim()) {
         const taskName = e.taskId ? (taskMap.get(e.taskId)?.name ?? "") : "";
@@ -63,12 +76,13 @@ export default function LogPage() {
       if (toMs !== null && e.startedAt > toMs) return false;
       return true;
     });
-  }, [completedEntries, filterProjectId, filterTaskName, filterTag, dateRange, taskMap]);
+  }, [completedEntries, filterClientId, filterProjectId, filterTaskName, filterTag, dateRange, taskMap, projectClientMap]);
 
   const hasActiveFilter =
-    filterProjectId || filterTaskName || filterTag || dateRange.from || dateRange.to;
+    filterClientId || filterProjectId || filterTaskName || filterTag || dateRange.from || dateRange.to;
 
   function clearFilters() {
+    setFilterClientId("");
     setFilterProjectId("");
     setFilterTaskName("");
     setFilterTag("");
@@ -100,6 +114,18 @@ export default function LogPage() {
 
       {/* Field filters */}
       <div className="flex gap-2 mb-6 flex-wrap">
+        {clients.length > 0 && (
+          <select
+            value={filterClientId}
+            onChange={(e) => setFilterClientId(e.target.value)}
+            className="flex-1 min-w-[130px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+          >
+            <option value="">All Clients</option>
+            {clients.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        )}
         <select
           value={filterProjectId}
           onChange={(e) => setFilterProjectId(e.target.value)}
