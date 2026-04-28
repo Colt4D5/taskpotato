@@ -123,6 +123,24 @@ export function useEntries() {
     [setEntries]
   );
 
+  const deleteEntries = useCallback(
+    (ids: string[]) => {
+      const set = new Set(ids);
+      setEntries((prev) => prev.filter((e) => !set.has(e.id)));
+    },
+    [setEntries]
+  );
+
+  const updateEntries = useCallback(
+    (ids: string[], patch: Partial<Omit<TimeEntry, "id">>) => {
+      const set = new Set(ids);
+      setEntries((prev) =>
+        prev.map((e) => (set.has(e.id) ? { ...e, ...patch } : e))
+      );
+    },
+    [setEntries]
+  );
+
   const runningEntry = entries.find((e) => e.stoppedAt === null) ?? null;
 
   const completedEntries = entries
@@ -140,6 +158,8 @@ export function useEntries() {
     updateEntry,
     updateAllTags,
     deleteEntry,
+    deleteEntries,
+    updateEntries,
     duplicateEntry,
   };
 }

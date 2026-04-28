@@ -296,3 +296,22 @@ All notable changes to TaskPotato are documented here.
   - `Shell` — mounts global nav shortcuts (T/L/R/?)
   - `TimerWidget` — mounts Space shortcut for timer toggle
   - `Nav` — `?` button at bottom of sidebar (desktop only) to trigger the shortcuts modal
+
+## [2.3.0] — 2026-04-28
+
+### Added
+- **Bulk entry operations** — select multiple entries in the Log for mass actions
+  - `☑ Select` button in the Log page header enters bulk-select mode; `Cancel` or `Escape` exits
+  - `BulkActionBar` component (`components/log/BulkActionBar.tsx`) — sticky action bar that appears at the top of the log when in bulk mode; shows selection count with a global select-all/deselect-all checkbox; action buttons activate once ≥1 entry is selected:
+    - **Reassign project** — dropdown of all projects (including "No project"); updates `projectId` and clears `taskId` on all selected entries in one write
+    - **Add tag** — inline text input; tag is normalized to lowercase kebab-case before applying; only appended if the entry doesn't already have it
+    - **Mark billable / Mark non-billable** — bulk toggle billable flag across all selected entries
+    - **Delete** — two-click confirmation (`Delete N` → `Confirm delete`) before removal; no accidental mass wipes
+  - Per-day checkbox in the day section header — select or deselect all entries within a single day; independent of other days
+  - In bulk mode all day sections auto-expand so every entry is visible and selectable
+  - `EntryRow` — new `selectable`, `selected`, and `onToggleSelect` props; renders a checkbox in place of the color dot; action buttons (Edit/Resume/Duplicate/Delete) are hidden while in bulk mode; selected rows get a subtle background highlight
+  - `EntryList` — new `bulkMode`, `selectedIds`, `onToggleSelect`, `onSelectDay`, `onDeselectDay` props; per-day select-all via day header checkbox; suppresses collapse toggle while in bulk mode
+  - `useEntries` — two new batch mutations:
+    - `deleteEntries(ids[])` — single `setEntries` pass filtering out all matching ids
+    - `updateEntries(ids[], patch)` — single `setEntries` pass applying the same patch to all matching entries
+  - Filters are hidden while in bulk mode to keep the UI uncluttered
