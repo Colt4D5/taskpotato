@@ -20,6 +20,10 @@ interface EntryRowProps {
   onResume?: (entry: TimeEntry) => void;
   onDuplicate?: (entry: TimeEntry) => void;
   hasRunning?: boolean;
+  // bulk selection
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 export function EntryRow({
@@ -33,6 +37,9 @@ export function EntryRow({
   onResume,
   onDuplicate,
   hasRunning,
+  selectable,
+  selected,
+  onToggleSelect,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -41,12 +48,24 @@ export function EntryRow({
 
   return (
     <>
-      <div className="group flex items-center gap-3 py-3 px-4 hover:bg-zinc-800/50 rounded-lg transition-colors">
-        {/* Color dot */}
-        <div
-          className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-0.5"
-          style={{ backgroundColor: project?.color ?? "#52525b" }}
-        />
+      <div
+        className={`group flex items-center gap-3 py-3 px-4 hover:bg-zinc-800/50 rounded-lg transition-colors ${selected ? "bg-zinc-800/60" : ""}`}
+      >
+        {/* Checkbox (bulk select mode) or color dot */}
+        {selectable ? (
+          <input
+            type="checkbox"
+            checked={selected ?? false}
+            onChange={() => onToggleSelect?.(entry.id)}
+            className="w-4 h-4 accent-orange-500 cursor-pointer flex-shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <div
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-0.5"
+            style={{ backgroundColor: project?.color ?? "#52525b" }}
+          />
+        )}
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
@@ -94,46 +113,48 @@ export function EntryRow({
           {formatDurationShort(duration)}
         </span>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {onDuplicate && (
+        {/* Actions — hidden in bulk-select mode */}
+        {!selectable && (
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {onDuplicate && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onDuplicate(entry)}
+                className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+                title="Duplicate to today"
+              >
+                ⧉ Copy
+              </Button>
+            )}
+            {!hasRunning && onResume && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onResume(entry)}
+                className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+              >
+                ▶ Resume
+              </Button>
+            )}
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => onDuplicate(entry)}
-              className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
-              title="Duplicate to today"
+              onClick={() => setEditing(true)}
+              className="text-xs px-2 py-1"
             >
-              ⧉ Copy
+              Edit
             </Button>
-          )}
-          {!hasRunning && onResume && (
             <Button
               size="sm"
               variant="ghost"
-              onClick={() => onResume(entry)}
-              className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+              onClick={() => onDelete(entry.id)}
+              className="text-xs px-2 py-1 text-red-400 hover:text-red-300 hover:bg-red-500/10"
             >
-              ▶ Resume
+              Delete
             </Button>
-          )}
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setEditing(true)}
-            className="text-xs px-2 py-1"
-          >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onDelete(entry.id)}
-            className="text-xs px-2 py-1 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-          >
-            Delete
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       <EntryEditor

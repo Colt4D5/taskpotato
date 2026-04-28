@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useClients } from "@/hooks/useClients";
 import { EntryList } from "@/components/log/EntryList";
+import { BulkActionBar } from "@/components/log/BulkActionBar";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
 import { QuickEntryForm } from "@/components/log/QuickEntryForm";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, deleteEntry, resumeEntry, duplicateEntry, addEntry } = useEntries();
+  const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
   const { clients } = useClients();
@@ -23,6 +24,10 @@ export default function LogPage() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
 
+  // Bulk selection state
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   // N shortcut: open quick entry form when not in an input
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -32,10 +37,15 @@ export default function LogPage() {
         e.preventDefault();
         setQuickEntryOpen(true);
       }
+      // Escape exits bulk mode
+      if (e.key === "Escape" && bulkMode) {
+        setBulkMode(false);
+        setSelectedIds(new Set());
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [bulkMode]);
 
   const taskMap = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks]);
 
@@ -97,78 +107,185 @@ export default function LogPage() {
     resumeEntry(entry.id);
   };
 
+  // Bulk selection handlers
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectAll = useCallback(() => {
+    setSelectedIds(new Set(filteredEntries.map((e) => e.id)));
+  }, [filteredEntries]);
+
+  const deselectAll = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const selectDay = useCallback((ids: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+  }, []);
+
+  const deselectDay = useCallback((ids: string[]) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  }, []);
+
+  const handleBulkDelete = useCallback(() => {
+    deleteEntries(Array.from(selectedIds));
+    setSelectedIds(new Set());
+    setBulkMode(false);
+  }, [selectedIds, deleteEntries]);
+
+  const handleBulkReassign = useCallback((projectId: string | null) => {
+    updateEntries(Array.from(selectedIds), { projectId, taskId: null });
+    setSelectedIds(new Set());
+    setBulkMode(false);
+  }, [selectedIds, updateEntries]);
+
+  const handleBulkAddTag = useCallback((tag: string) => {
+    const ids = Array.from(selectedIds);
+    for (const id of ids) {
+      const entry = completedEntries.find((e) => e.id === id);
+      if (!entry) continue;
+      const tags = entry.tags ?? [];
+      if (!tags.includes(tag)) {
+        updateEntry(id, { tags: [...tags, tag] });
+      }
+    }
+    setSelectedIds(new Set());
+    setBulkMode(false);
+  }, [selectedIds, completedEntries, updateEntry]);
+
+  const handleBulkSetBillable = useCallback((billable: boolean) => {
+    updateEntries(Array.from(selectedIds), { billable });
+    setSelectedIds(new Set());
+    setBulkMode(false);
+  }, [selectedIds, updateEntries]);
+
+  function exitBulkMode() {
+    setBulkMode(false);
+    setSelectedIds(new Set());
+  }
+
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold text-zinc-100">Time Log</h1>
-        <button
-          onClick={() => setQuickEntryOpen(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-400 text-white rounded-lg transition-colors font-medium"
-        >
-          <span className="text-base leading-none">+</span> Log time
-        </button>
+        <div className="flex items-center gap-2">
+          {bulkMode ? (
+            <button
+              onClick={exitBulkMode}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-700 hover:bg-zinc-600 text-zinc-300 rounded-lg transition-colors font-medium"
+            >
+              Cancel
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setBulkMode(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
+                title="Select multiple entries for bulk actions"
+              >
+                ☑ Select
+              </button>
+              <button
+                onClick={() => setQuickEntryOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-400 text-white rounded-lg transition-colors font-medium"
+              >
+                <span className="text-base leading-none">+</span> Log time
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Date range filter */}
-      <DateRangeFilter value={dateRange} onChange={setDateRange} />
-
-      {/* Field filters */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {clients.length > 0 && (
-          <select
-            value={filterClientId}
-            onChange={(e) => setFilterClientId(e.target.value)}
-            className="flex-1 min-w-[130px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-          >
-            <option value="">All Clients</option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        )}
-        <select
-          value={filterProjectId}
-          onChange={(e) => setFilterProjectId(e.target.value)}
-          className="flex-1 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-        >
-          <option value="">All Projects</option>
-          {projects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Filter by task name…"
-          value={filterTaskName}
-          onChange={(e) => setFilterTaskName(e.target.value)}
-          className="flex-1 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+      {/* Bulk action bar */}
+      {bulkMode && (
+        <BulkActionBar
+          selectedCount={selectedIds.size}
+          totalCount={filteredEntries.length}
+          projects={projects}
+          onSelectAll={selectAll}
+          onDeselectAll={deselectAll}
+          onDeleteSelected={handleBulkDelete}
+          onReassignProject={handleBulkReassign}
+          onAddTag={handleBulkAddTag}
+          onSetBillable={handleBulkSetBillable}
         />
-        {allTags.length > 0 && (
+      )}
+
+      {/* Date range filter (hidden in bulk mode) */}
+      {!bulkMode && <DateRangeFilter value={dateRange} onChange={setDateRange} />}
+
+      {/* Field filters (hidden in bulk mode) */}
+      {!bulkMode && (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {clients.length > 0 && (
+            <select
+              value={filterClientId}
+              onChange={(e) => setFilterClientId(e.target.value)}
+              className="flex-1 min-w-[130px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            >
+              <option value="">All Clients</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
           <select
-            value={filterTag}
-            onChange={(e) => setFilterTag(e.target.value)}
-            className="flex-1 min-w-[120px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            value={filterProjectId}
+            onChange={(e) => setFilterProjectId(e.target.value)}
+            className="flex-1 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
           >
-            <option value="">All Tags</option>
-            {allTags.map((t) => (
-              <option key={t} value={t}>#{t}</option>
+            <option value="">All Projects</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
             ))}
           </select>
-        )}
-        {hasActiveFilter && (
-          <button
-            onClick={clearFilters}
-            className="px-3 py-2 text-xs text-zinc-500 hover:text-orange-400 border border-zinc-800 rounded-lg transition-colors"
-          >
-            Clear all
-          </button>
-        )}
-      </div>
+          <input
+            type="text"
+            placeholder="Filter by task name…"
+            value={filterTaskName}
+            onChange={(e) => setFilterTaskName(e.target.value)}
+            className="flex-1 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+          />
+          {allTags.length > 0 && (
+            <select
+              value={filterTag}
+              onChange={(e) => setFilterTag(e.target.value)}
+              className="flex-1 min-w-[120px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            >
+              <option value="">All Tags</option>
+              {allTags.map((t) => (
+                <option key={t} value={t}>#{t}</option>
+              ))}
+            </select>
+          )}
+          {hasActiveFilter && (
+            <button
+              onClick={clearFilters}
+              className="px-3 py-2 text-xs text-zinc-500 hover:text-orange-400 border border-zinc-800 rounded-lg transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Filtered entry count hint */}
-      {(dateRange.from || dateRange.to) && (
+      {!bulkMode && (dateRange.from || dateRange.to) && (
         <p className="text-xs text-zinc-500 mb-3">
           {filteredEntries.length === 0
             ? "No entries in this range."
@@ -193,6 +310,11 @@ export default function LogPage() {
         onDuplicate={handleDuplicate}
         onResume={handleResume}
         hasRunning={runningEntry !== null}
+        bulkMode={bulkMode}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleSelect}
+        onSelectDay={selectDay}
+        onDeselectDay={deselectDay}
       />
     </div>
   );
