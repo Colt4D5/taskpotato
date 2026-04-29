@@ -11,7 +11,7 @@ interface ProjectFormProps {
   open: boolean;
   initial?: Partial<Project>;
   clients?: Client[];
-  onSave: (data: { name: string; color: string; budgetHours?: number; clientId?: string | null }) => void;
+  onSave: (data: { name: string; color: string; budgetHours?: number; hourlyRate?: number; clientId?: string | null }) => void;
   onClose: () => void;
   title?: string;
 }
@@ -31,6 +31,9 @@ export function ProjectForm({
   const [budgetRaw, setBudgetRaw] = useState(
     initial?.budgetHours ? String(initial.budgetHours) : ""
   );
+  const [hourlyRateRaw, setHourlyRateRaw] = useState(
+    initial?.hourlyRate ? String(initial.hourlyRate) : ""
+  );
   const [clientId, setClientId] = useState<string>(initial?.clientId ?? "");
   const [error, setError] = useState("");
 
@@ -45,10 +48,16 @@ export function ProjectForm({
       setError("Budget must be a positive number.");
       return;
     }
-    onSave({ name: trimmed, color, budgetHours, clientId: clientId || null });
+    const hourlyRate = hourlyRateRaw.trim() === "" ? undefined : parseFloat(hourlyRateRaw);
+    if (hourlyRate !== undefined && (isNaN(hourlyRate) || hourlyRate < 0)) {
+      setError("Hourly rate must be a non-negative number.");
+      return;
+    }
+    onSave({ name: trimmed, color, budgetHours, hourlyRate, clientId: clientId || null });
     setName("");
     setColor(DEFAULT_COLOR);
     setBudgetRaw("");
+    setHourlyRateRaw("");
     setClientId("");
     setError("");
   };
@@ -99,6 +108,26 @@ export function ProjectForm({
           />
           <p className="text-xs text-zinc-500">
             Set a cap on total tracked hours. You'll see burn progress on the Reports page.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-400">
+            Hourly Rate (USD) <span className="text-zinc-500 font-normal">— optional</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">$</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={hourlyRateRaw}
+              onChange={(e) => { setHourlyRateRaw(e.target.value); setError(""); }}
+              placeholder="e.g. 150"
+              className="rounded-md bg-zinc-800 border border-zinc-700 pl-7 pr-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 w-full"
+            />
+          </div>
+          <p className="text-xs text-zinc-500">
+            Used to calculate billable earnings on the Reports page.
           </p>
         </div>
         <div className="flex justify-end gap-2 pt-2">

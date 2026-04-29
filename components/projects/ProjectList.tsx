@@ -10,7 +10,7 @@ interface ProjectListProps {
   projects: Project[];
   tasks: Task[];
   clients?: Client[];
-  onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null) => void;
+  onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number) => void;
   onUpdateProject: (id: string, patch: Partial<Omit<Project, "id" | "createdAt">>) => void;
   onDeleteProject: (id: string) => void;
   onAddTask: (projectId: string, name: string, notes: string) => void;
@@ -177,8 +177,8 @@ export function ProjectList({
       <ProjectForm
         open={addOpen}
         clients={clients}
-        onSave={({ name, color, budgetHours, clientId }) => {
-          onAddProject(name, color, budgetHours, clientId);
+        onSave={({ name, color, budgetHours, hourlyRate, clientId }) => {
+          onAddProject(name, color, budgetHours, clientId, hourlyRate);
           setAddOpen(false);
         }}
         onClose={() => setAddOpen(false)}
@@ -190,8 +190,8 @@ export function ProjectList({
           initial={editingProject}
           clients={clients}
           title="Edit Project"
-          onSave={({ name, color, budgetHours, clientId }) => {
-            onUpdateProject(editingProject.id, { name, color, budgetHours, clientId });
+          onSave={({ name, color, budgetHours, hourlyRate, clientId }) => {
+            onUpdateProject(editingProject.id, { name, color, budgetHours, hourlyRate: hourlyRate ?? undefined, clientId });
             setEditingProject(null);
           }}
           onClose={() => setEditingProject(null)}

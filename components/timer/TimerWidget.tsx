@@ -107,8 +107,8 @@ export function TimerWidget() {
   const budgetPct = budgetMs > 0 ? selectedProjectTotalMs / budgetMs : 0;
   const budgetWarning = budgetMs > 0 && budgetPct >= 0.8;
 
-  const handleNewProject = (data: { name: string; color: string; budgetHours?: number }) => {
-    const project = addProject(data.name, data.color, data.budgetHours);
+  const handleNewProject = (data: { name: string; color: string; budgetHours?: number; hourlyRate?: number }) => {
+    const project = addProject(data.name, data.color, data.budgetHours, null, data.hourlyRate);
     setSelectedProjectId(project.id);
     setSelectedTaskId(null);
     setShowProjectForm(false);

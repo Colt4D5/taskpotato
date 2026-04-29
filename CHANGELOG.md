@@ -2,6 +2,25 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [2.4.0] — 2026-04-29
+
+### Added
+- **Per-project hourly rates & earnings breakdown** — set a billing rate on any project and track earned revenue on the Reports page
+  - `Project.hourlyRate?: number` — new optional field on the `Project` type; `undefined` or absent means no rate
+  - `ProjectForm` — new "Hourly Rate (USD)" numeric input in the create/edit modal; optional; dollar-sign prefix hint; accepts decimals (e.g. 150, 87.50); validation rejects negative values; help text explains Reports page usage
+  - `useProjects.addProject()` — updated signature accepts optional `hourlyRate`; stored on the project record
+  - `ProjectList` — threads `hourlyRate` through from form to hook on both create and edit
+  - `TimerWidget` inline project creation — threads `hourlyRate` from inline `ProjectForm` to hook
+  - `EarningsBreakdown` component (`components/reports/EarningsBreakdown.tsx`) — Reports page section showing billable earnings for the selected week per project:
+    - Only projects with a rate configured appear
+    - Only entries flagged as **billable** count toward earnings (non-billable time is excluded)
+    - Each row shows the project badge, rate per hour, billable duration, and earned amount as a green monospace value
+    - Horizontal progress bars scaled relative to the top-earning project
+    - Weekly total in green displayed in the section header
+    - Hides entirely when no projects have a rate set
+  - Reports page — `EarningsBreakdown` inserted above the Client Breakdown section
+  - JSON export/import — `hourlyRate` is part of the project object and round-trips automatically; no schema changes needed
+
 ## [2.2.0] — 2026-04-27
 
 ### Added

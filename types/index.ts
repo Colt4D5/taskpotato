@@ -13,6 +13,7 @@ export interface Project {
   archived: boolean;
   createdAt: number;
   budgetHours?: number; // 0 or undefined = no budget
+  hourlyRate?: number;   // USD per hour; undefined = no rate set
   clientId?: string | null;
 }
 
