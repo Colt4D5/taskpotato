@@ -14,6 +14,7 @@ import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
 import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
 import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
 import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
+import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
@@ -285,6 +286,9 @@ export default function ReportsPage() {
           ))}
         </div>
       </section>
+
+      {/* Earnings breakdown */}
+      <EarningsBreakdown projects={projects} entries={weekEntries} />
 
       {/* Client breakdown */}
       <ClientBreakdown
