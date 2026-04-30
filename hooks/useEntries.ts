@@ -100,6 +100,38 @@ export function useEntries() {
     [setEntries]
   );
 
+  /**
+   * Split a completed entry at `splitAt` (epoch ms).
+   * Entry A: original.startedAt → splitAt, keeps all fields.
+   * Entry B: splitAt → original.stoppedAt, inherits all fields; caller may
+   *           override projectId/taskId via the optional `secondPatch` arg.
+   */
+  const splitEntry = useCallback(
+    (id: string, splitAt: number, secondPatch?: Partial<Omit<TimeEntry, "id">>) => {
+      const source = entries.find((e) => e.id === id);
+      if (!source || source.stoppedAt === null) return;
+      if (splitAt <= source.startedAt || splitAt >= source.stoppedAt) return;
+
+      const entryA: TimeEntry = { ...source, stoppedAt: splitAt, offsetMs: undefined, resumedAt: undefined };
+      const entryB: TimeEntry = {
+        id: uuid(),
+        projectId: source.projectId,
+        taskId: source.taskId,
+        notes: source.notes,
+        tags: source.tags ? [...source.tags] : [],
+        billable: source.billable ?? true,
+        startedAt: splitAt,
+        stoppedAt: source.stoppedAt,
+        ...secondPatch,
+      };
+
+      setEntries((prev) =>
+        prev.flatMap((e) => (e.id === id ? [entryA, entryB] : [e]))
+      );
+    },
+    [entries, setEntries]
+  );
+
   const updateAllTags = useCallback(
     (oldTag: string, newTag: string | null) => {
       setEntries((prev) =>
@@ -161,5 +193,6 @@ export function useEntries() {
     deleteEntries,
     updateEntries,
     duplicateEntry,
+    splitEntry,
   };
 }

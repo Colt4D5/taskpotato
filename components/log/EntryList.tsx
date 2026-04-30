@@ -14,6 +14,7 @@ interface EntryListProps {
   onDelete: (id: string) => void;
   onDuplicate?: (entry: TimeEntry) => void;
   onResume?: (entry: TimeEntry) => void;
+  onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
   // bulk selection
   bulkMode?: boolean;
@@ -39,6 +40,7 @@ export function EntryList({
   onDelete,
   onDuplicate,
   onResume,
+  onSplit,
   hasRunning,
   bulkMode,
   selectedIds,
@@ -185,6 +187,7 @@ export function EntryList({
                     tasks={tasks}
                     onResume={onResume}
                     hasRunning={hasRunning}
+                    onSplit={onSplit}
                     selectable={bulkMode}
                     selected={selectedIds?.has(entry.id)}
                     onToggleSelect={onToggleSelect}
