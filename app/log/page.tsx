@@ -12,7 +12,7 @@ import { QuickEntryForm } from "@/components/log/QuickEntryForm";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry } = useEntries();
+  const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
   const { clients } = useClients();
@@ -172,6 +172,13 @@ export default function LogPage() {
     setBulkMode(false);
   }, [selectedIds, updateEntries]);
 
+  const handleSplit = useCallback(
+    (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => {
+      splitEntry(id, splitAt, { projectId: secondProjectId, taskId: secondTaskId });
+    },
+    [splitEntry]
+  );
+
   function exitBulkMode() {
     setBulkMode(false);
     setSelectedIds(new Set());
@@ -309,6 +316,7 @@ export default function LogPage() {
         onDelete={deleteEntry}
         onDuplicate={handleDuplicate}
         onResume={handleResume}
+        onSplit={handleSplit}
         hasRunning={runningEntry !== null}
         bulkMode={bulkMode}
         selectedIds={selectedIds}

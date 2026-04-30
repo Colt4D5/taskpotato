@@ -2,6 +2,22 @@
 
 All notable changes to TaskPotato are documented here.
 
+## [2.5.0] — 2026-04-30
+
+### Added
+- **Entry splitting** — divide any completed entry into two entries at an arbitrary split point
+  - `useEntries.splitEntry(id, splitAtMs, secondPatch?)` — replaces the original entry in-place with two entries: Entry A inherits all original fields with `stoppedAt = splitAt`; Entry B starts at `splitAt` and can optionally have a different `projectId` and `taskId` via `secondPatch`; both entries preserve notes, tags, and billable flag; operation is a single `setEntries` pass using `flatMap`
+  - `EntrySplitModal` component (`components/log/EntrySplitModal.tsx`) — modal for configuring the split:
+    - Shows original entry summary (description, project badge, time range, total duration)
+    - Time-of-day picker (`<input type="time" step="1">`) pre-seeded to the midpoint of the entry
+    - Live preview of the two resulting segment durations, updating as the split time changes
+    - Project selector for the second segment (defaults to same as original)
+    - Task selector for the second segment, filtered to the chosen project (hidden when project has no tasks)
+    - Inline validation: rejects split time outside entry bounds, or either segment under 1 second
+  - `EntryRow` — new **✂ Split** action button in the hover action bar; only shown for completed entries; hidden in bulk-select mode
+  - `EntryList` — threads `onSplit` prop down to `EntryRow`
+  - Log page — wires `handleSplit` → `splitEntry`; both resulting entries appear immediately in the log via existing reactive storage
+
 ## [2.4.0] — 2026-04-29
 
 ### Added

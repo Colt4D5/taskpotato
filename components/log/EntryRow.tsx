@@ -7,6 +7,7 @@ import { formatTime } from "@/lib/dateUtils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EntryEditor } from "./EntryEditor";
+import { EntrySplitModal } from "./EntrySplitModal";
 import { renderMarkdown, hasMarkdown } from "@/lib/markdown";
 
 interface EntryRowProps {
@@ -19,6 +20,7 @@ interface EntryRowProps {
   tasks: Task[];
   onResume?: (entry: TimeEntry) => void;
   onDuplicate?: (entry: TimeEntry) => void;
+  onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
   // bulk selection
   selectable?: boolean;
@@ -36,12 +38,14 @@ export function EntryRow({
   tasks,
   onResume,
   onDuplicate,
+  onSplit,
   hasRunning,
   selectable,
   selected,
   onToggleSelect,
 }: EntryRowProps) {
   const [editing, setEditing] = useState(false);
+  const [splitting, setSplitting] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const duration = elapsedMs(entry.startedAt, entry.stoppedAt);
   const notesHasMd = entry.notes ? hasMarkdown(entry.notes) : false;
@@ -137,6 +141,17 @@ export function EntryRow({
                 ▶ Resume
               </Button>
             )}
+            {onSplit && entry.stoppedAt !== null && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSplitting(true)}
+                className="text-xs px-2 py-1 text-zinc-400 hover:text-orange-400"
+                title="Split entry into two"
+              >
+                ✂ Split
+              </Button>
+            )}
             <Button
               size="sm"
               variant="ghost"
@@ -156,6 +171,18 @@ export function EntryRow({
           </div>
         )}
       </div>
+
+      <EntrySplitModal
+        open={splitting}
+        entry={entry}
+        projects={projects}
+        tasks={tasks}
+        onSplit={(splitAt, secondProjectId, secondTaskId) => {
+          onSplit!(entry.id, splitAt, secondProjectId, secondTaskId);
+          setSplitting(false);
+        }}
+        onClose={() => setSplitting(false)}
+      />
 
       <EntryEditor
         open={editing}
