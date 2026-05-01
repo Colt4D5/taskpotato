@@ -1,6 +1,13 @@
-# Changelog
+## [2.6.0] — 2026-05-01
 
-All notable changes to TaskPotato are documented here.
+### Added
+- **Log stats bar** — live summary strip above the entry list showing aggregate metrics for whatever is currently filtered
+  - `LogStatsBar` component (`components/log/LogStatsBar.tsx`) — renders a row of compact stat chips: **Total** time (orange), **Billable** time with percentage (green), **Entries** count, **Days** count, and **Avg / day** (shown only when more than one day is present in the filtered set)
+  - Stats recompute instantly as any filter changes — date range, project, task, tag, client — via `useMemo` over the `filteredEntries` array already wired to all filters
+  - Replaces the previous plain-text "N entries in selected range" hint that only appeared when a date range was active
+  - Billable calculation respects the `billable !== false` convention used throughout the app (entries without the field are treated as billable)
+  - Only rendered when at least one filtered entry exists — no empty-state noise
+  - Hidden in bulk-select mode to avoid layout clutter while selecting entries
 
 ## [2.5.0] — 2026-04-30
 
