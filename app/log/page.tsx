@@ -9,6 +9,7 @@ import { EntryList } from "@/components/log/EntryList";
 import { BulkActionBar } from "@/components/log/BulkActionBar";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
 import { QuickEntryForm } from "@/components/log/QuickEntryForm";
+import { LogStatsBar } from "@/components/log/LogStatsBar";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 
 export default function LogPage() {
@@ -291,13 +292,9 @@ export default function LogPage() {
         </div>
       )}
 
-      {/* Filtered entry count hint */}
-      {!bulkMode && (dateRange.from || dateRange.to) && (
-        <p className="text-xs text-zinc-500 mb-3">
-          {filteredEntries.length === 0
-            ? "No entries in this range."
-            : `${filteredEntries.length} entr${filteredEntries.length === 1 ? "y" : "ies"} in selected range`}
-        </p>
+      {/* Stats bar — shown whenever any filter is active or there are entries to summarize */}
+      {!bulkMode && filteredEntries.length > 0 && (
+        <LogStatsBar entries={filteredEntries} />
       )}
 
       <QuickEntryForm

@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 20 complete**
+🚧 **Active Development — Night 21 complete**
 
 ## Features
 
@@ -59,6 +59,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Client management — create named clients with color labels and optional notes; associate projects with clients; client breakdown section on Reports showing time distribution per client; client filter on the Log page; clients included in JSON export/import
 - ✅ Bulk entry operations — ☑ Select mode on the Log page; select individual entries or all entries in a day; bulk delete (with confirmation), bulk project reassign, bulk tag add, bulk billable toggle; Escape to exit
 - ✅ Entry splitting — ✂ Split button on any completed entry; configure split time with live duration preview for both segments; optionally assign the second segment to a different project and task
+- ✅ Log stats bar — live summary row above the entry list showing total time, billable time with percentage, entry count, active days, and average time per day; updates instantly as filters change
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
