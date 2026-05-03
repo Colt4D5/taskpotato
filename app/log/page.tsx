@@ -24,6 +24,7 @@ export default function LogPage() {
   const [filterTag, setFilterTag] = useState<string>("");
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
+  const [timelineMode, setTimelineMode] = useState(false);
 
   // Bulk selection state
   const [bulkMode, setBulkMode] = useState(false);
@@ -32,6 +33,12 @@ export default function LogPage() {
   // N shortcut: open quick entry form when not in an input
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.key === "v" || e.key === "V") {
+        const tag2 = (e.target as HTMLElement).tagName;
+        if (tag2 === "INPUT" || tag2 === "TEXTAREA" || tag2 === "SELECT") return;
+        e.preventDefault();
+        setTimelineMode((prev) => !prev);
+      }
       if (e.key === "n" || e.key === "N") {
         const tag = (e.target as HTMLElement).tagName;
         if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -200,6 +207,20 @@ export default function LogPage() {
           ) : (
             <>
               <button
+                onClick={() => setTimelineMode((v) => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors font-medium ${
+                  timelineMode
+                    ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
+                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border-zinc-700"
+                }`}
+                title={timelineMode ? "Switch to list view" : "Switch to timeline view"}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+                Timeline
+              </button>
+              <button
                 onClick={() => setBulkMode(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
                 title="Select multiple entries for bulk actions"
@@ -315,6 +336,7 @@ export default function LogPage() {
         onResume={handleResume}
         onSplit={handleSplit}
         hasRunning={runningEntry !== null}
+        timelineMode={timelineMode && !bulkMode}
         bulkMode={bulkMode}
         selectedIds={selectedIds}
         onToggleSelect={toggleSelect}

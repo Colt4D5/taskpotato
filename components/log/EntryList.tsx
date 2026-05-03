@@ -5,6 +5,7 @@ import { TimeEntry, Project, Task } from "@/types";
 import { groupByDay, formatDayLabel } from "@/lib/dateUtils";
 import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { EntryRow } from "./EntryRow";
+import { DayTimeline } from "./DayTimeline";
 
 interface EntryListProps {
   entries: TimeEntry[];
@@ -22,6 +23,7 @@ interface EntryListProps {
   onToggleSelect?: (id: string) => void;
   onSelectDay?: (ids: string[]) => void;
   onDeselectDay?: (ids: string[]) => void;
+  timelineMode?: boolean;
 }
 
 function todayKey(): string {
@@ -47,6 +49,7 @@ export function EntryList({
   onToggleSelect,
   onSelectDay,
   onDeselectDay,
+  timelineMode,
 }: EntryListProps) {
   const completed = entries.filter((e) => e.stoppedAt !== null);
   const grouped = groupByDay(completed);
@@ -172,7 +175,7 @@ export function EntryList({
             </button>
 
             {/* Collapsible entry list */}
-            {!isCollapsed && (
+            {!isCollapsed && !timelineMode && (
               <div className="bg-zinc-900 rounded-xl border border-zinc-800 divide-y divide-zinc-800/50 mt-1">
                 {dayEntries.map((entry) => (
                   <EntryRow
@@ -193,6 +196,18 @@ export function EntryList({
                     onToggleSelect={onToggleSelect}
                   />
                 ))}
+              </div>
+            )}
+
+            {/* Timeline view */}
+            {!isCollapsed && timelineMode && (
+              <div className="bg-zinc-900 rounded-xl border border-zinc-800 mt-1 overflow-hidden">
+                <DayTimeline
+                  dateStr={day}
+                  entries={dayEntries}
+                  projects={projects}
+                  tasks={tasks}
+                />
               </div>
             )}
           </div>
