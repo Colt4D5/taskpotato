@@ -357,3 +357,19 @@
     - `deleteEntries(ids[])` — single `setEntries` pass filtering out all matching ids
     - `updateEntries(ids[], patch)` — single `setEntries` pass applying the same patch to all matching entries
   - Filters are hidden while in bulk mode to keep the UI uncluttered
+
+## [2.7.0] — 2026-05-03
+
+### Added
+- **Day timeline view** — visualize each day's time entries as proportional blocks on a 24-hour axis
+  - `DayTimeline` component (`components/log/DayTimeline.tsx`) — renders a 1152px tall (48px/hour) scrollable 24-hour grid for a single day
+    - Hour grid lines at every hour; heavier lines every 3 hours, strongest every 6; hour labels at 12 AM, 3 AM, 6 AM, 9 AM, 12 PM, 3 PM, 6 PM, 9 PM
+    - Each entry is rendered as a colored block proportional to its actual duration; block color derives from the project color (filled at 20% opacity with a solid 3px left border)
+    - Overlap detection: entries that run concurrently are split into side-by-side columns using a greedy interval algorithm — no entries are hidden or obscured
+    - Entry blocks show a description label and task/duration sub-label when tall enough (≥28px); very short blocks show nothing but remain hoverable
+    - Hover tooltip shows full description, exact time range, and formatted duration
+    - "Now" indicator — an orange dot + horizontal line shows the current time of day when viewing today
+  - Log page — new **Timeline** toggle button in the header (between the existing controls); active state highlighted in orange; timeline mode is mutually exclusive with bulk-select mode
+  - `V` keyboard shortcut on the Log page toggles timeline mode (when not in an input)
+  - `KeyboardShortcutsHelp` — `V` shortcut added to reference modal
+  - `EntryList` — `timelineMode` prop; when true, replaces the flat entry list per day section with `DayTimeline`; collapse/expand of day sections still works normally in timeline mode
