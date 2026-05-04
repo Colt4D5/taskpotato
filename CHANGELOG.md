@@ -1,3 +1,16 @@
+## [2.8.0] — 2026-05-04
+
+### Added
+- **Custom date range on Reports** — toggle between Weekly navigation and an arbitrary date range picker
+  - Mode toggle buttons (`Weekly` / `Custom Range`) at the top of the Reports page; selected mode highlighted in orange
+  - Custom range picker: two `<input type="date">` fields (From / To) with inline validation (start ≤ end); error message shown when range is inverted
+  - Quick-select shortcut buttons: **Today**, **This week**, **This month** — fill both date pickers instantly without manual typing
+  - All report sections (total, billable breakdown, hours-per-day chart, earnings, client breakdown, project breakdown, task totals, tag totals) recompute reactively for the selected range
+  - Hours-per-day bar chart adapts: ranges ≤ 31 days show labeled bars; ranges > 31 days up to 60 days show a compact sparkline (bars with hover tooltips, no x-axis labels) to avoid overflow
+  - Weekly goal progress card is suppressed in custom range mode (goal is defined per-week; cross-week ranges would produce misleading numbers)
+  - Project Budget card continues to show all-time burn regardless of selected range (unchanged behavior)
+  - Weekly mode retains the existing ← Prev / Next → navigation and "Back to this week" shortcut
+
 ## [2.6.0] — 2026-05-01
 
 ### Added

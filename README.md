@@ -30,6 +30,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Task CRUD — nested under projects, archive/restore/delete
 - ✅ Reports — weekly bar chart, project breakdown with duration bars, task totals table
 - ✅ Week navigation in reports (browse any prior week)
+- ✅ Custom date range on Reports — toggle between weekly navigation and an arbitrary date range picker with Today / This week / This month quick-selects; all report sections update reactively
 - ✅ Settings — preferences (week start, default view), full JSON export (projects + tasks + entries), JSON import
 - ✅ Daily summary panel on timer page (total time, project bar chart, entry list)
 - ✅ Inline project creation from timer page (+ New Project button → auto-select)
