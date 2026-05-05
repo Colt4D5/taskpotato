@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 22 complete**
+🚧 **Active Development — Night 23 complete**
 
 ## Features
 
@@ -62,6 +62,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Entry splitting — ✂ Split button on any completed entry; configure split time with live duration preview for both segments; optionally assign the second segment to a different project and task
 - ✅ Log stats bar — live summary row above the entry list showing total time, billable time with percentage, entry count, active days, and average time per day; updates instantly as filters change
 - ✅ Day timeline view — toggle the Log page to Timeline mode (button or press `V`) to see each day's entries as proportional colored blocks on a 24-hour axis; overlap detection splits concurrent entries into side-by-side columns; current-time indicator on today; hover tooltips with full entry details
+- ✅ 12-week rolling trend chart — Reports page section showing 12 weeks of bar chart history; toggle between Total and Billable split views (stacked bars: green billable / zinc non-billable); summary chips for 12-week total, average per active week, average billable, and current week; current week highlighted in orange; per-bar hover tooltips
 - ⬜ Responsive mobile polish
 
 ## Tech Stack

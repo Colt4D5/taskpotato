@@ -1,4 +1,19 @@
-## [2.8.0] — 2026-05-04
+## [2.9.0] — 2026-05-05
+
+### Added
+- **12-week rolling trend chart** — Reports page section visualizing weekly totals over the past 12 weeks
+  - `WeeklyTrend` component (`components/reports/WeeklyTrend.tsx`) — bar chart spanning the 12 most recent calendar weeks (configurable week start respected)
+  - Two display modes toggled by buttons in the section header:
+    - **Total** — solid orange bars scaled to max week; current week rendered at full saturation, past weeks at 60% opacity
+    - **Billable split** — stacked bars showing billable (green) on top and non-billable (zinc) below; proportions derived from per-entry billable flags; current week at full saturation
+  - Summary chip row: 12-week total, average per active week, average billable per active week, current week total (shown only if current week has data)
+  - Per-bar hover tooltip: week label, total duration, and (in billable split mode) billable + non-billable breakdown
+  - Current week x-axis label highlighted in orange with bold text; empty weeks rendered as a thin baseline to show gaps
+  - Legend strip shown in billable split mode
+  - Hides entirely when no completed entries exist (no empty-state noise)
+  - Inserted in Reports page between the Activity heatmap section and the Weekly/Custom mode toggle
+
+
 
 ### Added
 - **Custom date range on Reports** — toggle between Weekly navigation and an arbitrary date range picker

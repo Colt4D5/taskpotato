@@ -15,6 +15,7 @@ import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
 import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
 import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
+import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
@@ -213,6 +214,13 @@ export default function ReportsPage() {
           <ActivityHeatmap stats={streakStats} />
         </section>
       )}
+
+      {/* 12-week trend */}
+      <WeeklyTrend
+        entries={completedEntries}
+        projects={projects}
+        weekStartsOn={settings.weekStartsOn}
+      />
 
       {/* Mode toggle */}
       <div className="flex items-center gap-2 mb-4">
