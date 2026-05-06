@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 23 complete**
+🚧 **Active Development — Night 24 complete**
 
 ## Features
 
@@ -59,6 +59,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Tag manager — Settings > Tags lists all tags with entry counts; rename (normalizes to lowercase kebab-case, blocks name collision), merge two tags into one, or delete a tag; all changes apply instantly across every entry
 - ✅ Client management — create named clients with color labels and optional notes; associate projects with clients; client breakdown section on Reports showing time distribution per client; client filter on the Log page; clients included in JSON export/import
 - ✅ Bulk entry operations — ☑ Select mode on the Log page; select individual entries or all entries in a day; bulk delete (with confirmation), bulk project reassign, bulk tag add, bulk billable toggle; Escape to exit
+- ✅ Live browser tab title — tab shows `▶ HH:MM:SS — description (project)` while timer is running; resets to "TaskPotato" when idle
 - ✅ Entry splitting — ✂ Split button on any completed entry; configure split time with live duration preview for both segments; optionally assign the second segment to a different project and task
 - ✅ Log stats bar — live summary row above the entry list showing total time, billable time with percentage, entry count, active days, and average time per day; updates instantly as filters change
 - ✅ Day timeline view — toggle the Log page to Timeline mode (button or press `V`) to see each day's entries as proportional colored blocks on a 24-hour axis; overlap detection splits concurrent entries into side-by-side columns; current-time indicator on today; hover tooltips with full entry details

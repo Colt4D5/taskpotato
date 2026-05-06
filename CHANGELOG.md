@@ -401,3 +401,14 @@
   - `V` keyboard shortcut on the Log page toggles timeline mode (when not in an input)
   - `KeyboardShortcutsHelp` — `V` shortcut added to reference modal
   - `EntryList` — `timelineMode` prop; when true, replaces the flat entry list per day section with `DayTimeline`; collapse/expand of day sections still works normally in timeline mode
+
+## [3.0.0] — 2026-05-06
+
+### Added
+- **Live browser tab title** — the browser tab shows the running timer at a glance, no need to keep the tab focused
+  - `DynamicTitle` component (`components/layout/DynamicTitle.tsx`) — mounted in `Shell`; drives `document.title` via a `setInterval` that ticks every second
+  - While a timer is running: `▶ HH:MM:SS — <description> (<project>)` — if notes are set, they appear first; if a project is selected, it appears in parentheses after the description; if only a project is set (no notes), the project name alone is shown; if neither, falls back to "Timer running"
+  - When idle or after the timer is stopped: title resets to `"TaskPotato"`
+  - Elapsed time calculation is consistent with `useTimer` — respects `offsetMs` and `resumedAt` for resumed entries
+  - Pure side-effect component (renders `null`); zero layout impact
+  - Interval is torn down and title reset on unmount or when `runningEntry` becomes `null`
