@@ -16,6 +16,8 @@ import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
 import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
 import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
+import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
+import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
@@ -182,6 +184,8 @@ export default function ReportsPage() {
   // Validate custom range
   const customRangeValid = customFrom <= customTo;
 
+  const summaryData = buildReportSummaryData(rangeEntries, projects, tasks, weekLabel);
+
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
       <h1 className="text-2xl font-semibold text-zinc-100 mb-6">Reports</h1>
@@ -342,16 +346,21 @@ export default function ReportsPage() {
       {customRangeValid && (
         <>
           {/* Range total */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-zinc-500">
-                {mode === "week" && isCurrentWeek ? "This week" : "Total"}
-              </p>
-              <p className="text-3xl font-mono font-semibold text-zinc-100 mt-0.5">
-                {formatDurationShort(totalRangeMs)}
-              </p>
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-zinc-500">
+                  {mode === "week" && isCurrentWeek ? "This week" : "Total"}
+                </p>
+                <p className="text-3xl font-mono font-semibold text-zinc-100 mt-0.5">
+                  {formatDurationShort(totalRangeMs)}
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <p className="text-xs text-zinc-600">{weekLabel}</p>
+                <CopySummaryButton data={summaryData} />
+              </div>
             </div>
-            <p className="text-xs text-zinc-600">{weekLabel}</p>
           </div>
 
           {/* Weekly goal progress — only in week mode */}
