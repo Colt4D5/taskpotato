@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useEntries } from "@/hooks/useEntries";
 import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
@@ -22,6 +22,8 @@ export default function LogPage() {
   const [filterTaskName, setFilterTaskName] = useState<string>("");
   const [filterProjectId, setFilterProjectId] = useState<string>("");
   const [filterTag, setFilterTag] = useState<string>("");
+  const [filterNotes, setFilterNotes] = useState<string>("");
+  const notesSearchRef = useRef<HTMLInputElement>(null);
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
   const [timelineMode, setTimelineMode] = useState(false);
@@ -44,6 +46,14 @@ export default function LogPage() {
         if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
         e.preventDefault();
         setQuickEntryOpen(true);
+      }
+      // / shortcut: focus notes search
+      if (e.key === "/") {
+        const tag3 = (e.target as HTMLElement).tagName;
+        if (tag3 === "INPUT" || tag3 === "TEXTAREA" || tag3 === "SELECT") return;
+        e.preventDefault();
+        notesSearchRef.current?.focus();
+        notesSearchRef.current?.select();
       }
       // Escape exits bulk mode
       if (e.key === "Escape" && bulkMode) {
@@ -90,20 +100,25 @@ export default function LogPage() {
         if (!taskName.toLowerCase().includes(filterTaskName.trim().toLowerCase())) return false;
       }
       if (filterTag && !(e.tags ?? []).includes(filterTag)) return false;
+      if (filterNotes.trim()) {
+        const q = filterNotes.trim().toLowerCase();
+        if (!e.notes?.toLowerCase().includes(q)) return false;
+      }
       if (fromMs !== null && e.startedAt < fromMs) return false;
       if (toMs !== null && e.startedAt > toMs) return false;
       return true;
     });
-  }, [completedEntries, filterClientId, filterProjectId, filterTaskName, filterTag, dateRange, taskMap, projectClientMap]);
+  }, [completedEntries, filterClientId, filterProjectId, filterTaskName, filterTag, filterNotes, dateRange, taskMap, projectClientMap]);
 
   const hasActiveFilter =
-    filterClientId || filterProjectId || filterTaskName || filterTag || dateRange.from || dateRange.to;
+    filterClientId || filterProjectId || filterTaskName || filterTag || filterNotes || dateRange.from || dateRange.to;
 
   function clearFilters() {
     setFilterClientId("");
     setFilterProjectId("");
     setFilterTaskName("");
     setFilterTag("");
+    setFilterNotes("");
     setDateRange({ from: "", to: "" });
   }
 
@@ -284,6 +299,15 @@ export default function LogPage() {
             ))}
           </select>
           <input
+            ref={notesSearchRef}
+            type="text"
+            placeholder="Search notes… (press /)"
+            value={filterNotes}
+            onChange={(e) => setFilterNotes(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Escape") { setFilterNotes(""); notesSearchRef.current?.blur(); } }}
+            className="flex-1 min-w-[160px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 placeholder-zinc-600 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+          />
+          <input
             type="text"
             placeholder="Filter by task name…"
             value={filterTaskName}
@@ -327,6 +351,7 @@ export default function LogPage() {
       />
 
       <EntryList
+        searchQuery={filterNotes}
         entries={filteredEntries}
         projects={projects}
         tasks={tasks}

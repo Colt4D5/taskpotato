@@ -17,6 +17,7 @@ interface EntryListProps {
   onResume?: (entry: TimeEntry) => void;
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
+  searchQuery?: string;
   // bulk selection
   bulkMode?: boolean;
   selectedIds?: Set<string>;
@@ -44,6 +45,7 @@ export function EntryList({
   onResume,
   onSplit,
   hasRunning,
+  searchQuery = "",
   bulkMode,
   selectedIds,
   onToggleSelect,
@@ -194,6 +196,7 @@ export function EntryList({
                     selectable={bulkMode}
                     selected={selectedIds?.has(entry.id)}
                     onToggleSelect={onToggleSelect}
+                    searchQuery={searchQuery}
                   />
                 ))}
               </div>
