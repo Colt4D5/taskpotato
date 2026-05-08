@@ -1,3 +1,16 @@
+## [3.2.0] — 2026-05-08
+
+### Added
+- **Notes full-text search on the Log page** — find any entry by its description without scrolling through the entire log
+  - New "Search notes…" text input in the Log filter bar; filters `filteredEntries` to only entries whose `notes` contain the query (case-insensitive substring match)
+  - Press `/` anywhere on the Log page (when not in another input) to instantly focus the search field and select all text — no mouse required; press `Esc` inside the field to clear the query and blur
+  - `HighlightText` component (`components/ui/HighlightText.tsx`) — renders a string with all occurrences of the search query highlighted in amber (`bg-amber-400/30 text-amber-200`) using a regex split; resets to plain rendering when query is empty
+  - `EntryRow` — accepts new `searchQuery?: string` prop; passes it to `HighlightText` for the notes/description field so matches are visible inline without opening the editor
+  - `EntryList` — accepts and threads `searchQuery` prop through to each `EntryRow`
+  - `LogStatsBar` stat chips update live as notes search filters the entry set
+  - Clears with "Clear all" alongside all other active filters
+  - `KeyboardShortcutsHelp` — `/` shortcut added to the reference modal
+
 ## [3.1.0] — 2026-05-07
 
 ### Added

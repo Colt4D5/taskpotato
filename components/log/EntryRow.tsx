@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { EntryEditor } from "./EntryEditor";
 import { EntrySplitModal } from "./EntrySplitModal";
 import { renderMarkdown, hasMarkdown } from "@/lib/markdown";
+import { HighlightText } from "@/components/ui/HighlightText";
 
 interface EntryRowProps {
   entry: TimeEntry;
@@ -22,6 +23,7 @@ interface EntryRowProps {
   onDuplicate?: (entry: TimeEntry) => void;
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
+  searchQuery?: string;
   // bulk selection
   selectable?: boolean;
   selected?: boolean;
@@ -40,6 +42,7 @@ export function EntryRow({
   onDuplicate,
   onSplit,
   hasRunning,
+  searchQuery = "",
   selectable,
   selected,
   onToggleSelect,
@@ -81,7 +84,7 @@ export function EntryRow({
                 className={`text-sm text-zinc-100 text-left ${notesHasMd ? "cursor-pointer hover:text-orange-300" : ""} ${expanded ? "" : "truncate max-w-xs"}`}
                 title={notesHasMd ? (expanded ? "Collapse preview" : "Expand markdown preview") : undefined}
               >
-                {entry.notes}
+                <HighlightText text={entry.notes} query={searchQuery} />
               </button>
             ) : (
               <span className="text-sm text-zinc-500 italic">No description</span>
