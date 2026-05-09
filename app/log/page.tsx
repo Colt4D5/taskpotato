@@ -10,10 +10,17 @@ import { BulkActionBar } from "@/components/log/BulkActionBar";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
 import { QuickEntryForm } from "@/components/log/QuickEntryForm";
 import { LogStatsBar } from "@/components/log/LogStatsBar";
+import { UndoToast } from "@/components/ui/UndoToast";
+import { useUndoDelete } from "@/hooks/useUndoDelete";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry } = useEntries();
+
+  // Undo delete
+  const { pending: undoPending, pendingIds, stage: stageDelete, undo: undoDelete, commit: commitDelete } = useUndoDelete({
+    onCommit: (ids) => deleteEntries(ids),
+  });
   const { projects } = useProjects();
   const { tasks } = useTasks();
   const { clients } = useClients();
@@ -164,10 +171,11 @@ export default function LogPage() {
   }, []);
 
   const handleBulkDelete = useCallback(() => {
-    deleteEntries(Array.from(selectedIds));
+    const toDelete = completedEntries.filter((e) => selectedIds.has(e.id));
+    stageDelete(toDelete);
     setSelectedIds(new Set());
     setBulkMode(false);
-  }, [selectedIds, deleteEntries]);
+  }, [selectedIds, completedEntries, stageDelete]);
 
   const handleBulkReassign = useCallback((projectId: string | null) => {
     updateEntries(Array.from(selectedIds), { projectId, taskId: null });
@@ -356,11 +364,15 @@ export default function LogPage() {
         projects={projects}
         tasks={tasks}
         onUpdate={updateEntry}
-        onDelete={deleteEntry}
+        onDelete={(id) => {
+          const entry = completedEntries.find((e) => e.id === id);
+          if (entry) stageDelete([entry]);
+        }}
         onDuplicate={handleDuplicate}
         onResume={handleResume}
         onSplit={handleSplit}
         hasRunning={runningEntry !== null}
+        hiddenIds={pendingIds}
         timelineMode={timelineMode && !bulkMode}
         bulkMode={bulkMode}
         selectedIds={selectedIds}
@@ -368,6 +380,13 @@ export default function LogPage() {
         onSelectDay={selectDay}
         onDeselectDay={deselectDay}
       />
+      {undoPending && (
+        <UndoToast
+          label={undoPending.label}
+          onUndo={undoDelete}
+          onDismiss={commitDelete}
+        />
+      )}
     </div>
   );
 }
