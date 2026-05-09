@@ -18,6 +18,7 @@ interface EntryListProps {
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
   searchQuery?: string;
+  hiddenIds?: Set<string>;
   // bulk selection
   bulkMode?: boolean;
   selectedIds?: Set<string>;
@@ -46,6 +47,7 @@ export function EntryList({
   onSplit,
   hasRunning,
   searchQuery = "",
+  hiddenIds,
   bulkMode,
   selectedIds,
   onToggleSelect,
@@ -53,7 +55,7 @@ export function EntryList({
   onDeselectDay,
   timelineMode,
 }: EntryListProps) {
-  const completed = entries.filter((e) => e.stoppedAt !== null);
+  const completed = entries.filter((e) => e.stoppedAt !== null && !hiddenIds?.has(e.id));
   const grouped = groupByDay(completed);
   const sortedDays = Array.from(grouped.keys()).sort((a, b) =>
     b.localeCompare(a)

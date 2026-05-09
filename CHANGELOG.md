@@ -1,3 +1,20 @@
+## [3.3.0] — 2026-05-09
+
+### Added
+- **Undo for entry deletion** — a 5-second grace window before any deleted entry is actually removed from storage
+  - `useUndoDelete` hook (`hooks/useUndoDelete.ts`) — manages a pending-delete queue; stores the in-flight entries and their ids; sets a 5-second timeout before calling `deleteEntries`; exposes `stage(entries)`, `undo()`, and `commit()` methods
+  - Deleting a single entry from `EntryRow` now calls `stageDelete([entry])` instead of immediately removing it; the entry is hidden from the list via a `pendingIds` set passed as `hiddenIds` to `EntryList`
+  - Bulk delete in `BulkActionBar` similarly calls `stageDelete(selectedEntries)` — the entire selection vanishes from view but is not yet purged from localStorage
+  - If a second delete is staged while one is already pending, the first is committed immediately before the new pending delete begins
+  - `UndoToast` component (`components/ui/UndoToast.tsx`) — fixed toast rendered at the bottom center of the screen:
+    - Shrinking orange progress bar animating from 100% → 0% over the 5-second window
+    - Label text: `"1 entry deleted"` or `"N entries deleted"`
+    - **Undo** button cancels the timer and restores entries to the list instantly — no data is ever written to storage during the pending window, so undo is lossless
+    - **×** dismiss button commits the delete immediately without waiting for the timer
+    - `aria-live="assertive"` for screen reader announcements
+  - `EntryList` — new optional `hiddenIds?: Set<string>` prop; entries in this set are filtered out of the rendered list before grouping by day, making soft-deleted entries invisible without mutating the actual storage
+  - Keyboard shortcut `Escape` dismisses the toast and commits the delete when focus is not in an input (handled by existing Escape listener which exits bulk mode — undo must be clicked explicitly)
+
 ## [3.2.0] — 2026-05-08
 
 ### Added
