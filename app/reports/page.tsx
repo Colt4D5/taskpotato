@@ -17,6 +17,7 @@ import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
 import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
+import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -77,6 +78,7 @@ export default function ReportsPage() {
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
 
   const [mode, setMode] = useState<ReportMode>("week");
+  const [timesheetOpen, setTimesheetOpen] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0);
 
   // Custom range state — default to this week
@@ -358,7 +360,20 @@ export default function ReportsPage() {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <p className="text-xs text-zinc-600">{weekLabel}</p>
-                <CopySummaryButton data={summaryData} />
+                <div className="flex items-center gap-2">
+                  <CopySummaryButton data={summaryData} />
+                  <button
+                    onClick={() => setTimesheetOpen(true)}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 border border-zinc-700 rounded-lg transition-colors font-medium"
+                    title="Print or export this period as a timesheet"
+                    disabled={rangeEntries.length === 0}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 18v3h12v-3" />
+                    </svg>
+                    Print
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -630,6 +645,15 @@ export default function ReportsPage() {
           <ProjectBudgetCard projects={projects} entries={completedEntries} />
         </>
       )}
+      <PrintTimesheetModal
+        open={timesheetOpen}
+        onClose={() => setTimesheetOpen(false)}
+        entries={rangeEntries}
+        projects={projects}
+        tasks={tasks}
+        clients={clients}
+        rangeLabel={weekLabel}
+      />
     </div>
   );
 }

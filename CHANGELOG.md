@@ -1,3 +1,21 @@
+## [3.4.0] — 2026-05-10
+
+### Added
+- **Printable Timesheet / Invoice View** — generate a clean, print-ready timesheet for any Reports period directly in the browser
+  - `PrintTimesheetModal` component (`components/reports/PrintTimesheetModal.tsx`) — full-screen white overlay rendering a professional timesheet document:
+    - **Header** — TaskPotato branding, period label (e.g. "May 5 – May 11, 2026"), total duration, billable/non-billable split (when applicable), and total earnings (when projects have hourly rates configured)
+    - **Entry table** — one row per entry, sorted chronologically; columns: Date (grouped — date shown only on first row of each day), Time (start → end), Project / Task (with color dot, non-billable badge, tags), Notes, Duration (H:MM), and Earnings (when applicable); totals row in the table footer
+    - **Project Summary table** — below the entry table; aggregates total time, billable time, and earnings per project; collapses billable and earnings columns when those features are not in use for the current period
+    - **Footer** — generation date and TaskPotato credit
+    - Non-billable entries show a subtle "non-billable" pill badge; entries without a rate show "—" in the Earnings column; both columns hide entirely when not relevant to the current data set
+    - Tags shown as `#tag` chips inline under each entry's project row
+    - Earnings column and project summary earnings column only appear when at least one project in the period has an hourly rate and at least one entry is billable with that project
+  - **Print CSS** — a `<style>` block injected while the modal is open hides everything except the modal root during `window.print()`; produces a clean single-file PDF with no browser chrome, no dark UI, no nav
+  - **"Print / Save PDF" button** in the modal header triggers `window.print()`; works with browser's native Save as PDF option
+  - **"Print" button** added to the range total card header on the Reports page (alongside the existing Copy Summary button); disabled when the current period has no entries; opens `PrintTimesheetModal` for the current mode's date range and period label
+  - Works with both Weekly and Custom Range modes — whatever range is currently displayed in Reports is exactly what renders in the timesheet
+  - `Escape` key dismisses the modal; clicking the backdrop also closes it
+
 ## [3.3.0] — 2026-05-09
 
 ### Added

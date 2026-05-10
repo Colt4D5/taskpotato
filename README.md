@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 25 complete**
+🚧 **Active Development — Night 26 complete**
 
 ## Features
 
@@ -67,6 +67,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Copy Summary — one-click clipboard export of a formatted Markdown summary from the Reports page; includes totals, billable/non-billable split, project/task/tag breakdowns with percentages; works in both Weekly and Custom Range modes; paste-ready for standups, invoices, or Slack
 - ✅ Notes full-text search — search bar on the Log page filters entries by description text; press `/` to focus from anywhere; matched substrings highlighted in amber inline; clears with Escape or "Clear all"
 - ✅ 12-week rolling trend chart — Reports page section showing 12 weeks of bar chart history; toggle between Total and Billable split views (stacked bars: green billable / zinc non-billable); summary chips for 12-week total, average per active week, average billable, and current week; current week highlighted in orange; per-bar hover tooltips
+- ✅ Printable Timesheet / Invoice View — "Print" button on the Reports range card opens a print-ready white overlay; entry table with date, time range, project/task, notes, duration, and earnings columns; project summary table below; billable/earnings columns hide when not applicable; browser "Save as PDF" integration via `window.print()`; works with both Weekly and Custom Range modes
 - ⬜ Responsive mobile polish
 
 ## Tech Stack
