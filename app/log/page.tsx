@@ -13,6 +13,7 @@ import { LogStatsBar } from "@/components/log/LogStatsBar";
 import { UndoToast } from "@/components/ui/UndoToast";
 import { useUndoDelete } from "@/hooks/useUndoDelete";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
+import { exportFilteredCSV } from "@/lib/csvExport";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry } = useEntries();
@@ -24,6 +25,11 @@ export default function LogPage() {
   const { projects } = useProjects();
   const { tasks } = useTasks();
   const { clients } = useClients();
+
+  const clientNameMap = useMemo(
+    () => new Map(clients.map((c) => [c.id, c.name])),
+    [clients]
+  );
 
   const [filterClientId, setFilterClientId] = useState<string>("");
   const [filterTaskName, setFilterTaskName] = useState<string>("");
@@ -119,6 +125,24 @@ export default function LogPage() {
 
   const hasActiveFilter =
     filterClientId || filterProjectId || filterTaskName || filterTag || filterNotes || dateRange.from || dateRange.to;
+
+  function handleExportFiltered() {
+    let rangeLabel: string | undefined;
+    if (dateRange.from && dateRange.to) {
+      rangeLabel = `${dateRange.from}_${dateRange.to}`;
+    } else if (dateRange.from) {
+      rangeLabel = `from_${dateRange.from}`;
+    } else if (dateRange.to) {
+      rangeLabel = `to_${dateRange.to}`;
+    }
+    exportFilteredCSV({
+      entries: filteredEntries,
+      projects,
+      tasks,
+      clientNames: clientNameMap,
+      rangeLabel,
+    });
+  }
 
   function clearFilters() {
     setFilterClientId("");
@@ -250,6 +274,18 @@ export default function LogPage() {
               >
                 ☑ Select
               </button>
+              {filteredEntries.length > 0 && (
+                <button
+                  onClick={handleExportFiltered}
+                  title="Export filtered entries as CSV"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Export
+                </button>
+              )}
               <button
                 onClick={() => setQuickEntryOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-400 text-white rounded-lg transition-colors font-medium"

@@ -1,4 +1,16 @@
-## [3.4.0] — 2026-05-10
+## [3.5.0] — 2026-05-11
+
+### Added
+- **Export filtered entries from the Log page** — download exactly what is currently displayed as a CSV, not the entire dataset
+  - **Export button** added to the Log page header (between the Timeline toggle and the Log time button); only visible when the filtered entry list is non-empty; displays a download arrow icon
+  - Clicking Export calls `exportFilteredCSV()` with the current `filteredEntries` array — the button respects every active filter dimension: date range, client, project, tag, notes search, and task name
+  - **Smart filename** — when a date range is active the filename encodes the range (e.g. `taskpotato-filtered_2026-05-01_2026-05-11.csv`); otherwise falls back to today's date (`taskpotato-filtered_2026-05-11.csv`)
+  - **Client column** — the CSV now includes a `Client` column populated from the project → client relationship; if the entry's project has a client assigned and client names are available, the client name is written; blank otherwise; this column also appears in the full Settings export for consistency
+  - `exportFilteredCSV()` added to `lib/csvExport.ts` — accepts entries, projects, tasks, an optional `clientNames` Map, and an optional `rangeLabel` string; internally delegates to the shared `buildRows()` helper so all CSV formatting logic lives in one place
+  - Refactored `lib/csvExport.ts`: extracted `buildRows()` (shared by both export paths), `triggerDownload()` (shared download trigger), and the `HEADERS` constant; the existing `exportCSV()` used by Settings is unchanged in behavior
+  - No keyboard shortcut (the operation is contextual on filtered state — not a global action)
+
+
 
 ### Added
 - **Printable Timesheet / Invoice View** — generate a clean, print-ready timesheet for any Reports period directly in the browser
