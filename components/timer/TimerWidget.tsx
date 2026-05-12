@@ -12,6 +12,7 @@ import { formatDurationShort, elapsedMs } from "@/lib/duration";
 import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
 import { TagInput } from "@/components/ui/TagInput";
+import { DescriptionAutocomplete, AutocompleteSuggestion } from "@/components/timer/DescriptionAutocomplete";
 import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { IdleAlert } from "@/components/timer/IdleAlert";
 import { TemplateQuickStart } from "@/components/timer/TemplateQuickStart";
@@ -25,7 +26,7 @@ import { AppSettings, DEFAULT_SETTINGS } from "@/types";
 
 export function TimerWidget() {
   const { templates } = useTemplates();
-  const { tasks: projectTasksList } = useTasks();
+  const { tasks: projectTasksList } = useTasks(); // all tasks — used for autocomplete + template quick-start
 
   const applyTemplate = (tpl: EntryTemplate) => {
     if (isRunning) return;
@@ -62,7 +63,8 @@ export function TimerWidget() {
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [showIdleAlert, setShowIdleAlert] = useState(false);
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
-  const { completedEntries, updateEntry } = useEntries();
+  const { completedEntries, updateEntry, entries } = useEntries();
+  const allTasks = projectTasksList; // same array, no second hook call needed
   const { addProject } = useProjects();
 
   const idleThresholdMs = (settings.idleAlertHours ?? 2) * 3_600_000;
@@ -131,15 +133,24 @@ export function TimerWidget() {
         disabled={isRunning}
       />
 
-      {/* Description input */}
-      <input
-        type="text"
-        placeholder="What are you working on?"
+      {/* Description input with autocomplete */}
+      <DescriptionAutocomplete
         value={notes}
-        onChange={(e) => setNotes(e.target.value)}
+        onChange={setNotes}
+        onApplySuggestion={(s: AutocompleteSuggestion) => {
+          setNotes(s.notes);
+          if (!isRunning) {
+            setSelectedProjectId(s.projectId);
+            setSelectedTaskId(s.taskId);
+            setTags(s.tags);
+            setBillable(s.billable);
+          }
+        }}
         disabled={isRunning}
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-orange-500/50 disabled:opacity-50 disabled:cursor-not-allowed text-center text-lg"
-        onKeyDown={(e) => e.key === "Enter" && toggle()}
+        entries={entries}
+        projects={activeProjects}
+        tasks={allTasks}
+        onEnterKey={toggle}
       />
 
       {/* Project selector + New Project button */}
