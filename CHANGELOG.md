@@ -1,3 +1,17 @@
+## [3.6.0] — 2026-05-12
+
+### Added
+- **Description autocomplete on the Timer page** — as you type in the "What are you working on?" field, a dropdown suggests previously-used descriptions and auto-fills the project, task, tags, and billable flag alongside them
+  - `DescriptionAutocomplete` component (`components/timer/DescriptionAutocomplete.tsx`) — drop-in replacement for the plain `<input>` in `TimerWidget`; fully keyboard-navigable dropdown with ARIA attributes (`role="listbox"`, `aria-autocomplete="list"`, `aria-expanded`, `aria-activedescendant`)
+  - `buildSuggestions(entries)` — derives up to 50 unique suggestions from all completed entries; groups by normalized description text; each suggestion carries the most-recently-used project/task/tags/billable state; sorted by last-used timestamp so the most recent descriptions appear first
+  - `filterSuggestions(suggestions, query)` — case-insensitive substring filter ranked so prefix matches appear before mid-string matches; returns up to 8 results per keystroke
+  - Each dropdown item shows: project color dot, notes text with query match **highlighted in amber**, task name (when set), project badge, and a use-count hint (e.g. `×5`) when the description has been used more than once
+  - Keyboard controls: `↑` / `↓` to navigate items; `Enter` to accept highlighted item (or start/stop timer when no item is selected); `Tab` to accept the top match without closing the keyboard focus; `Escape` to dismiss; click outside also dismisses
+  - Applying a suggestion auto-fills all five fields at once — description, project, task, tags, and billable — so you can start a recurring entry with a single keypress from anywhere in the input
+  - The dropdown is suppressed while a timer is already running (description is locked mid-session)
+  - No new storage key — reads from the existing `taskpotato:entries` array; zero data migration required
+  - `Enter` to start/stop timer behavior is fully preserved — pressing Enter with no autocomplete item selected still toggles the timer as before
+
 ## [3.5.0] — 2026-05-11
 
 ### Added
