@@ -18,6 +18,7 @@ import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
 import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
 import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
+import { PeakHoursChart } from "@/components/reports/PeakHoursChart";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -490,6 +491,9 @@ export default function ReportsPage() {
               </div>
             )}
           </section>
+
+          {/* Peak hours */}
+          <PeakHoursChart entries={rangeEntries} />
 
           {/* Earnings breakdown */}
           <EarningsBreakdown projects={projects} entries={rangeEntries} />
