@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 27 complete**
+🚧 **Active Development — Night 28 complete**
 
 ## Features
 
@@ -70,6 +70,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ 12-week rolling trend chart — Reports page section showing 12 weeks of bar chart history; toggle between Total and Billable split views (stacked bars: green billable / zinc non-billable); summary chips for 12-week total, average per active week, average billable, and current week; current week highlighted in orange; per-bar hover tooltips
 - ✅ Printable Timesheet / Invoice View — "Print" button on the Reports range card opens a print-ready white overlay; entry table with date, time range, project/task, notes, duration, and earnings columns; project summary table below; billable/earnings columns hide when not applicable; browser "Save as PDF" integration via `window.print()`; works with both Weekly and Custom Range modes
 - ✅ Export filtered entries — "Export" button in the Log page header downloads exactly what is currently filtered as a CSV; filename reflects the active date range; Client column populated for client-linked projects; integrates seamlessly with all filter dimensions (date range, project, client, tag, notes search)
+- ✅ Peak hours distribution — Reports page section showing a 24-bar chart of when (by hour of day) you work most; entry time is accurately sliced across hour boundaries so multi-hour sessions count correctly; peak hour highlighted in orange; top-quartile hours shown in muted orange; summary chips for peak hour, active hours, and dominant work period (Morning/Afternoon/Evening/Night); period breakdown grid below the chart with the dominant period highlighted; hover tooltip per bar shows time range, duration, and percentage of total
 - ⬜ Responsive mobile polish
 
 ## Tech Stack

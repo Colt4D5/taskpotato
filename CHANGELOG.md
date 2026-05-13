@@ -1,4 +1,21 @@
-## [3.6.0] — 2026-05-12
+## [3.7.0] — 2026-05-13
+
+### Added
+- **Peak hours distribution** — Reports page section showing when (by hour of day) you do your actual work
+  - `lib/peakHours.ts` — `computePeakHours(entries)` distributes completed entry time into 24 hourly buckets; uses a cursor-walk algorithm that slices each entry across hour boundaries so a 2.5-hour session spanning 10:30–13:00 is correctly attributed to hours 10, 11, 12, and 13 proportionally — not just the start hour
+  - `peakHourStats(buckets)` — derives `peakHour`, `peakMs`, `activeHours`, and `topQuartileHours` (top 25% of active hours by time); used for chart coloring and summary chips
+  - `formatHourLabel(hour)` — formats 0–23 as human-readable 12-hour labels ("12 AM", "1 PM", etc.)
+  - `PeakHoursChart` component (`components/reports/PeakHoursChart.tsx`) — 24-bar chart rendered with three visual tiers:
+    - **Peak bar** — brightest orange (`bg-orange-400`), the single highest-volume hour
+    - **Top-quartile bars** — muted orange (`bg-orange-500/60`), top 25% of active hours
+    - **Other bars** — zinc (`bg-zinc-700/80`), below the threshold
+  - Summary chips above the chart: peak hour with duration, active hours count, and dominant work period label
+  - Hover tooltip per bar: time range (e.g. `10 AM–11 AM`), formatted duration, and percentage of total tracked time
+  - Period breakdown grid below the chart — four cells (Morning 5–11, Afternoon 12–16, Evening 17–20, Night 21–4) showing total time and percentage; dominant period highlighted in orange
+  - The peak hour, dominant period, and period breakdown react to whatever date range is currently selected in Reports — Weekly or Custom Range
+  - Component returns `null` when no tracked time exists in the range — no empty-state noise
+  - Inserted on the Reports page after the "Hours per Day" bar chart section, before the Earnings breakdown
+
 
 ### Added
 - **Description autocomplete on the Timer page** — as you type in the "What are you working on?" field, a dropdown suggests previously-used descriptions and auto-fills the project, task, tags, and billable flag alongside them
