@@ -1,4 +1,19 @@
-## [3.7.0] — 2026-05-13
+## [3.8.0] — 2026-05-14
+
+### Added
+- **Today's progress indicator in the sidebar nav** — a persistent, live "how much have I tracked today?" widget in the desktop sidebar that answers the most common time-tracking question without requiring any navigation
+  - `hooks/useTodayTotal.ts` — `useTodayTotal(entries)` computes today's total tracked milliseconds from all entries; clamps each entry to today's midnight boundaries so sessions that span midnight are only credited for today's portion; for the running entry, accounts for `offsetMs` (prior accumulated time from resumes) plus live elapsed time from `resumedAt` or `startedAt`; installs a 1-second `setInterval` while any timer is running and tears it down the moment the timer stops — no wasted ticks when idle
+  - `components/layout/TodayProgress.tsx` — compact circular-ring widget rendered in the desktop sidebar footer (above `⌘` and `?` buttons):
+    - **Goal mode** (weekly goal set in Settings): ring fills proportionally to `todayMs / (weeklyGoalHours ÷ 5)`; orange while in progress, turns green when the daily implied goal is reached; `stroke-dashoffset` animated with a 1-second CSS linear transition for a smooth live fill
+    - **No-goal mode**: full-opacity muted orange static ring — visually distinct from empty, never draws proportional fill
+    - **Empty state**: dim zinc ring with `0m` label when nothing is tracked today
+    - Time label centered inside the ring; splits into two lines (`4h` / `23m`) when there is an hours component to fit the 38×38 ring footprint; single line (`23m`) for sub-hour totals
+    - Animated orange pulse dot in the corner when a timer is currently running
+    - Hover tooltip renders to the right of the sidebar with exact time and, when a goal is set, `Today: 4h 12m / 8h daily goal`
+    - Fully client-side; reads from the existing `taskpotato:entries` and `taskpotato:settings` localStorage keys — zero new storage, zero migration
+  - Wired into `Nav.tsx` immediately above the `⌘` command-palette button; only visible on the `md:` breakpoint sidebar (no mobile bottom nav clutter)
+
+
 
 ### Added
 - **Peak hours distribution** — Reports page section showing when (by hour of day) you do your actual work
