@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Timer, List, BarChart2, Settings } from "lucide-react";
+import { TodayProgress } from "./TodayProgress";
 
 const NAV_ITEMS = [
   { href: "/timer", label: "Timer", icon: Timer },
@@ -42,6 +43,7 @@ export function Nav({ onOpenCommandPalette }: NavProps = {}) {
         })}
       </ul>
       <div className="hidden md:flex md:flex-col md:mt-auto md:mb-4 md:px-2 md:gap-1">
+        <TodayProgress />
         {onOpenCommandPalette && (
           <button
             onClick={onOpenCommandPalette}
