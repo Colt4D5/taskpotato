@@ -57,6 +57,7 @@ export interface AppSettings {
   idleAlertHours: 0 | 1 | 2 | 4 | 8;
   timeRounding: 0 | 5 | 10 | 15;
   weeklyGoalHours: number; // 0 = disabled
+  tagGoals?: Record<string, number>; // tag name → hours/week; omit or 0 = no goal
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -66,4 +67,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   idleAlertHours: 2,
   timeRounding: 0,
   weeklyGoalHours: 0,
+  tagGoals: {},
 };

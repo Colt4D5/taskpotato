@@ -19,6 +19,7 @@ import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
 import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
 import { PeakHoursChart } from "@/components/reports/PeakHoursChart";
+import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -385,6 +386,15 @@ export default function ReportsPage() {
               totalMs={totalRangeMs}
               goalHours={settings.weeklyGoalHours}
               isCurrentWeek={isCurrentWeek}
+            />
+          )}
+
+          {/* Tag goal progress — only in week mode */}
+          {mode === "week" && (
+            <TagGoalProgress
+              entries={completedEntries}
+              settings={settings}
+              weekOffset={weekOffset}
             />
           )}
 
