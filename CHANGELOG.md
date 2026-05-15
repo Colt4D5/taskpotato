@@ -1,3 +1,18 @@
+## [3.9.0] — 2026-05-15
+
+### Added
+- **Per-tag weekly goals** — set a target hours/week for individual tags in Settings; track progress per tag in the Reports page (weekly mode only)
+  - `AppSettings.tagGoals?: Record<string, number>` — new optional field mapping tag names to weekly hour targets; `0` or absent means no goal; fully backward-compatible (existing settings without the field behave identically to before)
+  - `TagGoalManager` component (`components/settings/TagGoalManager.tsx`) — Settings section rendered after the Tag Manager; lists every tag that appears on at least one entry (sorted alphabetically); per-tag numeric input (0–168, step 0.5h) with `×` clear button; existing goal displayed as an amber `Nh/wk` badge next to the tag name; returns `null` when no tags exist yet
+  - `TagGoalProgress` component (`components/reports/TagGoalProgress.tsx`) — Reports section rendered in weekly mode immediately after the overall WeeklyGoalProgress card; only renders when at least one tag goal is configured:
+    - Progress bar per tag filling proportionally to `trackedMs / goalMs` for the current week (respects `weekStartsOn` and `weekOffset`)
+    - Color coding: muted orange below 75% progress, brighter orange at 75–99%, green at 100%+
+    - Inline `✓ Done` badge when goal is reached; `+Xh over` hint when exceeded
+    - `remaining` / `no time yet` sub-labels when under goal
+    - Sorted by progress percentage descending so the most-advanced goals surface first; ties broken by goal size
+  - Wired into `app/settings/page.tsx` (between TagManager and Templates sections) and `app/reports/page.tsx` (after WeeklyGoalProgress, weekly mode only)
+  - No new localStorage keys — `tagGoals` stored inline on the existing `taskpotato:settings` object; zero migration required; fully round-trips through the JSON export/import
+
 ## [3.8.0] — 2026-05-14
 
 ### Added

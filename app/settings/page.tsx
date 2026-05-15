@@ -10,6 +10,7 @@ import { AppSettings, DEFAULT_SETTINGS, Client, Project, Task, TimeEntry, EntryT
 import { ProjectList } from "@/components/projects/ProjectList";
 import { ClientList } from "@/components/clients/ClientList";
 import { TagManager } from "@/components/settings/TagManager";
+import { TagGoalManager } from "@/components/settings/TagGoalManager";
 import { TemplateList } from "@/components/timer/TemplateList";
 import { useTemplates } from "@/hooks/useTemplates";
 import { Button } from "@/components/ui/Button";
@@ -246,6 +247,13 @@ export default function SettingsPage() {
 
       {/* Tags */}
       <TagManager entries={entries} onUpdateAllTags={updateAllTags} />
+
+      {/* Tag Goals */}
+      <TagGoalManager
+        entries={entries}
+        settings={settings}
+        onUpdateSettings={(patch) => setSettings((s) => ({ ...s, ...patch }))}
+      />
 
       {/* Templates */}
       <section className="mb-10">
