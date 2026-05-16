@@ -19,7 +19,7 @@ import { exportCSV } from "@/lib/csvExport";
 export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
-  const { entries, updateEntry, deleteEntry, updateAllTags } = useEntries();
+  const { entries, updateEntry, deleteEntry, updateAllTags, allTags: entriesAllTags } = useEntries();
   const { clients, addClient, updateClient, deleteClient } = useClients();
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
@@ -261,6 +261,7 @@ export default function SettingsPage() {
           templates={templates}
           projects={projects}
           tasks={tasks}
+          allTags={entriesAllTags}
           onAdd={addTemplate}
           onUpdate={updateTemplate}
           onDelete={deleteTemplate}

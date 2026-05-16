@@ -10,6 +10,7 @@ interface QuickEntryFormProps {
   open: boolean;
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
   onSave: (entry: Omit<TimeEntry, "id">) => void;
   onClose: () => void;
 }
@@ -58,7 +59,7 @@ function parseDuration(val: string): number | null {
   return null;
 }
 
-export function QuickEntryForm({ open, projects, tasks, onSave, onClose }: QuickEntryFormProps) {
+export function QuickEntryForm({ open, projects, tasks, allTags, onSave, onClose }: QuickEntryFormProps) {
   const now = new Date();
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
@@ -229,7 +230,7 @@ export function QuickEntryForm({ open, projects, tasks, onSave, onClose }: Quick
         {/* Tags */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Tags</label>
-          <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" />
+          <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" allTags={allTags} />
         </div>
 
         {/* Billable */}

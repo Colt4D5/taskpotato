@@ -16,7 +16,7 @@ import { startOfDay, endOfDay } from "@/lib/dateUtils";
 import { exportFilteredCSV } from "@/lib/csvExport";
 
 export default function LogPage() {
-  const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry } = useEntries();
+  const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
 
   // Undo delete
   const { pending: undoPending, pendingIds, stage: stageDelete, undo: undoDelete, commit: commitDelete } = useUndoDelete({
@@ -390,6 +390,7 @@ export default function LogPage() {
         open={quickEntryOpen}
         projects={projects}
         tasks={tasks}
+        allTags={entriesAllTags}
         onSave={(entry) => addEntry(entry)}
         onClose={() => setQuickEntryOpen(false)}
       />
@@ -399,6 +400,7 @@ export default function LogPage() {
         entries={filteredEntries}
         projects={projects}
         tasks={tasks}
+        allTags={entriesAllTags}
         onUpdate={updateEntry}
         onDelete={(id) => {
           const entry = completedEntries.find((e) => e.id === id);

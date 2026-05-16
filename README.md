@@ -34,6 +34,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Settings — preferences (week start, default view), full JSON export (projects + tasks + entries), JSON import
 - ✅ Daily summary panel on timer page (total time, project bar chart, entry list)
 - ✅ Description autocomplete — typing in the timer's description field shows a ranked dropdown of previously-used descriptions; selecting one auto-fills project, task, tags, and billable flag; query match highlighted in amber; keyboard-navigable (↑/↓/Enter/Tab/Escape)
+- ✅ Tag autocomplete — typing in any tag field (timer, entry editor, Quick Log, template form) shows a live dropdown of previously-used tags filtered by the current input; prefix matches surface first; query highlighted in amber; keyboard-navigable (↑/↓/Enter/Tab/Escape); suggestions ranked by usage frequency so your most-used tags come first
 - ✅ Inline project creation from timer page (+ New Project button → auto-select)
 - ✅ Resume a stopped entry from the log — continues from accumulated time (no duplicate entries)
 - ✅ Duplicate any completed entry to today — copies project, task, notes, tags, and billable flag in one click

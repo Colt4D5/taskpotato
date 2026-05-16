@@ -9,6 +9,7 @@ interface TemplateListProps {
   templates: EntryTemplate[];
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
   onAdd: (
     name: string,
     projectId: string | null,
@@ -25,6 +26,7 @@ export function TemplateList({
   templates,
   projects,
   tasks,
+  allTags,
   onAdd,
   onUpdate,
   onDelete,
@@ -119,6 +121,7 @@ export function TemplateList({
         onSave={onAdd}
         projects={projects}
         tasks={tasks}
+        allTags={allTags}
       />
 
       {editing && (
@@ -131,6 +134,7 @@ export function TemplateList({
           initial={editing}
           projects={projects}
           tasks={tasks}
+          allTags={allTags}
         />
       )}
     </div>

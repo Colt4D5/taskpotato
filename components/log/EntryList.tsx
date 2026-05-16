@@ -11,6 +11,7 @@ interface EntryListProps {
   entries: TimeEntry[];
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
   onUpdate: (id: string, patch: Partial<Omit<TimeEntry, "id">>) => void;
   onDelete: (id: string) => void;
   onDuplicate?: (entry: TimeEntry) => void;
@@ -40,6 +41,7 @@ export function EntryList({
   entries,
   projects,
   tasks,
+  allTags,
   onUpdate,
   onDelete,
   onDuplicate,
@@ -192,6 +194,7 @@ export function EntryList({
                     onDuplicate={onDuplicate}
                     projects={projects}
                     tasks={tasks}
+                    allTags={allTags}
                     onResume={onResume}
                     hasRunning={hasRunning}
                     onSplit={onSplit}

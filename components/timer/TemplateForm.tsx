@@ -21,6 +21,7 @@ interface TemplateFormProps {
   initial?: EntryTemplate;
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
 }
 
 export function TemplateForm({
@@ -30,6 +31,7 @@ export function TemplateForm({
   initial,
   projects,
   tasks,
+  allTags,
 }: TemplateFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [projectId, setProjectId] = useState<string | null>(initial?.projectId ?? null);
@@ -143,7 +145,7 @@ export function TemplateForm({
           <label className="block text-xs font-medium text-zinc-400 mb-1.5">
             Tags
           </label>
-          <TagInput tags={tags} onChange={setTags} />
+          <TagInput tags={tags} onChange={setTags} allTags={allTags} />
         </div>
 
         <div className="flex items-center justify-between py-2">

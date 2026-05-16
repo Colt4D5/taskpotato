@@ -63,7 +63,7 @@ export function TimerWidget() {
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [showIdleAlert, setShowIdleAlert] = useState(false);
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
-  const { completedEntries, updateEntry, entries } = useEntries();
+  const { completedEntries, updateEntry, entries, allTags } = useEntries();
   const allTasks = projectTasksList; // same array, no second hook call needed
   const { addProject } = useProjects();
 
@@ -223,6 +223,7 @@ export function TimerWidget() {
           onChange={setTags}
           disabled={isRunning}
           placeholder="Add tags (Enter or comma)…"
+          allTags={allTags}
         />
       </div>
 
