@@ -13,6 +13,7 @@ interface EntryEditorProps {
   entry: TimeEntry;
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
   onSave: (patch: Partial<Omit<TimeEntry, "id">>) => void;
   onClose: () => void;
 }
@@ -46,6 +47,7 @@ export function EntryEditor({
   entry,
   projects,
   tasks,
+  allTags,
   onSave,
   onClose,
 }: EntryEditorProps) {
@@ -172,7 +174,7 @@ export function EntryEditor({
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Tags</label>
-          <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" />
+          <TagInput tags={tags} onChange={setTags} placeholder="Add tags (Enter or comma)…" allTags={allTags} />
         </div>
 
         {/* Billable toggle */}

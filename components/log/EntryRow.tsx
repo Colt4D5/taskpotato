@@ -19,6 +19,7 @@ interface EntryRowProps {
   onDelete: (id: string) => void;
   projects: Project[];
   tasks: Task[];
+  allTags?: string[];
   onResume?: (entry: TimeEntry) => void;
   onDuplicate?: (entry: TimeEntry) => void;
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
@@ -38,6 +39,7 @@ export function EntryRow({
   onDelete,
   projects,
   tasks,
+  allTags,
   onResume,
   onDuplicate,
   onSplit,
@@ -192,6 +194,7 @@ export function EntryRow({
         entry={entry}
         projects={projects}
         tasks={tasks}
+        allTags={allTags}
         onSave={(patch) => {
           onUpdate(entry.id, patch);
           setEditing(false);

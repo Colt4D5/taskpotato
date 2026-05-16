@@ -179,8 +179,22 @@ export function useEntries() {
     .filter((e) => e.stoppedAt !== null)
     .sort((a, b) => b.startedAt - a.startedAt);
 
+  // All unique tags across every entry, sorted by usage frequency descending
+  const allTags: string[] = (() => {
+    const freq = new Map<string, number>();
+    for (const e of entries) {
+      for (const t of e.tags ?? []) {
+        freq.set(t, (freq.get(t) ?? 0) + 1);
+      }
+    }
+    return Array.from(freq.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([t]) => t);
+  })();
+
   return {
     entries,
+    allTags,
     runningEntry,
     completedEntries,
     startEntry,

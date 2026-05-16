@@ -1,3 +1,17 @@
+## [4.0.0] — 2026-05-16
+
+### Added
+- **Tag autocomplete** — typing in any tag field now shows a live filtered suggestion dropdown of all previously-used tags, so you never have to remember exact tag names or manually type ones you've used before
+  - `TagInput` component enhanced with an optional `allTags?: string[]` prop; when provided, a suggestion dropdown appears as soon as the input has text; fully backward-compatible — callers that don't pass `allTags` get identical behavior to before
+  - Suggestions filter in real time to tags containing the current input text (case-insensitive); prefix matches sorted first, then alphabetical; up to 8 suggestions rendered per keystroke; already-applied tags are excluded from the list
+  - Query text highlighted in amber within each suggestion item so you can see exactly why the match surfaced
+  - Full keyboard navigation: `↑` / `↓` to move through items, `Enter` or `Tab` to apply the highlighted suggestion, `Escape` to dismiss without applying, `Tab` with no item highlighted accepts the top suggestion; click on any item works as expected
+  - ARIA semantics: `role="combobox"` on the input, `role="listbox"` on the dropdown, `aria-autocomplete`, `aria-expanded`, `aria-controls`, `aria-activedescendant`, `aria-selected` per option — screen-reader accessible
+  - `allTags` derived value added to `useEntries` — computes all unique tags across every entry (including running), sorted by usage frequency descending so your most-used tags surface first in suggestions
+  - Wired into all five tag entry points: TimerWidget (start new entry), EntryEditor (edit existing entry), QuickEntryForm (manual log entry), TemplateForm (create/edit template in Settings)
+  - `EntryRow`, `EntryList`, `QuickEntryForm`, `TemplateList` interface types updated with the optional `allTags?` prop; threaded through from each page-level component down to the leaf inputs
+  - No new localStorage keys; `allTags` is computed live from existing `taskpotato:entries` — zero migration, zero storage overhead
+
 ## [3.9.0] — 2026-05-15
 
 ### Added
