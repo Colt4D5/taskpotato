@@ -14,9 +14,13 @@ import { UndoToast } from "@/components/ui/UndoToast";
 import { useUndoDelete } from "@/hooks/useUndoDelete";
 import { startOfDay, endOfDay } from "@/lib/dateUtils";
 import { exportFilteredCSV } from "@/lib/csvExport";
+import { useFilterPresets } from "@/hooks/useFilterPresets";
+import { FilterPresetsBar } from "@/components/log/FilterPresetsBar";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
+  const { presets, addPreset, deletePreset } = useFilterPresets();
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
   // Undo delete
   const { pending: undoPending, pendingIds, stage: stageDelete, undo: undoDelete, commit: commitDelete } = useUndoDelete({
@@ -151,6 +155,30 @@ export default function LogPage() {
     setFilterTag("");
     setFilterNotes("");
     setDateRange({ from: "", to: "" });
+    setActivePresetId(null);
+  }
+
+  function applyPreset(preset: import("@/types").FilterPreset) {
+    setFilterClientId(preset.clientId);
+    setFilterProjectId(preset.projectId);
+    setFilterTaskName(preset.taskName);
+    setFilterTag(preset.tag);
+    setFilterNotes(preset.notes);
+    setDateRange({ from: preset.dateRangeFrom, to: preset.dateRangeTo });
+    setActivePresetId(preset.id);
+  }
+
+  function saveCurrentAsPreset(name: string) {
+    const preset = addPreset(name, {
+      clientId: filterClientId,
+      projectId: filterProjectId,
+      taskName: filterTaskName,
+      tag: filterTag,
+      notes: filterNotes,
+      dateRangeFrom: dateRange.from,
+      dateRangeTo: dateRange.to,
+    });
+    setActivePresetId(preset.id);
   }
 
   const handleDuplicate = (entry: { id: string }) => {
@@ -314,6 +342,27 @@ export default function LogPage() {
 
       {/* Date range filter (hidden in bulk mode) */}
       {!bulkMode && <DateRangeFilter value={dateRange} onChange={setDateRange} />}
+
+      {/* Filter presets bar (hidden in bulk mode) */}
+      {!bulkMode && (
+        <FilterPresetsBar
+          presets={presets}
+          activePresetId={activePresetId}
+          currentFilters={{
+            clientId: filterClientId,
+            projectId: filterProjectId,
+            taskName: filterTaskName,
+            tag: filterTag,
+            notes: filterNotes,
+            dateRange,
+          }}
+          hasActiveFilter={!!hasActiveFilter}
+          onApply={applyPreset}
+          onSave={saveCurrentAsPreset}
+          onDelete={deletePreset}
+          onClearActivePreset={() => setActivePresetId(null)}
+        />
+      )}
 
       {/* Field filters (hidden in bulk mode) */}
       {!bulkMode && (
