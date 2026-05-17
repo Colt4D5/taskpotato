@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 28 complete**
+🚧 **Active Development — Night 29 complete**
 
 ## Features
 
@@ -74,7 +74,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Peak hours distribution — Reports page section showing a 24-bar chart of when (by hour of day) you work most; entry time is accurately sliced across hour boundaries so multi-hour sessions count correctly; peak hour highlighted in orange; top-quartile hours shown in muted orange; summary chips for peak hour, active hours, and dominant work period (Morning/Afternoon/Evening/Night); period breakdown grid below the chart with the dominant period highlighted; hover tooltip per bar shows time range, duration, and percentage of total
 - ✅ Today's progress indicator — persistent live widget in the desktop sidebar showing today's total tracked time with a circular progress ring; ring fills proportional to the implied daily goal (weeklyGoal ÷ 5) when a weekly goal is configured, turns green at 100%; animated pulse dot indicates a timer is currently running; hover tooltip shows exact time and goal progress; ticks live every second while the timer is active; no goal configured = static muted ring
 - ✅ Per-tag weekly goals — set a target hours/week for any tag in Settings > Tag Weekly Goals; weekly progress bars in Reports track each tag independently; bars turn green when the goal is reached, amber at 75%+; remaining or over-goal time shown below each bar; only tags that appear on at least one entry are listed; ordered by progress descending so the most-advanced goals surface first
-- ⬜ Responsive mobile polish
+- ✅ Saved filter presets — name and save any combination of Log filters (client, project, task, tag, notes search, date range) as a named preset; one-click apply from pills in the Log page; active preset highlighted in orange with a modified-state indicator (`*`) when filters have been changed after applying; delete with two-click confirmation; preset pills only appear when presets exist or a filter is active; "Save filter" button appears whenever any filter is active; preset names auto-suggest from the active filter dimensions; stored in `taskpotato:filter-presets`
 
 ## Tech Stack
 

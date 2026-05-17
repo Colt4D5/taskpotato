@@ -60,6 +60,19 @@ export interface AppSettings {
   tagGoals?: Record<string, number>; // tag name → hours/week; omit or 0 = no goal
 }
 
+export interface FilterPreset {
+  id: string;
+  name: string;
+  clientId: string;
+  projectId: string;
+  taskName: string;
+  tag: string;
+  notes: string;
+  dateRangeFrom: string; // YYYY-MM-DD or ""
+  dateRangeTo: string;   // YYYY-MM-DD or ""
+  createdAt: number;
+}
+
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: "system",
   weekStartsOn: 1,

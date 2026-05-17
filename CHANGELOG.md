@@ -1,3 +1,20 @@
+## [4.1.0] — 2026-05-17
+
+### Added
+- **Saved filter presets on the Log page** — name and persist any combination of active Log filters so you never have to rebuild the same filter from scratch
+  - `FilterPreset` type (`types/index.ts`) — new interface with `id`, `name`, `clientId`, `projectId`, `taskName`, `tag`, `notes`, `dateRangeFrom`, `dateRangeTo`, and `createdAt` fields; captures the full state of all six Log filter dimensions
+  - `useFilterPresets` hook (`hooks/useFilterPresets.ts`) — localStorage-backed CRUD stored under `taskpotato:filter-presets`; exposes `presets`, `addPreset(name, filters)` (returns the created preset), `deletePreset(id)`, and `renamePreset(id, name)`
+  - `FilterPresetsBar` component (`components/log/FilterPresetsBar.tsx`) — compact pill row rendered on the Log page above the field filters:
+    - Only visible when at least one saved preset exists **or** a filter is currently active — no permanent UI overhead for users who don't use presets
+    - Each saved preset renders as a pill button; clicking an inactive preset applies all its stored filter values at once and highlights the pill in orange; clicking an already-active preset deactivates it (filters remain in place)
+    - **Active + modified indicator** — when filters have been changed since applying a preset, a subtle `*` is appended to the pill label so you know the view no longer exactly matches the saved preset
+    - **Delete** — each pill has an `×` button that only becomes visible on hover; first click shows `×?` (confirmation state), second click deletes; confirmation auto-cancels after 3 seconds to prevent accidental deletions; if the deleted preset was active, the active tracking is cleared
+    - **"Save filter" button** — a dashed `+` pill appears whenever any filter is active; clicking it opens an inline name input pre-populated with an auto-suggested name derived from the active filter dimensions (e.g. `#frontend + range`); submit saves the preset and immediately marks it active; press `Escape` to cancel without saving
+    - Auto-name suggestion reads the active dimensions (project, client, tag, task, notes snippet, date range) and joins them with ` + ` so the suggested name is meaningfully descriptive by default
+  - Log page — `clearFilters()` also clears the active preset id; `activePresetId` state tracks which preset is currently applied; `applyPreset()` sets all six filter state fields atomically from the preset record; `saveCurrentAsPreset()` calls `addPreset` and immediately activates the returned preset id
+  - JSON export/import — filter presets are **not** included in the data export by design (they are UI preferences, not time-tracking data); stored under their own `taskpotato:filter-presets` key alongside the other non-entry keys
+  - No changes to existing filter behavior — all existing filters work identically; presets are additive
+
 ## [4.0.0] — 2026-05-16
 
 ### Added
