@@ -8,6 +8,7 @@ const SHORTCUTS = [
   { key: "L", description: "Go to Log" },
   { key: "R", description: "Go to Reports" },
   { key: "N", description: "Log time manually (on Log page)" },
+  { key: "G", description: "Toggle group by project (on Log page)" },
   { key: "V", description: "Toggle timeline view (on Log page)" },
   { key: "/", description: "Focus notes search (on Log page)" },
   { key: "Space", description: "Start / Stop timer (when not typing)" },
