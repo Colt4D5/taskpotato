@@ -6,6 +6,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { useTasks } from "@/hooks/useTasks";
 import { useClients } from "@/hooks/useClients";
 import { EntryList } from "@/components/log/EntryList";
+import { ProjectGroupedList } from "@/components/log/ProjectGroupedList";
 import { BulkActionBar } from "@/components/log/BulkActionBar";
 import { DateRangeFilter, type DateRange } from "@/components/log/DateRangeFilter";
 import { QuickEntryForm } from "@/components/log/QuickEntryForm";
@@ -44,6 +45,7 @@ export default function LogPage() {
   const [dateRange, setDateRange] = useState<DateRange>({ from: "", to: "" });
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
   const [timelineMode, setTimelineMode] = useState(false);
+  const [groupBy, setGroupBy] = useState<"day" | "project">("day");
 
   // Bulk selection state
   const [bulkMode, setBulkMode] = useState(false);
@@ -57,6 +59,12 @@ export default function LogPage() {
         if (tag2 === "INPUT" || tag2 === "TEXTAREA" || tag2 === "SELECT") return;
         e.preventDefault();
         setTimelineMode((prev) => !prev);
+      }
+      if (e.key === "g" || e.key === "G") {
+        const tagG = (e.target as HTMLElement).tagName;
+        if (tagG === "INPUT" || tagG === "TEXTAREA" || tagG === "SELECT") return;
+        e.preventDefault();
+        setGroupBy((prev) => (prev === "day" ? "project" : "day"));
       }
       if (e.key === "n" || e.key === "N") {
         const tag = (e.target as HTMLElement).tagName;
@@ -282,6 +290,23 @@ export default function LogPage() {
           ) : (
             <>
               <button
+                onClick={() => setGroupBy((v) => (v === "day" ? "project" : "day"))}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors font-medium ${
+                  groupBy === "project"
+                    ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
+                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border-zinc-700"
+                }`}
+                title={groupBy === "project" ? "Group by date" : "Group by project"}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M3 12h18M3 17h18" />
+                  <circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none" />
+                  <circle cx="7" cy="12" r="1.5" fill="currentColor" stroke="none" />
+                  <circle cx="7" cy="17" r="1.5" fill="currentColor" stroke="none" />
+                </svg>
+                By Project
+              </button>
+              <button
                 onClick={() => setTimelineMode((v) => !v)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors font-medium ${
                   timelineMode
@@ -444,29 +469,54 @@ export default function LogPage() {
         onClose={() => setQuickEntryOpen(false)}
       />
 
-      <EntryList
-        searchQuery={filterNotes}
-        entries={filteredEntries}
-        projects={projects}
-        tasks={tasks}
-        allTags={entriesAllTags}
-        onUpdate={updateEntry}
-        onDelete={(id) => {
-          const entry = completedEntries.find((e) => e.id === id);
-          if (entry) stageDelete([entry]);
-        }}
-        onDuplicate={handleDuplicate}
-        onResume={handleResume}
-        onSplit={handleSplit}
-        hasRunning={runningEntry !== null}
-        hiddenIds={pendingIds}
-        timelineMode={timelineMode && !bulkMode}
-        bulkMode={bulkMode}
-        selectedIds={selectedIds}
-        onToggleSelect={toggleSelect}
-        onSelectDay={selectDay}
-        onDeselectDay={deselectDay}
-      />
+      {groupBy === "project" && !bulkMode ? (
+        <ProjectGroupedList
+          searchQuery={filterNotes}
+          entries={filteredEntries}
+          projects={projects}
+          tasks={tasks}
+          allTags={entriesAllTags}
+          onUpdate={updateEntry}
+          onDelete={(id) => {
+            const entry = completedEntries.find((e) => e.id === id);
+            if (entry) stageDelete([entry]);
+          }}
+          onDuplicate={handleDuplicate}
+          onResume={handleResume}
+          onSplit={handleSplit}
+          hasRunning={runningEntry !== null}
+          hiddenIds={pendingIds}
+          bulkMode={bulkMode}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onSelectGroup={selectDay}
+          onDeselectGroup={deselectDay}
+        />
+      ) : (
+        <EntryList
+          searchQuery={filterNotes}
+          entries={filteredEntries}
+          projects={projects}
+          tasks={tasks}
+          allTags={entriesAllTags}
+          onUpdate={updateEntry}
+          onDelete={(id) => {
+            const entry = completedEntries.find((e) => e.id === id);
+            if (entry) stageDelete([entry]);
+          }}
+          onDuplicate={handleDuplicate}
+          onResume={handleResume}
+          onSplit={handleSplit}
+          hasRunning={runningEntry !== null}
+          hiddenIds={pendingIds}
+          timelineMode={timelineMode && !bulkMode}
+          bulkMode={bulkMode}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onSelectDay={selectDay}
+          onDeselectDay={deselectDay}
+        />
+      )}
       {undoPending && (
         <UndoToast
           label={undoPending.label}

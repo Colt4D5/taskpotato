@@ -25,6 +25,7 @@ interface EntryRowProps {
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
   searchQuery?: string;
+  showDate?: boolean;  // show date label in the time line (used in project-grouped view)
   // bulk selection
   selectable?: boolean;
   selected?: boolean;
@@ -45,6 +46,7 @@ export function EntryRow({
   onSplit,
   hasRunning,
   searchQuery = "",
+  showDate = false,
   selectable,
   selected,
   onToggleSelect,
@@ -106,6 +108,11 @@ export function EntryRow({
             )}
           </div>
           <div className="text-xs text-zinc-500 mt-0.5">
+            {showDate && (
+              <span className="mr-1.5 text-zinc-600 font-medium">
+                {new Date(entry.startedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })} ·
+              </span>
+            )}
             {formatTime(entry.startedAt)}
             {entry.stoppedAt && ` – ${formatTime(entry.stoppedAt)}`}
           </div>

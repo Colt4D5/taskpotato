@@ -1,4 +1,20 @@
-## [4.1.0] — 2026-05-17
+## [4.2.0] — 2026-05-18
+
+### Added
+- **Group by Project on the Log page** — pivot the entry list from day buckets to project buckets with a single click
+  - `ProjectGroupedList` component (`components/log/ProjectGroupedList.tsx`) — renders completed entries grouped by project instead of by date:
+    - Each project group has a collapsible header with the project color dot, project name (or "No project" for unassigned entries), entry count, and total tracked time for that project
+    - Groups are sorted by total tracked time descending so your most-worked projects surface first
+    - Entries within each group are sorted newest-first; each entry shows a date label (`May 18 ·`) prepended to the time range so temporal context isn't lost when chronological grouping is gone
+    - Per-group select-all checkbox in bulk mode (mirrors the per-day checkbox in day-grouped mode)
+    - All entry actions work identically: Edit, Resume, Duplicate, Split, Delete — all filters and undo-delete are respected
+  - **"By Project" toggle button** added to the Log page header alongside Timeline and Select; active state highlighted in orange
+  - **`G` keyboard shortcut** on the Log page toggles between day grouping and project grouping (when not in an input)
+  - `EntryRow` — new `showDate?: boolean` prop; when `true`, renders the formatted date (`May 18 ·`) before the time range in the sub-label; used automatically by `ProjectGroupedList`; day-grouped and timeline views are unaffected
+  - `KeyboardShortcutsHelp` — `G` shortcut added to the reference modal
+  - Timeline mode continues to use day grouping; switching to project grouping while timeline mode is active falls back to the list view for that mode
+  - No new localStorage keys; purely a view transformation over the existing filtered entry set
+
 
 ### Added
 - **Saved filter presets on the Log page** — name and persist any combination of active Log filters so you never have to rebuild the same filter from scratch
