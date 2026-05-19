@@ -8,7 +8,7 @@ import { useClients } from "@/hooks/useClients";
 
 interface ClientListProps {
   clients: Client[];
-  onAdd: (name: string, color: string, notes?: string) => void;
+  onAdd: (name: string, color: string, notes?: string, monthlyBudgetHours?: number) => void;
   onUpdate: (id: string, patch: Partial<Omit<Client, "id" | "createdAt">>) => void;
   onDelete: (id: string) => void;
 }
@@ -31,7 +31,7 @@ export function ClientList({ clients, onAdd, onUpdate, onDelete }: ClientListPro
 
       <ClientForm
         open={addOpen}
-        onSave={(data) => { onAdd(data.name, data.color, data.notes); setAddOpen(false); }}
+        onSave={(data) => { onAdd(data.name, data.color, data.notes, data.monthlyBudgetHours); setAddOpen(false); }}
         onClose={() => setAddOpen(false)}
       />
 
@@ -60,6 +60,12 @@ export function ClientList({ clients, onAdd, onUpdate, onDelete }: ClientListPro
                 />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-zinc-200 truncate">{client.name}</p>
+                  {client.monthlyBudgetHours && client.monthlyBudgetHours > 0 && (
+                    <p className="text-xs text-zinc-500">
+                      <span className="text-amber-500/80">{client.monthlyBudgetHours}h</span>
+                      {" "}/mo budget
+                    </p>
+                  )}
                   {client.notes && (
                     <p className="text-xs text-zinc-500 truncate max-w-xs">{client.notes}</p>
                   )}

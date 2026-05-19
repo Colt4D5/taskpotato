@@ -14,12 +14,13 @@ export function useClients() {
   const [clients, setClients] = useStorage<Client[]>("clients", []);
 
   const addClient = useCallback(
-    (name: string, color?: string, notes?: string) => {
+    (name: string, color?: string, notes?: string, monthlyBudgetHours?: number) => {
       const client: Client = {
         id: uuid(),
         name: name.trim(),
         color: color ?? CLIENT_COLORS[Math.floor(Math.random() * CLIENT_COLORS.length)],
         notes: notes?.trim() || undefined,
+        monthlyBudgetHours: monthlyBudgetHours && monthlyBudgetHours > 0 ? monthlyBudgetHours : undefined,
         createdAt: Date.now(),
       };
       setClients((prev) => [...prev, client]);

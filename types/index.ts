@@ -3,6 +3,7 @@ export interface Client {
   name: string;
   color: string;
   notes?: string;
+  monthlyBudgetHours?: number; // 0 or undefined = no budget
   createdAt: number;
 }
 
