@@ -13,6 +13,7 @@ import { computeStreaks } from "@/lib/streaks";
 import { ActivityHeatmap } from "@/components/reports/ActivityHeatmap";
 import { WeeklyGoalProgress } from "@/components/reports/WeeklyGoalProgress";
 import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
+import { ClientBudgetCard } from "@/components/reports/ClientBudgetCard";
 import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
 import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
@@ -111,6 +112,19 @@ export default function ReportsPage() {
   const rangeEntries = completedEntries.filter(
     (e) => e.startedAt >= rangeStart.getTime() && e.startedAt <= rangeEnd.getTime()
   );
+
+  // Current calendar month entries (for client retainer budget tracking)
+  const { monthEntries, monthLabel } = useMemo(() => {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    return {
+      monthEntries: completedEntries.filter(
+        (e) => e.startedAt >= monthStart.getTime() && e.startedAt <= monthEnd.getTime()
+      ),
+      monthLabel: now.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+    };
+  }, [completedEntries]);
 
   // Days for bar chart
   const chartDays = useMemo(() => {
@@ -656,6 +670,12 @@ export default function ReportsPage() {
             </section>
           )}
 
+          <ClientBudgetCard
+            clients={clients}
+            projects={projects}
+            monthEntries={monthEntries}
+            monthLabel={monthLabel}
+          />
           <ProjectBudgetCard projects={projects} entries={completedEntries} />
         </>
       )}

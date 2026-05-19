@@ -10,7 +10,7 @@ import { ColorPicker } from "@/components/ui/ColorPicker";
 interface ClientFormProps {
   open: boolean;
   initial?: Partial<Client>;
-  onSave: (data: { name: string; color: string; notes?: string }) => void;
+  onSave: (data: { name: string; color: string; notes?: string; monthlyBudgetHours?: number }) => void;
   onClose: () => void;
   title?: string;
 }
@@ -27,7 +27,11 @@ export function ClientForm({
   const [name, setName] = useState(initial?.name ?? "");
   const [color, setColor] = useState(initial?.color ?? DEFAULT_COLOR);
   const [notes, setNotes] = useState(initial?.notes ?? "");
+  const [monthlyBudget, setMonthlyBudget] = useState(
+    initial?.monthlyBudgetHours ? String(initial.monthlyBudgetHours) : ""
+  );
   const [error, setError] = useState("");
+  const [budgetError, setBudgetError] = useState("");
 
   const handleSave = () => {
     const trimmed = name.trim();
@@ -35,11 +39,27 @@ export function ClientForm({
       setError("Client name is required.");
       return;
     }
-    onSave({ name: trimmed, color, notes: notes.trim() || undefined });
+    let parsedBudget: number | undefined;
+    if (monthlyBudget.trim() !== "") {
+      const val = parseFloat(monthlyBudget);
+      if (isNaN(val) || val <= 0) {
+        setBudgetError("Must be a positive number.");
+        return;
+      }
+      parsedBudget = val;
+    }
+    onSave({
+      name: trimmed,
+      color,
+      notes: notes.trim() || undefined,
+      monthlyBudgetHours: parsedBudget,
+    });
     setName("");
     setColor(DEFAULT_COLOR);
     setNotes("");
+    setMonthlyBudget("");
     setError("");
+    setBudgetError("");
   };
 
   return (
@@ -57,6 +77,25 @@ export function ClientForm({
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Color</label>
           <ColorPicker value={color} onChange={setColor} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-400">
+            Monthly Budget (hours) <span className="text-zinc-500 font-normal">— optional</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              min="0.5"
+              step="0.5"
+              value={monthlyBudget}
+              onChange={(e) => { setMonthlyBudget(e.target.value); setBudgetError(""); }}
+              placeholder="e.g. 40"
+              className="w-32 rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+            <span className="text-sm text-zinc-500">hrs / month</span>
+          </div>
+          {budgetError && <p className="text-xs text-red-400">{budgetError}</p>}
+          <p className="text-xs text-zinc-600">Tracks time burned against this retainer cap on the Reports page.</p>
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">

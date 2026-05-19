@@ -1,3 +1,22 @@
+## [4.3.0] — 2026-05-19
+
+### Added
+- **Per-client monthly hour budgets** — set a monthly hour cap on any client and track retainer burn on the Reports page
+  - `Client.monthlyBudgetHours?: number` — new optional field on the `Client` type; `undefined` or `0` means no budget; fully backward-compatible with all existing client records
+  - `ClientForm` — new **Monthly Budget (hours)** numeric input in the create/edit modal; optional; accepts decimals (e.g. 40, 37.5); validation rejects non-positive values; help text explains Reports page usage; field persists correctly through edit round-trips
+  - `ClientList` — monthly budget displayed inline as an amber `Nh/mo budget` label under the client name when a budget is set; passed through the `onAdd`/`onUpdate` props to storage
+  - `useClients.addClient()` — updated signature accepts optional `monthlyBudgetHours` as 4th parameter; stored on the client record; zero and absent treated identically (no budget)
+  - `ClientBudgetCard` component (`components/reports/ClientBudgetCard.tsx`) — Reports page section showing current-month burn per budgeted client:
+    - Only clients with a `monthlyBudgetHours > 0` are rendered; card returns `null` when none exist — no noise for users who don't use this feature
+    - Burn is scoped to the **current calendar month** (midnight-to-midnight boundaries, local time); caller-independent so the card always reflects the live month regardless of what date range is selected in Reports
+    - Month label (e.g. `May 2026`) shown in the card header so the scope is always explicit
+    - Each row shows the client color dot, name, burn progress bar, `tracked / budget` monospace label, and a `% used / remaining or over` detail line
+    - Color coding: orange while under 80%, amber at 80–99% with a `near limit` badge, red at 100%+ with an `over budget` badge
+    - Rows sorted by burn percentage descending — the most at-risk client surfaces first
+    - Burn is aggregated from all completed entries on projects whose `clientId` matches; project↔client linkage via the same `Project.clientId` field used by `ClientBreakdown`
+  - Reports page — `ClientBudgetCard` mounted above `ProjectBudgetCard` at the bottom of the page; receives pre-computed `monthEntries` (current-month filter of `completedEntries`) and `monthLabel` derived via `useMemo` so the filter doesn't recompute on every render
+  - JSON export/import — `monthlyBudgetHours` is stored on the client object and round-trips automatically through the existing export/import path; no schema version bump required
+
 ## [4.2.0] — 2026-05-18
 
 ### Added
