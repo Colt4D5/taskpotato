@@ -173,6 +173,31 @@ export function useEntries() {
     [setEntries]
   );
 
+  const markEntriesInvoiced = useCallback(
+    (ids: string[], invoiceId: string) => {
+      const set = new Set(ids);
+      setEntries((prev) =>
+        prev.map((e) => (set.has(e.id) ? { ...e, invoiceId } : e))
+      );
+    },
+    [setEntries]
+  );
+
+  const unmarkEntriesInvoiced = useCallback(
+    (ids: string[]) => {
+      const set = new Set(ids);
+      setEntries((prev) =>
+        prev.map((e) => {
+          if (!set.has(e.id)) return e;
+          const { invoiceId: _removed, ...rest } = e;
+          void _removed;
+          return rest as TimeEntry;
+        })
+      );
+    },
+    [setEntries]
+  );
+
   const runningEntry = entries.find((e) => e.stoppedAt === null) ?? null;
 
   const completedEntries = entries
@@ -208,5 +233,7 @@ export function useEntries() {
     updateEntries,
     duplicateEntry,
     splitEntry,
+    markEntriesInvoiced,
+    unmarkEntriesInvoiced,
   };
 }

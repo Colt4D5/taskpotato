@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 interface EarningsBreakdownProps {
   projects: Project[];
   entries: TimeEntry[]; // already week-scoped
+  onCreateInvoice?: () => void;
 }
 
 function formatCurrency(amount: number): string {
@@ -18,7 +19,7 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export function EarningsBreakdown({ projects, entries }: EarningsBreakdownProps) {
+export function EarningsBreakdown({ projects, entries, onCreateInvoice }: EarningsBreakdownProps) {
   // Only consider projects with a rate set
   const ratedProjects = projects.filter((p) => p.hourlyRate !== undefined && p.hourlyRate > 0);
   if (ratedProjects.length === 0) return null;
@@ -27,21 +28,25 @@ export function EarningsBreakdown({ projects, entries }: EarningsBreakdownProps)
 
   // Billable ms per project (only entries marked billable)
   const billableMsMap = new Map<string, number>();
+  const invoicedMsMap = new Map<string, number>();
   for (const e of entries) {
     if (!e.projectId || !ratedProjectIds.has(e.projectId)) continue;
     if (e.billable === false) continue;
-    billableMsMap.set(
-      e.projectId,
-      (billableMsMap.get(e.projectId) ?? 0) + elapsedMs(e.startedAt, e.stoppedAt)
-    );
+    const dur = elapsedMs(e.startedAt, e.stoppedAt);
+    billableMsMap.set(e.projectId, (billableMsMap.get(e.projectId) ?? 0) + dur);
+    if (e.invoiceId) {
+      invoicedMsMap.set(e.projectId, (invoicedMsMap.get(e.projectId) ?? 0) + dur);
+    }
   }
 
   const rows = ratedProjects
     .map((p) => {
       const ms = billableMsMap.get(p.id) ?? 0;
+      const invoicedMs = invoicedMsMap.get(p.id) ?? 0;
       const hours = ms / 3_600_000;
       const earnings = hours * (p.hourlyRate ?? 0);
-      return { project: p, ms, hours, earnings };
+      const invoicedEarnings = (invoicedMs / 3_600_000) * (p.hourlyRate ?? 0);
+      return { project: p, ms, hours, earnings, invoicedMs, invoicedEarnings };
     })
     .filter((r) => r.ms > 0 || r.project.hourlyRate! > 0)
     .sort((a, b) => b.earnings - a.earnings);
@@ -51,20 +56,39 @@ export function EarningsBreakdown({ projects, entries }: EarningsBreakdownProps)
   const totalEarnings = rows.reduce((sum, r) => sum + r.earnings, 0);
   const maxEarnings = Math.max(...rows.map((r) => r.earnings), 0.01);
 
+  // Count unbilled entries in this range that have a rate
+  const unbilledCount = rows.filter((r) => {
+    return entries.some(
+      (e) => e.projectId === r.project.id && e.billable !== false && !e.invoiceId
+    );
+  }).length;
+
   return (
     <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">
           Earnings (Billable)
         </h2>
-        <span className="text-lg font-mono font-semibold text-green-400">
-          {formatCurrency(totalEarnings)}
-        </span>
+        <div className="flex items-center gap-2">
+          {onCreateInvoice && unbilledCount > 0 && (
+            <button
+              onClick={onCreateInvoice}
+              className="text-xs px-2.5 py-1 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg transition-colors"
+              title="Create invoice for unbilled entries"
+            >
+              + Invoice unbilled
+            </button>
+          )}
+          <span className="text-lg font-mono font-semibold text-green-400">
+            {formatCurrency(totalEarnings)}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        {rows.map(({ project, ms, earnings }) => {
+        {rows.map(({ project, ms, earnings, invoicedMs, invoicedEarnings }) => {
           const pct = maxEarnings > 0 ? (earnings / maxEarnings) * 100 : 0;
+          const invoicedPct = ms > 0 ? (invoicedMs / ms) * 100 : 0;
           return (
             <div key={project.id}>
               <div className="flex items-center justify-between mb-1">
@@ -73,6 +97,11 @@ export function EarningsBreakdown({ projects, entries }: EarningsBreakdownProps)
                   <span className="text-xs text-zinc-500">
                     @ {formatCurrency(project.hourlyRate!)}/hr
                   </span>
+                  {invoicedMs > 0 && (
+                    <span className="text-xs text-green-400/70 bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 rounded-full" title={`${formatCurrency(invoicedEarnings)} invoiced`}>
+                      {formatCurrency(invoicedEarnings)} invoiced
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-zinc-500 font-mono">
@@ -84,10 +113,20 @@ export function EarningsBreakdown({ projects, entries }: EarningsBreakdownProps)
                 </div>
               </div>
               <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-green-500/70 transition-all"
-                  style={{ width: `${pct}%` }}
-                />
+                <div className="h-full rounded-full overflow-hidden" style={{ width: `${pct}%` }}>
+                  <div
+                    className="h-full rounded-full bg-green-500/70 relative"
+                    style={{ width: '100%' }}
+                  >
+                    {invoicedPct > 0 && (
+                      <div
+                        className="absolute inset-y-0 left-0 bg-green-400 rounded-full"
+                        style={{ width: `${invoicedPct}%` }}
+                        title={`${Math.round(invoicedPct)}% invoiced`}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           );

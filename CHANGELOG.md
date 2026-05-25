@@ -1,3 +1,41 @@
+## [4.4.0] — 2026-05-25
+
+### Added
+- **Invoice tracking** — create invoices from billable time entries, track draft/sent/paid status, and mark entries as invoiced so you never double-bill a client
+  - `Invoice` type (`types/index.ts`) — new interface with `id`, `number` (user-defined, e.g. `INV-001`), `clientId`, `projectIds`, `entryIds`, `totalMs`, `totalEarnings`, `status` (`draft` | `sent` | `paid`), `issuedAt`, `sentAt?`, `paidAt?`, and `notes?` fields
+  - `TimeEntry.invoiceId?: string` — new optional field set when an entry has been added to an invoice; present on `InvoiceId`-marked entries; absent means unbilled; fully backward-compatible
+  - `useInvoices` hook (`hooks/useInvoices.ts`) — localStorage-backed CRUD stored under `taskpotato:invoices`; exposes `invoices`, `addInvoice`, `updateInvoice`, `deleteInvoice`, `markSent`, `markPaid`, and `nextInvoiceNumber` (auto-generates sequential `INV-NNN` numbers)
+  - `markEntriesInvoiced(ids, invoiceId)` — new `useEntries` method; batch-patches `invoiceId` onto selected entries in a single `setEntries` pass
+  - `unmarkEntriesInvoiced(ids)` — new `useEntries` method; removes `invoiceId` from entries when an invoice is deleted, returning them to unbilled state
+  - `CreateInvoiceModal` component (`components/reports/CreateInvoiceModal.tsx`) — modal for building a new invoice:
+    - Invoice number field pre-populated with the next sequential number (editable)
+    - Optional client filter dropdown — scope entry selection to a specific client
+    - Date range pickers (From / To) defaulting to the current month
+    - Memo / notes textarea for payment terms or other details
+    - Live entry preview: shows candidate unbilled billable entries (completed, not already invoiced, in range, matching client) grouped by project with entry count, total time, and earnings per project; updates reactively as filters change
+    - Entry count, total tracked time, and total earnings summary in the preview header
+    - Validation: rejects empty invoice number, inverted date ranges, and empty entry sets with inline error messages
+    - Create button disabled when no eligible entries exist
+  - `InvoiceList` component (`components/reports/InvoiceList.tsx`) — Invoices section on the Reports page showing all invoices:
+    - Each row: invoice number (clickable for detail), status badge (`Draft` / `Sent` / `Paid` with color coding — zinc / amber / green), optional client pill, issue date, entry count, total time, project badges, and earnings
+    - Per-row hover actions: **Mark sent** (draft only), **Mark paid** (sent only), **View** (detail modal), **Delete** (two-click confirmation)
+    - Deleting an invoice calls `unmarkEntriesInvoiced` so those entries revert to unbilled and become available for future invoices
+    - Empty state message with a helpful explanation when no invoices exist
+    - `+ New Invoice` button in the section header
+  - `InvoiceDetailModal` — full breakdown of a single invoice:
+    - Header info grid: status, client, issued date, sent/paid timestamps (when available), total time, total earnings
+    - Memo/notes block when set
+    - Per-entry list grouped by project: each entry shows date, description, and duration; project rows show subtotal time and earnings
+    - **Mark sent** / **Mark paid** action buttons in the modal footer (contextual on status)
+  - Reports page — `InvoiceList` and `CreateInvoiceModal` mounted below the Project Budgets section; `CreateInvoiceModal` defaults `nextInvoiceNumber()` on every open so the number is always fresh after prior invoices are created
+  - `EarningsBreakdown` — enhanced with invoice awareness:
+    - **`+ Invoice unbilled` button** appears in the section header when unbilled billable entries with project rates exist; opens `CreateInvoiceModal` directly from the earnings view
+    - **Per-project invoiced badge** — amber `$X invoiced` pill shown next to the project name when any portion of its earnings in the current range has been invoiced
+    - **Dual-tone progress bar** — the existing green bar now renders a brighter green overlay proportional to the invoiced fraction so you can see at a glance what portion of each project's earnings has been invoiced vs. still outstanding
+  - Log page — `EntryRow` shows a `invoiced` green pill badge on entries that have been added to an invoice; visually distinct from the `non-billable` badge; renders next to tags
+  - Settings page — `invoices` array included in JSON export payload and restored on import (backward-compatible: import silently skips if field absent)
+  - JSON export/import — `invoices` round-trips automatically; `InvoiceId` fields on entries also persist, so the invoiced state is preserved across backup/restore cycles
+
 ## [4.3.0] — 2026-05-19
 
 ### Added

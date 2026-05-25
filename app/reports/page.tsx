@@ -16,6 +16,8 @@ import { ProjectBudgetCard } from "@/components/reports/ProjectBudgetCard";
 import { ClientBudgetCard } from "@/components/reports/ClientBudgetCard";
 import { ClientBreakdown } from "@/components/reports/ClientBreakdown";
 import { EarningsBreakdown } from "@/components/reports/EarningsBreakdown";
+import { InvoiceList } from "@/components/reports/InvoiceList";
+import { CreateInvoiceModal } from "@/components/reports/CreateInvoiceModal";
 import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
 import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
@@ -24,6 +26,7 @@ import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
+import { useInvoices } from "@/hooks/useInvoices";
 
 type ReportMode = "week" | "custom";
 
@@ -74,7 +77,7 @@ function daysBetween(start: Date, end: Date, maxDays = 60): { label: string; dat
 }
 
 export default function ReportsPage() {
-  const { completedEntries } = useEntries();
+  const { completedEntries, entries: allEntries, markEntriesInvoiced, unmarkEntriesInvoiced } = useEntries();
   const { projects } = useProjects();
   const { tasks } = useTasks();
   const { clients } = useClients();
@@ -83,6 +86,19 @@ export default function ReportsPage() {
   const [mode, setMode] = useState<ReportMode>("week");
   const [timesheetOpen, setTimesheetOpen] = useState(false);
   const [weekOffset, setWeekOffset] = useState(0);
+  const [createInvoiceOpen, setCreateInvoiceOpen] = useState(false);
+
+  const { invoices, addInvoice, markSent, markPaid, deleteInvoice, nextInvoiceNumber } = useInvoices();
+
+  function handleCreateInvoice(data: Parameters<typeof addInvoice>[0], entryIds: string[]) {
+    const inv = addInvoice(data);
+    markEntriesInvoiced(entryIds, inv.id);
+  }
+
+  function handleDeleteInvoice(invoiceId: string, entryIds: string[]) {
+    deleteInvoice(invoiceId);
+    unmarkEntriesInvoiced(entryIds);
+  }
 
   // Custom range state — default to this week
   const baseWeekStart = startOfWeek(new Date(), 1);
@@ -520,7 +536,7 @@ export default function ReportsPage() {
           <PeakHoursChart entries={rangeEntries} />
 
           {/* Earnings breakdown */}
-          <EarningsBreakdown projects={projects} entries={rangeEntries} />
+          <EarningsBreakdown projects={projects} entries={rangeEntries} onCreateInvoice={() => setCreateInvoiceOpen(true)} />
 
           {/* Client breakdown */}
           <ClientBreakdown
@@ -677,6 +693,18 @@ export default function ReportsPage() {
             monthLabel={monthLabel}
           />
           <ProjectBudgetCard projects={projects} entries={completedEntries} />
+
+          {/* Invoices */}
+          <InvoiceList
+            invoices={invoices}
+            entries={allEntries}
+            projects={projects}
+            clients={clients}
+            onMarkSent={markSent}
+            onMarkPaid={markPaid}
+            onDelete={handleDeleteInvoice}
+            onCreateNew={() => setCreateInvoiceOpen(true)}
+          />
         </>
       )}
       <PrintTimesheetModal
@@ -687,6 +715,15 @@ export default function ReportsPage() {
         tasks={tasks}
         clients={clients}
         rangeLabel={weekLabel}
+      />
+      <CreateInvoiceModal
+        open={createInvoiceOpen}
+        onClose={() => setCreateInvoiceOpen(false)}
+        entries={completedEntries}
+        projects={projects}
+        clients={clients}
+        defaultNumber={nextInvoiceNumber()}
+        onCreate={handleCreateInvoice}
       />
     </div>
   );
