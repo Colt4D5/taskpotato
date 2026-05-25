@@ -38,6 +38,7 @@ export interface TimeEntry {
   billable: boolean;
   resumedAt?: number;   // timestamp when last resumed (for in-progress resume)
   offsetMs?: number;    // accumulated ms from previous runs before this resume
+  invoiceId?: string;   // set when entry has been added to an invoice
 }
 
 export interface EntryTemplate {
@@ -72,6 +73,21 @@ export interface FilterPreset {
   dateRangeFrom: string; // YYYY-MM-DD or ""
   dateRangeTo: string;   // YYYY-MM-DD or ""
   createdAt: number;
+}
+
+export interface Invoice {
+  id: string;
+  number: string;          // user-defined invoice number, e.g. "INV-001"
+  clientId: string | null; // which client this is billed to
+  projectIds: string[];    // projects included (for display)
+  entryIds: string[];      // the entry ids that make up this invoice
+  totalMs: number;         // total tracked time in ms (billable only)
+  totalEarnings: number;   // total USD amount
+  status: "draft" | "sent" | "paid";
+  issuedAt: number;        // timestamp when invoice was created
+  sentAt?: number;         // timestamp when marked sent
+  paidAt?: number;         // timestamp when marked paid
+  notes?: string;          // optional memo/notes
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {

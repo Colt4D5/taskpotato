@@ -106,6 +106,9 @@ export function EntryRow({
             {!entry.billable && (
               <span className="text-xs bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded-full border border-zinc-700">non-billable</span>
             )}
+            {entry.invoiceId && (
+              <span className="text-xs bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded-full border border-green-500/30" title="Included in an invoice">invoiced</span>
+            )}
           </div>
           <div className="text-xs text-zinc-500 mt-0.5">
             {showDate && (

@@ -6,13 +6,14 @@ import { useTasks } from "@/hooks/useTasks";
 import { useEntries } from "@/hooks/useEntries";
 import { useClients } from "@/hooks/useClients";
 import { useStorage } from "@/hooks/useStorage";
-import { AppSettings, DEFAULT_SETTINGS, Client, Project, Task, TimeEntry, EntryTemplate } from "@/types";
+import { AppSettings, DEFAULT_SETTINGS, Client, Project, Task, TimeEntry, EntryTemplate, Invoice } from "@/types";
 import { ProjectList } from "@/components/projects/ProjectList";
 import { ClientList } from "@/components/clients/ClientList";
 import { TagManager } from "@/components/settings/TagManager";
 import { TagGoalManager } from "@/components/settings/TagGoalManager";
 import { TemplateList } from "@/components/timer/TemplateList";
 import { useTemplates } from "@/hooks/useTemplates";
+import { useInvoices } from "@/hooks/useInvoices";
 import { Button } from "@/components/ui/Button";
 import { exportCSV } from "@/lib/csvExport";
 
@@ -22,6 +23,8 @@ export default function SettingsPage() {
   const { entries, updateEntry, deleteEntry, updateAllTags, allTags: entriesAllTags } = useEntries();
   const { clients, addClient, updateClient, deleteClient } = useClients();
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
+  const { invoices } = useInvoices();
+  const [, setStoredInvoices] = useStorage<Invoice[]>("invoices", []);
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
   const [, setStoredProjects] = useStorage<Project[]>("projects", []);
@@ -44,6 +47,7 @@ export default function SettingsPage() {
       tasks,
       entries,
       templates,
+      invoices,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -78,6 +82,7 @@ export default function SettingsPage() {
         if (data.entries) setStoredEntries(data.entries as TimeEntry[]);
         if (data.templates) setStoredTemplates(data.templates as EntryTemplate[]);
         if (data.clients) setStoredClients(data.clients as Client[]);
+        if (data.invoices) setStoredInvoices(data.invoices as Invoice[]);
         setImportSuccess(true);
       } catch (err) {
         setImportError(err instanceof Error ? err.message : "Invalid JSON file");
