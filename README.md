@@ -41,7 +41,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Log page filters — by project and task name
 - ✅ Reactive state — all UI updates instantly without page reload (custom storage event bus)
 - ✅ Theme toggle (light/dark/system)
-- ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, ? for help modal, ⌘K for command palette
+- ✅ Keyboard shortcuts — T/L/R to navigate, Space to toggle timer, N to log time, J to open today’s day note, G to toggle project grouping, V to toggle timeline, / to focus search, ? for help modal, ⌘K for command palette
 - ✅ Command palette — ⌘K (or Ctrl+K) to open a global search palette; search entries by notes, project, task, and tags; keyboard-navigable with ↑↓ and ↵; shows duration, tags, and billable status per result
 - ✅ Tags on entries — tag input on timer, filter by tag on log page, tag breakdown on reports
 - ✅ CSV export — download all completed entries as a spreadsheet (Settings > Data)
@@ -79,6 +79,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Group by Project on the Log page — pivot the entry list from day buckets to project buckets; each group shows total tracked time, entry count, and a per-group select-all checkbox; entries within each group sorted newest-first with a date label; toggle with the "By Project" button or press `G`
 - ✅ Per-client monthly hour budgets — set a monthly hour cap on any client (Settings > Clients); Reports page shows a "Client Retainer Budgets" card with per-client burn progress bars, over-budget / near-limit badges, hours-used / budget, and remaining time; scoped to the current calendar month; burn calculated from all entries on projects associated with each client; sorted by % burn descending so most-at-risk clients surface first
 - ✅ Invoice tracking — create invoices from billable time entries, track draft/sent/paid status, and mark entries as invoiced to prevent double-billing; `CreateInvoiceModal` lets you filter by client and date range to select unbilled entries; live preview shows total time and earnings per project; sequential invoice numbering (INV-001…); `InvoiceList` on the Reports page shows all invoices with status badges, entry counts, earnings, and project badges; per-invoice detail modal with full entry breakdown grouped by project; Earnings section gains an `+ Invoice unbilled` shortcut button and a per-project invoiced progress indicator showing what fraction of each project's earnings has been invoiced; Log page shows an `invoiced` green badge on entries that are part of an invoice; deleting an invoice reverts entries to unbilled; JSON export/import includes invoices
+- ✅ Daily Work Journal — per-day Markdown notes attached to each day in the Log (separate from per-entry descriptions); amber `Note` pill in each day header opens an inline editor with Write/Preview tabs; notes render as a Markdown block above the entry list when a day is expanded; press `J` anywhere on the Log page to open today's note; `Ctrl+Enter` / `Cmd+Enter` saves; word count footer; delete note button; JSON export/import includes day notes
 
 ## Tech Stack
 

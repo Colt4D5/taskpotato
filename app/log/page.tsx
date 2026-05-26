@@ -17,10 +17,20 @@ import { startOfDay, endOfDay } from "@/lib/dateUtils";
 import { exportFilteredCSV } from "@/lib/csvExport";
 import { useFilterPresets } from "@/hooks/useFilterPresets";
 import { FilterPresetsBar } from "@/components/log/FilterPresetsBar";
+import { useDayNotes } from "@/hooks/useDayNotes";
+import { DayNote } from "@/components/log/DayNote";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
   const { presets, addPreset, deletePreset } = useFilterPresets();
+  const { getNote: getDayNote, setNote: saveDayNote } = useDayNotes();
+  const [todayNoteForceOpen, setTodayNoteForceOpen] = useState(false);
+
+  // Today's key for J shortcut
+  const todayKey = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  })();
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
   // Undo delete
@@ -65,6 +75,12 @@ export default function LogPage() {
         if (tagG === "INPUT" || tagG === "TEXTAREA" || tagG === "SELECT") return;
         e.preventDefault();
         setGroupBy((prev) => (prev === "day" ? "project" : "day"));
+      }
+      if (e.key === "j" || e.key === "J") {
+        const tagJ = (e.target as HTMLElement).tagName;
+        if (tagJ === "INPUT" || tagJ === "TEXTAREA" || tagJ === "SELECT") return;
+        e.preventDefault();
+        setTodayNoteForceOpen(true);
       }
       if (e.key === "n" || e.key === "N") {
         const tag = (e.target as HTMLElement).tagName;
@@ -469,6 +485,17 @@ export default function LogPage() {
         onClose={() => setQuickEntryOpen(false)}
       />
 
+      {/* Hidden DayNote for today — triggered by J shortcut */}
+      <div className="hidden">
+        <DayNote
+          dateKey={todayKey}
+          note={getDayNote(todayKey)}
+          onSave={saveDayNote}
+          forceOpen={todayNoteForceOpen}
+          onOpenChange={(open) => { if (!open) setTodayNoteForceOpen(false); }}
+        />
+      </div>
+
       {groupBy === "project" && !bulkMode ? (
         <ProjectGroupedList
           searchQuery={filterNotes}
@@ -515,6 +542,8 @@ export default function LogPage() {
           onToggleSelect={toggleSelect}
           onSelectDay={selectDay}
           onDeselectDay={deselectDay}
+          getDayNote={getDayNote}
+          onSaveDayNote={saveDayNote}
         />
       )}
       {undoPending && (
