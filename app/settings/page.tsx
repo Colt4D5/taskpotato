@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const { templates, addTemplate, updateTemplate, deleteTemplate } = useTemplates();
   const { invoices } = useInvoices();
   const [, setStoredInvoices] = useStorage<Invoice[]>("invoices", []);
+  const [dayNotes, setStoredDayNotes] = useStorage<Record<string, string>>("day-notes", {});
   const [settings, setSettings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const [, setStoredEntries] = useStorage<TimeEntry[]>("entries", []);
   const [, setStoredProjects] = useStorage<Project[]>("projects", []);
@@ -48,6 +49,7 @@ export default function SettingsPage() {
       entries,
       templates,
       invoices,
+      dayNotes,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -83,6 +85,9 @@ export default function SettingsPage() {
         if (data.templates) setStoredTemplates(data.templates as EntryTemplate[]);
         if (data.clients) setStoredClients(data.clients as Client[]);
         if (data.invoices) setStoredInvoices(data.invoices as Invoice[]);
+        if (data.dayNotes && typeof data.dayNotes === "object" && !Array.isArray(data.dayNotes)) {
+          setStoredDayNotes(data.dayNotes as Record<string, string>);
+        }
         setImportSuccess(true);
       } catch (err) {
         setImportError(err instanceof Error ? err.message : "Invalid JSON file");

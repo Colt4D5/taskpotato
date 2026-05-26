@@ -1,3 +1,20 @@
+## [4.5.0] — 2026-05-26
+
+### Added
+- **Daily Work Journal** — per-day markdown notes attached to each day in the Log, separate from per-entry descriptions; for standups, blockers, wins, and anything that belongs to the day rather than a single time entry
+  - `useDayNotes` hook (`hooks/useDayNotes.ts`) — localStorage-backed store under `taskpotato:day-notes`; stored as a flat `Record<string, string>` keyed by `YYYY-MM-DD`; exposes `getNote(dateKey)`, `setNote(dateKey, content)`, and `deleteNote(dateKey)`; `setNote` with empty or whitespace content auto-deletes the key instead of storing a blank string; reactive via the existing `taskpotato:storage-update` event bus so all consumers stay in sync across tabs
+  - `DayNote` component (`components/log/DayNote.tsx`) — self-contained note editor with an inline trigger button rendered in each day header of the Log:
+    - **Trigger button** — amber `Note` pill when a note exists, muted `Add note` when empty; appears next to the collapse chevron in each day row header
+    - **Modal editor** — full-screen overlay with a resizable `<textarea>` in write mode; full Markdown preview tab (same `renderMarkdown` + `prose prose-invert` path used by `EntryEditor`); write/preview tab toggle in the modal header
+    - **Keyboard shortcuts** inside the editor: `Ctrl+Enter` / `Cmd+Enter` saves and closes; `Escape` cancels and reverts the draft to the last saved state
+    - **Word count** footer chip while writing; **Delete note** button appears when content is unchanged from the saved version (i.e. you opened an existing note without editing it)
+    - `forceOpen` prop + `onOpenChange` callback allows parent components to programmatically open the modal (used by the `J` keyboard shortcut on the Log page)
+  - **Inline note preview** — when a day section is expanded and it has a note, the note renders as a compact Markdown block (amber tint, `prose-invert prose-sm`) between the day header and the entry list; click the amber `Note` button in the header to edit
+  - **`J` keyboard shortcut** on the Log page — press `J` anywhere (when not in an input) to open the day note editor for today without scrolling; `KeyboardShortcutsHelp` updated with the new shortcut
+  - `EntryList` — accepts new `getDayNote` and `onSaveDayNote` props; renders the `DayNote` trigger in each day header and the inline note preview block when a note exists for the day; both props are optional for backward compatibility
+  - Log page (`app/log/page.tsx`) — mounts `useDayNotes`, threads `getDayNote`/`saveDayNote` into `EntryList`, and mounts a hidden top-level `DayNote` for today to handle the `J` shortcut (modal overlays render outside the collapsed day list)
+  - JSON export/import — `dayNotes` object included in the export payload; restored on import when the field is present and is a non-array object; backward-compatible (import silently skips if absent)
+
 ## [4.4.0] — 2026-05-25
 
 ### Added

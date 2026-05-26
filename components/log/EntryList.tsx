@@ -6,6 +6,8 @@ import { groupByDay, formatDayLabel } from "@/lib/dateUtils";
 import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { EntryRow } from "./EntryRow";
 import { DayTimeline } from "./DayTimeline";
+import { DayNote } from "./DayNote";
+import { renderMarkdown } from "@/lib/markdown";
 
 interface EntryListProps {
   entries: TimeEntry[];
@@ -27,6 +29,9 @@ interface EntryListProps {
   onSelectDay?: (ids: string[]) => void;
   onDeselectDay?: (ids: string[]) => void;
   timelineMode?: boolean;
+  // Day notes
+  getDayNote?: (dateKey: string) => string;
+  onSaveDayNote?: (dateKey: string, content: string) => void;
 }
 
 function todayKey(): string {
@@ -56,6 +61,8 @@ export function EntryList({
   onSelectDay,
   onDeselectDay,
   timelineMode,
+  getDayNote,
+  onSaveDayNote,
 }: EntryListProps) {
   const completed = entries.filter((e) => e.stoppedAt !== null && !hiddenIds?.has(e.id));
   const grouped = groupByDay(completed);
@@ -153,6 +160,14 @@ export function EntryList({
                     title={allDaySelected ? "Deselect day" : "Select all in day"}
                   />
                 )}
+                {/* Day note button */}
+                {!bulkMode && getDayNote && onSaveDayNote && (
+                  <DayNote
+                    dateKey={day}
+                    note={getDayNote(day)}
+                    onSave={onSaveDayNote}
+                  />
+                )}
                 {!bulkMode && (
                   <svg
                     className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-150 ${
@@ -181,6 +196,14 @@ export function EntryList({
             </button>
 
             {/* Collapsible entry list */}
+            {!isCollapsed && !timelineMode && getDayNote && onSaveDayNote && getDayNote(day) && !bulkMode && (
+              <div className="mt-1 px-4 py-2.5 bg-amber-950/20 border border-amber-400/15 rounded-xl">
+                <div
+                  className="prose prose-invert prose-sm max-w-none text-amber-200/80 text-xs leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: renderMarkdown(getDayNote(day)) }}
+                />
+              </div>
+            )}
             {!isCollapsed && !timelineMode && (
               <div className="bg-zinc-900 rounded-xl border border-zinc-800 divide-y divide-zinc-800/50 mt-1">
                 {dayEntries.map((entry) => (
