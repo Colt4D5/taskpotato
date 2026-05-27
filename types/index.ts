@@ -13,8 +13,9 @@ export interface Project {
   color: string;
   archived: boolean;
   createdAt: number;
-  budgetHours?: number; // 0 or undefined = no budget
-  hourlyRate?: number;   // USD per hour; undefined = no rate set
+  budgetHours?: number;       // 0 or undefined = no budget (all-time)
+  weeklyTargetHours?: number; // 0 or undefined = no weekly target
+  hourlyRate?: number;        // USD per hour; undefined = no rate set
   clientId?: string | null;
 }
 

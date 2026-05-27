@@ -246,7 +246,7 @@ export default function SettingsPage() {
           projects={projects}
           tasks={tasks}
           clients={clients}
-          onAddProject={(name, color, budgetHours, clientId, hourlyRate) => addProject(name, color, budgetHours, clientId, hourlyRate)}
+          onAddProject={(name, color, budgetHours, clientId, hourlyRate, weeklyTargetHours) => addProject(name, color, budgetHours, clientId, hourlyRate, weeklyTargetHours)}
           onUpdateProject={updateProject}
           onDeleteProject={deleteProject}
           onAddTask={(projectId, name, notes) => addTask(projectId, name, notes)}

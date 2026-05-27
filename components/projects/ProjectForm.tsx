@@ -11,7 +11,7 @@ interface ProjectFormProps {
   open: boolean;
   initial?: Partial<Project>;
   clients?: Client[];
-  onSave: (data: { name: string; color: string; budgetHours?: number; hourlyRate?: number; clientId?: string | null }) => void;
+  onSave: (data: { name: string; color: string; budgetHours?: number; hourlyRate?: number; clientId?: string | null; weeklyTargetHours?: number }) => void;
   onClose: () => void;
   title?: string;
 }
@@ -35,6 +35,9 @@ export function ProjectForm({
     initial?.hourlyRate ? String(initial.hourlyRate) : ""
   );
   const [clientId, setClientId] = useState<string>(initial?.clientId ?? "");
+  const [weeklyTargetRaw, setWeeklyTargetRaw] = useState(
+    initial?.weeklyTargetHours ? String(initial.weeklyTargetHours) : ""
+  );
   const [error, setError] = useState("");
 
   const handleSave = () => {
@@ -53,12 +56,18 @@ export function ProjectForm({
       setError("Hourly rate must be a non-negative number.");
       return;
     }
-    onSave({ name: trimmed, color, budgetHours, hourlyRate, clientId: clientId || null });
+    const weeklyTargetHours = weeklyTargetRaw.trim() === "" ? undefined : parseFloat(weeklyTargetRaw);
+    if (weeklyTargetHours !== undefined && (isNaN(weeklyTargetHours) || weeklyTargetHours <= 0)) {
+      setError("Weekly target must be a positive number.");
+      return;
+    }
+    onSave({ name: trimmed, color, budgetHours, hourlyRate, clientId: clientId || null, weeklyTargetHours });
     setName("");
     setColor(DEFAULT_COLOR);
     setBudgetRaw("");
     setHourlyRateRaw("");
     setClientId("");
+    setWeeklyTargetRaw("");
     setError("");
   };
 
@@ -108,6 +117,23 @@ export function ProjectForm({
           />
           <p className="text-xs text-zinc-500">
             Set a cap on total tracked hours. You'll see burn progress on the Reports page.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-400">
+            Weekly Target (hours) <span className="text-zinc-500 font-normal">— optional</span>
+          </label>
+          <input
+            type="number"
+            min="0.1"
+            step="0.5"
+            value={weeklyTargetRaw}
+            onChange={(e) => { setWeeklyTargetRaw(e.target.value); setError(""); }}
+            placeholder="e.g. 10"
+            className="rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 w-full"
+          />
+          <p className="text-xs text-zinc-500">
+            Target hours per week for this project. Tracked on the Reports page in weekly mode.
           </p>
         </div>
         <div className="flex flex-col gap-1.5">

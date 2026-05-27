@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 30 complete**
+🚧 **Active Development — Night 31 complete**
 
 ## Features
 
@@ -80,6 +80,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Per-client monthly hour budgets — set a monthly hour cap on any client (Settings > Clients); Reports page shows a "Client Retainer Budgets" card with per-client burn progress bars, over-budget / near-limit badges, hours-used / budget, and remaining time; scoped to the current calendar month; burn calculated from all entries on projects associated with each client; sorted by % burn descending so most-at-risk clients surface first
 - ✅ Invoice tracking — create invoices from billable time entries, track draft/sent/paid status, and mark entries as invoiced to prevent double-billing; `CreateInvoiceModal` lets you filter by client and date range to select unbilled entries; live preview shows total time and earnings per project; sequential invoice numbering (INV-001…); `InvoiceList` on the Reports page shows all invoices with status badges, entry counts, earnings, and project badges; per-invoice detail modal with full entry breakdown grouped by project; Earnings section gains an `+ Invoice unbilled` shortcut button and a per-project invoiced progress indicator showing what fraction of each project's earnings has been invoiced; Log page shows an `invoiced` green badge on entries that are part of an invoice; deleting an invoice reverts entries to unbilled; JSON export/import includes invoices
 - ✅ Daily Work Journal — per-day Markdown notes attached to each day in the Log (separate from per-entry descriptions); amber `Note` pill in each day header opens an inline editor with Write/Preview tabs; notes render as a Markdown block above the entry list when a day is expanded; press `J` anywhere on the Log page to open today's note; `Ctrl+Enter` / `Cmd+Enter` saves; word count footer; delete note button; JSON export/import includes day notes
+- ✅ Per-project weekly targets — set a target hours/week on any project (Settings > Projects or the inline project form on the Timer page); Reports page shows a "Project Weekly Targets" card in weekly mode with per-project progress bars; bars color-code green when done, amber at 75%+, and muted below; over-goal and near-target badges; remaining or over-goal time shown below each bar; projects sorted by progress percentage descending so the most-advanced targets surface first; `Nh/wk` badge shown next to project name in Settings; stored as `weeklyTargetHours` on the project record and fully backward-compatible
 
 ## Tech Stack
 

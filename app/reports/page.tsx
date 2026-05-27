@@ -23,6 +23,7 @@ import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
 import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
 import { PeakHoursChart } from "@/components/reports/PeakHoursChart";
 import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
+import { ProjectWeeklyTargets } from "@/components/reports/ProjectWeeklyTargets";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -425,6 +426,14 @@ export default function ReportsPage() {
               entries={completedEntries}
               settings={settings}
               weekOffset={weekOffset}
+            />
+          )}
+
+          {/* Project weekly targets — only in week mode */}
+          {mode === "week" && (
+            <ProjectWeeklyTargets
+              projects={projects}
+              weekEntries={rangeEntries}
             />
           )}
 
