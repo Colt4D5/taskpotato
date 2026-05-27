@@ -10,7 +10,7 @@ interface ProjectListProps {
   projects: Project[];
   tasks: Task[];
   clients?: Client[];
-  onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number) => void;
+  onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number, weeklyTargetHours?: number) => void;
   onUpdateProject: (id: string, patch: Partial<Omit<Project, "id" | "createdAt">>) => void;
   onDeleteProject: (id: string) => void;
   onAddTask: (projectId: string, name: string, notes: string) => void;
@@ -77,6 +77,11 @@ export function ProjectList({
                 <span className="text-xs text-zinc-600">
                   {projectTasks.filter((t) => !t.archived).length} tasks
                 </span>
+                {(project.weeklyTargetHours ?? 0) > 0 && (
+                  <span className="text-xs text-orange-400/70 font-mono">
+                    {project.weeklyTargetHours}h/wk
+                  </span>
+                )}
                 {clients.length > 0 && project.clientId && (() => {
                   const client = clients.find((c) => c.id === project.clientId);
                   return client ? (
@@ -177,8 +182,8 @@ export function ProjectList({
       <ProjectForm
         open={addOpen}
         clients={clients}
-        onSave={({ name, color, budgetHours, hourlyRate, clientId }) => {
-          onAddProject(name, color, budgetHours, clientId, hourlyRate);
+        onSave={({ name, color, budgetHours, hourlyRate, clientId, weeklyTargetHours }) => {
+          onAddProject(name, color, budgetHours, clientId, hourlyRate, weeklyTargetHours);
           setAddOpen(false);
         }}
         onClose={() => setAddOpen(false)}
@@ -190,8 +195,8 @@ export function ProjectList({
           initial={editingProject}
           clients={clients}
           title="Edit Project"
-          onSave={({ name, color, budgetHours, hourlyRate, clientId }) => {
-            onUpdateProject(editingProject.id, { name, color, budgetHours, hourlyRate: hourlyRate ?? undefined, clientId });
+          onSave={({ name, color, budgetHours, hourlyRate, clientId, weeklyTargetHours }) => {
+            onUpdateProject(editingProject.id, { name, color, budgetHours, hourlyRate: hourlyRate ?? undefined, clientId, weeklyTargetHours: weeklyTargetHours ?? undefined });
             setEditingProject(null);
           }}
           onClose={() => setEditingProject(null)}

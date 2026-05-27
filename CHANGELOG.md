@@ -1,3 +1,23 @@
+## [4.6.0] — 2026-05-27
+
+### Added
+- **Per-project weekly targets** — set a target hours/week on any project and track weekly progress on the Reports page, alongside the existing all-time project budgets
+  - `Project.weeklyTargetHours?: number` — new optional field on the `Project` type; `undefined` or `0` means no weekly target; fully backward-compatible with all existing project records
+  - `ProjectForm` — new **Weekly Target (hours)** numeric input in the create/edit modal; optional; accepts decimals (e.g. 10, 7.5); validation rejects non-positive values; help text explains Reports page weekly mode usage; field persists correctly through edit round-trips; shown in both the Settings project form and the inline project creation form on the Timer page
+  - `ProjectList` — weekly target displayed inline as an orange `Nh/wk` monospace label next to the task count when a target is set on the project; passed correctly through the `onAdd`/`onUpdate` props to storage
+  - `useProjects.addProject()` — updated signature accepts optional `weeklyTargetHours` as 6th parameter; stored on the project record; zero and absent treated identically (no target)
+  - `ProjectWeeklyTargets` component (`components/reports/ProjectWeeklyTargets.tsx`) — Reports page section showing current-week progress per project with a weekly target configured:
+    - Only projects with `weeklyTargetHours > 0` and not archived are rendered; returns `null` when none exist — no noise for users who don't use this feature
+    - Each row shows the project badge, tracked time this week, target (e.g. `10h target`), and a progress bar filling proportionally to `trackedMs / targetMs`
+    - Color coding: muted orange below 75% progress, brighter orange at 75–99%, green at 100%+ with a `✓ Done` badge
+    - **Near target** amber badge appears when progress is between 80–99% so you know you're close without being done
+    - Over-goal entries show `+Xh over` in green below the bar
+    - Rows sorted by progress percentage descending — the projects you're closest to finishing (or have finished) surface first; ties broken by target size
+    - Burn calculated from all completed entries whose `projectId` matches and whose `startedAt` falls within the current week range (respects `weekOffset` via the caller-provided `weekEntries` slice)
+  - Reports page — `ProjectWeeklyTargets` mounted in weekly mode only, immediately after the `TagGoalProgress` section; receives the pre-filtered `rangeEntries` slice (already scoped to the current week in weekly mode) as `weekEntries`; hidden in Custom Range mode where a week-scoped target makes no sense
+  - `TimerWidget` — inline project creation already uses `ProjectForm`; `weeklyTargetHours` now threads from the form through `handleNewProject` to `addProject` so projects created directly from the timer page can carry a weekly target
+  - `weeklyTargetHours` is stored directly on the project object in the existing `taskpotato:projects` key and round-trips automatically through the existing JSON export/import path; no schema version bump required
+
 ## [4.5.0] — 2026-05-26
 
 ### Added

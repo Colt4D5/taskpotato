@@ -14,7 +14,7 @@ export function useProjects() {
   const [projects, setProjects] = useStorage<Project[]>("projects", []);
 
   const addProject = useCallback(
-    (name: string, color?: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number) => {
+    (name: string, color?: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number, weeklyTargetHours?: number) => {
       const project: Project = {
         id: uuid(),
         name: name.trim(),
@@ -24,6 +24,7 @@ export function useProjects() {
         ...(budgetHours && budgetHours > 0 ? { budgetHours } : {}),
         ...(hourlyRate !== undefined && hourlyRate >= 0 ? { hourlyRate } : {}),
         ...(clientId ? { clientId } : {}),
+        ...(weeklyTargetHours && weeklyTargetHours > 0 ? { weeklyTargetHours } : {}),
       };
       setProjects((prev) => [...prev, project]);
       return project;
