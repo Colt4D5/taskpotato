@@ -22,6 +22,7 @@ import { WeeklyTrend } from "@/components/reports/WeeklyTrend";
 import { CopySummaryButton } from "@/components/reports/CopySummaryButton";
 import { PrintTimesheetModal } from "@/components/reports/PrintTimesheetModal";
 import { PeakHoursChart } from "@/components/reports/PeakHoursChart";
+import { WeekdayDistribution } from "@/components/reports/WeekdayDistribution";
 import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { ProjectWeeklyTargets } from "@/components/reports/ProjectWeeklyTargets";
 import { buildReportSummaryData } from "@/lib/reportSummary";
@@ -543,6 +544,15 @@ export default function ReportsPage() {
 
           {/* Peak hours */}
           <PeakHoursChart entries={rangeEntries} />
+
+          {/* Weekday distribution */}
+          <WeekdayDistribution
+            entries={rangeEntries}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            weekStartsOn={settings.weekStartsOn as 0 | 1}
+            totalRangeMs={totalRangeMs}
+          />
 
           {/* Earnings breakdown */}
           <EarningsBreakdown projects={projects} entries={rangeEntries} onCreateInvoice={() => setCreateInvoiceOpen(true)} />

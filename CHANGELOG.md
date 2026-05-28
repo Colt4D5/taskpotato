@@ -1,4 +1,22 @@
-## [4.6.0] — 2026-05-27
+## [4.7.0] — 2026-05-28
+
+### Added
+- **Weekday distribution chart** — Reports page section showing time tracked broken down by day of week (Mon–Sun), letting you see exactly which days you actually work vs. the days you merely intend to
+  - `lib/weekdayDistribution.ts` — `computeWeekdayDistribution(entries, rangeStart, rangeEnd, weekStartsOn)` distributes completed entry time into 7 day-of-week buckets ordered from the configured week start; each entry is assigned to the weekday of its `startedAt` timestamp (local time) — intuitive, since a session started Tuesday belongs to Tuesday; `countWeekdayOccurrences()` counts how many calendar times each weekday appeared in the range so an accurate per-occurrence average can be computed; `weekdayStats()` derives `peakDow`, `peakMs`, `activeDays`, and `emptyDays` from the bucket set
+  - `WeekdayDistribution` component (`components/reports/WeekdayDistribution.tsx`) — 7-bar chart with rich interactions:
+    - Each bar's height is proportional to `totalMs` (or `avgMs` in average mode) relative to the highest bar in the set
+    - **Peak day** bar rendered at full `bg-orange-400`; other active bars at `bg-orange-500/55`; zero-time bars render as a thin dim baseline so the 7-day structure is always visible
+    - **Summary chips** above the chart: peak day name, count of active days, count of empty days (when any)
+    - **Hover tooltip** per bar: total time, percentage of range total, and (when avg toggle is shown) average per occurrence; in average mode the tooltip flips to show avg as primary and total as secondary
+    - **Total / Avg per week toggle** — appears only when the selected range spans more than one week (7+ days would all be exactly 1 occurrence so the average is identical to total and the toggle would be meaningless); in average mode the chart reflects per-occurrence averages; footer note explains the average scope
+    - Day label below each bar highlighted in orange for the peak day
+    - Duration label in monospace zinc below the day label (or `—` for zero days)
+    - Respects the `weekStartsOn` setting so users who start their week on Sunday see Sunday first
+    - Returns `null` when `totalRangeMs === 0` — no empty-state noise
+  - Reports page — `WeekdayDistribution` mounted after `PeakHoursChart` and before `EarningsBreakdown`; receives `rangeStart`, `rangeEnd`, `weekStartsOn` from settings, and the already-computed `totalRangeMs` so no redundant aggregation occurs
+  - No new localStorage keys; pure derivation from the existing completed entries set for whatever range is selected
+
+
 
 ### Added
 - **Per-project weekly targets** — set a target hours/week on any project and track weekly progress on the Reports page, alongside the existing all-time project budgets
