@@ -17,6 +17,7 @@ export interface Project {
   weeklyTargetHours?: number; // 0 or undefined = no weekly target
   hourlyRate?: number;        // USD per hour; undefined = no rate set
   clientId?: string | null;
+  pinned?: boolean;           // true = surfaced at top of all project selectors
 }
 
 export interface Task {

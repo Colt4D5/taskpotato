@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Project } from "@/types";
+import { sortedProjectGroups } from "@/lib/projectSort";
 
 interface BulkActionBarProps {
   selectedCount: number;
@@ -75,16 +76,28 @@ export function BulkActionBar({
                 >
                   — No project
                 </button>
-                {projects.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => { onReassignProject(p.id); setShowReassign(false); }}
-                    className="w-full text-left text-sm px-3 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2 last:rounded-b-lg"
-                  >
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
-                    {p.name}
-                  </button>
-                ))}
+                {(() => {
+                  const { pinned, unpinned, hasPinned } = sortedProjectGroups(projects);
+                  const renderBtn = (p: Project) => (
+                    <button
+                      key={p.id}
+                      onClick={() => { onReassignProject(p.id); setShowReassign(false); }}
+                      className="w-full text-left text-sm px-3 py-2 text-zinc-300 hover:bg-zinc-800 transition-colors flex items-center gap-2 last:rounded-b-lg"
+                    >
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
+                      {p.name}
+                    </button>
+                  );
+                  if (!hasPinned) return unpinned.map(renderBtn);
+                  return (
+                    <>
+                      <div className="px-3 pt-1.5 pb-0.5 text-[10px] text-zinc-500 uppercase tracking-wider">⭐ Pinned</div>
+                      {pinned.map(renderBtn)}
+                      <div className="px-3 pt-1.5 pb-0.5 text-[10px] text-zinc-500 uppercase tracking-wider border-t border-zinc-800 mt-1">All</div>
+                      {unpinned.map(renderBtn)}
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
