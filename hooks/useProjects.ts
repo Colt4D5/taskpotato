@@ -48,7 +48,16 @@ export function useProjects() {
     [setProjects]
   );
 
+  const togglePin = useCallback(
+    (id: string) => {
+      setProjects((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, pinned: !p.pinned } : p))
+      );
+    },
+    [setProjects]
+  );
+
   const activeProjects = projects.filter((p) => !p.archived);
 
-  return { projects, activeProjects, addProject, updateProject, deleteProject };
+  return { projects, activeProjects, addProject, updateProject, deleteProject, togglePin };
 }

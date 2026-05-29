@@ -1,3 +1,22 @@
+## [4.8.0] — 2026-05-29
+
+### Added
+- **Pinned projects** — star any project in Settings so it always floats to the top of every project selector throughout the app
+  - `Project.pinned?: boolean` — new optional field on the `Project` type; `false` or `undefined` means unpinned; fully backward-compatible with all existing project records
+  - `useProjects.togglePin(id)` — new method that flips the `pinned` flag on a project in a single `setProjects` pass; no arguments beyond the project id required
+  - `lib/projectSort.ts` — `sortedProjectGroups(projects)` utility splits any active project list into `{ pinned, unpinned, hasPinned }`; each group is sorted alphabetically; consumed by every dropdown that renders projects so the sorting logic lives in one place and is not repeated
+  - **Pin button in Settings → Projects** — each active project row gains a ★/☆ toggle button to the left of the existing Edit/Archive/Delete actions; filled amber star when pinned, dim outline star when not; hover tooltip explains the action; clicking toggles immediately with no confirmation needed
+  - **Pinned badge in Settings project name** — a small ⭐ prefix appears in the project name button when the project is pinned so the pinned state is visible at a glance in the list without needing to read button states
+  - **`<optgroup>` separation in all project selects** — when at least one project is pinned, every project `<select>` in the app renders an `⭐ Pinned` optgroup at the top followed by an `All Projects` optgroup below; when no projects are pinned the dropdown renders as a flat list (identical to previous behavior, no regression); updated in:
+    - Timer page (main project dropdown on `TimerWidget`)
+    - Log page (filter project dropdown)
+    - Entry editor modal (`EntryEditor`)
+    - Quick Log form (`QuickEntryForm`)
+    - Entry split modal (`EntrySplitModal`)
+    - Template form (`TemplateForm`)
+  - **BulkActionBar reassign menu** — the non-select reassign popover on the Log bulk actions bar also separates pinned and unpinned projects with labelled section headers when any are pinned
+  - `pinned` is stored directly on the project object in the existing `taskpotato:projects` key; no new localStorage keys; round-trips automatically through JSON export/import without any schema changes
+
 ## [4.7.0] — 2026-05-28
 
 ### Added

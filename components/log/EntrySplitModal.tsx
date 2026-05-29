@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { formatTime } from "@/lib/dateUtils";
 import { formatDurationShort, elapsedMs } from "@/lib/duration";
+import { sortedProjectGroups } from "@/lib/projectSort";
 
 interface EntrySplitModalProps {
   open: boolean;
@@ -164,9 +165,19 @@ export function EntrySplitModal({
             className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
           >
             <option value="">No project</option>
-            {projects.filter((p) => !p.archived).map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
+            {(() => {
+              const { pinned, unpinned, hasPinned } = sortedProjectGroups(projects.filter((p) => !p.archived));
+              return hasPinned ? (
+                <>
+                  <optgroup label="⭐ Pinned">
+                    {pinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                  <optgroup label="All Projects">
+                    {unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                </>
+              ) : unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>);
+            })()}
           </select>
         </div>
 

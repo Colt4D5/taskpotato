@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { exportCSV } from "@/lib/csvExport";
 
 export default function SettingsPage() {
-  const { projects, addProject, updateProject, deleteProject } = useProjects();
+  const { projects, addProject, updateProject, deleteProject, togglePin } = useProjects();
   const { tasks, addTask, updateTask, deleteTask } = useTasks();
   const { entries, updateEntry, deleteEntry, updateAllTags, allTags: entriesAllTags } = useEntries();
   const { clients, addClient, updateClient, deleteClient } = useClients();
@@ -249,6 +249,7 @@ export default function SettingsPage() {
           onAddProject={(name, color, budgetHours, clientId, hourlyRate, weeklyTargetHours) => addProject(name, color, budgetHours, clientId, hourlyRate, weeklyTargetHours)}
           onUpdateProject={updateProject}
           onDeleteProject={deleteProject}
+          onTogglePin={togglePin}
           onAddTask={(projectId, name, notes) => addTask(projectId, name, notes)}
           onUpdateTask={updateTask}
           onDeleteTask={deleteTask}

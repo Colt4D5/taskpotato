@@ -13,6 +13,7 @@ interface ProjectListProps {
   onAddProject: (name: string, color: string, budgetHours?: number, clientId?: string | null, hourlyRate?: number, weeklyTargetHours?: number) => void;
   onUpdateProject: (id: string, patch: Partial<Omit<Project, "id" | "createdAt">>) => void;
   onDeleteProject: (id: string) => void;
+  onTogglePin: (id: string) => void;
   onAddTask: (projectId: string, name: string, notes: string) => void;
   onUpdateTask: (id: string, patch: Partial<Omit<Task, "id" | "createdAt">>) => void;
   onDeleteTask: (id: string) => void;
@@ -25,6 +26,7 @@ export function ProjectList({
   onAddProject,
   onUpdateProject,
   onDeleteProject,
+  onTogglePin,
   onAddTask,
   onUpdateTask,
   onDeleteTask,
@@ -69,9 +71,12 @@ export function ProjectList({
                   onClick={() => setExpandedId(expanded ? null : project.id)}
                 />
                 <button
-                  className="flex-1 text-left text-sm font-medium text-zinc-200 hover:text-white transition-colors truncate"
+                  className="flex-1 text-left text-sm font-medium text-zinc-200 hover:text-white transition-colors truncate flex items-center gap-1.5"
                   onClick={() => setExpandedId(expanded ? null : project.id)}
                 >
+                  {project.pinned && (
+                    <span className="text-amber-400 text-[10px] leading-none flex-shrink-0" title="Pinned">⭐</span>
+                  )}
                   {project.name}
                 </button>
                 <span className="text-xs text-zinc-600">
@@ -91,6 +96,17 @@ export function ProjectList({
                   ) : null;
                 })()}
                 <div className="flex gap-1">
+                  <button
+                    title={project.pinned ? "Unpin project" : "Pin to top of selectors"}
+                    onClick={() => onTogglePin(project.id)}
+                    className={`px-2 py-1 rounded text-xs transition-colors ${
+                      project.pinned
+                        ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                        : "text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800"
+                    }`}
+                  >
+                    {project.pinned ? "★" : "☆"}
+                  </button>
                   <Button
                     size="sm"
                     variant="ghost"

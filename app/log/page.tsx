@@ -19,6 +19,7 @@ import { useFilterPresets } from "@/hooks/useFilterPresets";
 import { FilterPresetsBar } from "@/components/log/FilterPresetsBar";
 import { useDayNotes } from "@/hooks/useDayNotes";
 import { DayNote } from "@/components/log/DayNote";
+import { sortedProjectGroups } from "@/lib/projectSort";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
@@ -426,11 +427,19 @@ export default function LogPage() {
             className="flex-1 min-w-[140px] bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
           >
             <option value="">All Projects</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
+            {(() => {
+              const { pinned, unpinned, hasPinned } = sortedProjectGroups(projects);
+              return hasPinned ? (
+                <>
+                  <optgroup label="⭐ Pinned">
+                    {pinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                  <optgroup label="All Projects">
+                    {unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                </>
+              ) : unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>);
+            })()}
           </select>
           <input
             ref={notesSearchRef}

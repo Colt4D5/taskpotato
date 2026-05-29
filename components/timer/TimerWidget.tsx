@@ -13,6 +13,7 @@ import { startOfDay, endOfDay, formatTime } from "@/lib/dateUtils";
 
 import { TagInput } from "@/components/ui/TagInput";
 import { DescriptionAutocomplete, AutocompleteSuggestion } from "@/components/timer/DescriptionAutocomplete";
+import { sortedProjectGroups } from "@/lib/projectSort";
 import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { IdleAlert } from "@/components/timer/IdleAlert";
 import { TemplateQuickStart } from "@/components/timer/TemplateQuickStart";
@@ -165,11 +166,27 @@ export function TimerWidget() {
           className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-zinc-300 focus:outline-none focus:ring-2 focus:ring-orange-500/50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <option value="">No project</option>
-          {activeProjects.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
+          {(() => {
+            const { pinned, unpinned, hasPinned } = sortedProjectGroups(activeProjects);
+            return hasPinned ? (
+              <>
+                <optgroup label="⭐ Pinned">
+                  {pinned.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="All Projects">
+                  {unpinned.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </optgroup>
+              </>
+            ) : (
+              unpinned.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))
+            );
+          })()}
         </select>
 
         <Button

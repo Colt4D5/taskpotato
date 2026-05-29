@@ -5,6 +5,7 @@ import { Project, Task, TimeEntry } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { TagInput } from "@/components/ui/TagInput";
+import { sortedProjectGroups } from "@/lib/projectSort";
 
 interface QuickEntryFormProps {
   open: boolean;
@@ -257,9 +258,19 @@ export function QuickEntryForm({ open, projects, tasks, allTags, onSave, onClose
             className={inputClass}
           >
             <option value="">No project</option>
-            {projects.filter((p) => !p.archived).map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
+            {(() => {
+              const { pinned, unpinned, hasPinned } = sortedProjectGroups(projects.filter((p) => !p.archived));
+              return hasPinned ? (
+                <>
+                  <optgroup label="⭐ Pinned">
+                    {pinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                  <optgroup label="All Projects">
+                    {unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                </>
+              ) : unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>);
+            })()}
           </select>
         </div>
 

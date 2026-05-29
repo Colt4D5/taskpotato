@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { TagInput } from "@/components/ui/TagInput";
 import { Input } from "@/components/ui/Input";
+import { sortedProjectGroups } from "@/lib/projectSort";
 
 interface TemplateFormProps {
   open: boolean;
@@ -98,13 +99,19 @@ export function TemplateForm({
             className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50"
           >
             <option value="">No project</option>
-            {projects
-              .filter((p) => !p.archived)
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
+            {(() => {
+              const { pinned, unpinned, hasPinned } = sortedProjectGroups(projects.filter((p) => !p.archived));
+              return hasPinned ? (
+                <>
+                  <optgroup label="⭐ Pinned">
+                    {pinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                  <optgroup label="All Projects">
+                    {unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </optgroup>
+                </>
+              ) : unpinned.map((p) => <option key={p.id} value={p.id}>{p.name}</option>);
+            })()}
           </select>
         </div>
 
