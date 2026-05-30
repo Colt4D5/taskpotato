@@ -5,8 +5,11 @@ import { TimeEntry, Project, Task } from "@/types";
 import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { EntryRow } from "./EntryRow";
 
+import { findOverlappingIds } from "@/lib/overlapDetection";
+
 interface ProjectGroupedListProps {
   entries: TimeEntry[];
+  allEntries?: TimeEntry[];  // full unfiltered set for overlap detection
   projects: Project[];
   tasks: Task[];
   allTags?: string[];
@@ -40,6 +43,7 @@ function groupByProject(
 
 export function ProjectGroupedList({
   entries,
+  allEntries,
   projects,
   tasks,
   allTags,
@@ -60,6 +64,12 @@ export function ProjectGroupedList({
   const completed = entries.filter((e) => e.stoppedAt !== null && !hiddenIds?.has(e.id));
 
   const grouped = useMemo(() => groupByProject(completed), [completed]);
+
+  // Overlap detection uses the full unfiltered set
+  const overlappingIds = useMemo(
+    () => findOverlappingIds(allEntries ?? entries),
+    [allEntries, entries]
+  );
 
   const projectMap = new Map(projects.map((p) => [p.id, p]));
   const taskMap = new Map(tasks.map((t) => [t.id, t]));
@@ -188,6 +198,7 @@ export function ProjectGroupedList({
                     projects={projects}
                     tasks={tasks}
                     allTags={allTags}
+                    allEntries={allEntries ?? entries}
                     onResume={onResume}
                     hasRunning={hasRunning}
                     onSplit={onSplit}
@@ -196,6 +207,7 @@ export function ProjectGroupedList({
                     onToggleSelect={onToggleSelect}
                     searchQuery={searchQuery}
                     showDate
+                    isOverlapping={overlappingIds.has(entry.id)}
                   />
                 ))}
               </div>
