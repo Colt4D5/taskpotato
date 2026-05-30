@@ -20,12 +20,16 @@ import { FilterPresetsBar } from "@/components/log/FilterPresetsBar";
 import { useDayNotes } from "@/hooks/useDayNotes";
 import { DayNote } from "@/components/log/DayNote";
 import { sortedProjectGroups } from "@/lib/projectSort";
+import { findOverlappingIds } from "@/lib/overlapDetection";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
   const { presets, addPreset, deletePreset } = useFilterPresets();
   const { getNote: getDayNote, setNote: saveDayNote } = useDayNotes();
   const [todayNoteForceOpen, setTodayNoteForceOpen] = useState(false);
+
+  // Overlap detection — computed over full dataset so banner shows even when filter is active
+  const overlapCount = useMemo(() => findOverlappingIds(completedEntries).size, [completedEntries]);
 
   // Today's key for J shortcut
   const todayKey = (() => {
@@ -367,6 +371,18 @@ export default function LogPage() {
         </div>
       </div>
 
+      {/* Overlap warning banner */}
+      {overlapCount > 0 && !bulkMode && (
+        <div className="flex items-start gap-2.5 mb-4 px-3.5 py-2.5 rounded-xl bg-amber-500/8 border border-amber-500/25">
+          <span className="text-amber-400 mt-0.5 flex-shrink-0">⚠</span>
+          <p className="text-sm text-amber-300/90">
+            <span className="font-medium">{overlapCount} {overlapCount === 1 ? "entry" : "entries"} with overlapping time ranges</span>
+            {" "}— entries with an <span className="font-mono text-amber-400 text-xs">⚠ overlap</span> badge are flagged below.
+            Open the entry editor to review and fix the conflicting times.
+          </p>
+        </div>
+      )}
+
       {/* Bulk action bar */}
       {bulkMode && (
         <BulkActionBar
@@ -509,6 +525,7 @@ export default function LogPage() {
         <ProjectGroupedList
           searchQuery={filterNotes}
           entries={filteredEntries}
+          allEntries={completedEntries}
           projects={projects}
           tasks={tasks}
           allTags={entriesAllTags}
@@ -532,6 +549,7 @@ export default function LogPage() {
         <EntryList
           searchQuery={filterNotes}
           entries={filteredEntries}
+          allEntries={completedEntries}
           projects={projects}
           tasks={tasks}
           allTags={entriesAllTags}

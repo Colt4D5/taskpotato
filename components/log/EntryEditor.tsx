@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { TimeEntry, Project, Task } from "@/types";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/Input";
 import { TagInput } from "@/components/ui/TagInput";
 import { renderMarkdown } from "@/lib/markdown";
 import { sortedProjectGroups } from "@/lib/projectSort";
+import { findProposedOverlaps } from "@/lib/overlapDetection";
+import { formatTime } from "@/lib/dateUtils";
 
 interface EntryEditorProps {
   open: boolean;
@@ -15,6 +17,7 @@ interface EntryEditorProps {
   projects: Project[];
   tasks: Task[];
   allTags?: string[];
+  allEntries?: TimeEntry[];  // full entry set for overlap detection
   onSave: (patch: Partial<Omit<TimeEntry, "id">>) => void;
   onClose: () => void;
 }
@@ -49,6 +52,7 @@ export function EntryEditor({
   projects,
   tasks,
   allTags,
+  allEntries,
   onSave,
   onClose,
 }: EntryEditorProps) {
@@ -87,6 +91,15 @@ export function EntryEditor({
   const availableTasks = tasks.filter(
     (t) => t.projectId === projectId && !t.archived
   );
+
+  // Reactive overlap check — updates as user edits times
+  const overlapWarning = useMemo(() => {
+    if (!allEntries || !entry.stoppedAt) return [];
+    const start = combineDateTime(startDate, startTime);
+    const stop = combineDateTime(stopDate, stopTime);
+    if (!start || !stop || stop <= start) return [];
+    return findProposedOverlaps(start, stop, entry.id, allEntries);
+  }, [allEntries, startDate, startTime, stopDate, stopTime, entry.id, entry.stoppedAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = () => {
     setError(null);
@@ -236,6 +249,39 @@ export function EntryEditor({
                 className={inputClass}
               />
             </div>
+          </div>
+        )}
+
+        {/* Overlap advisory — non-blocking, shown when current times clash with other entries */}
+        {overlapWarning.length > 0 && (
+          <div className="flex flex-col gap-1 rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-2.5 -mt-1">
+            <div className="flex items-center gap-2">
+              <span className="text-amber-400 text-sm font-medium">⚠ Overlap detected</span>
+              <span className="text-xs text-amber-300/70">Save will still work — resolve manually if needed</span>
+            </div>
+            <ul className="flex flex-col gap-0.5 mt-0.5">
+              {overlapWarning.map((e) => {
+                const proj = projects.find((p) => p.id === e.projectId);
+                return (
+                  <li key={e.id} className="text-xs text-amber-200/80">
+                    <span className="font-mono text-amber-300">
+                      {formatTime(e.startedAt)}–{e.stoppedAt ? formatTime(e.stoppedAt) : "…"}
+                    </span>
+                    {proj && (
+                      <span
+                        className="ml-1.5 px-1 py-0.5 rounded text-[10px] font-medium"
+                        style={{ backgroundColor: proj.color + "33", color: proj.color }}
+                      >
+                        {proj.name}
+                      </span>
+                    )}
+                    {e.notes && (
+                      <span className="ml-1.5 text-amber-200/60 truncate"> — {e.notes.slice(0, 40)}{e.notes.length > 40 ? "…" : ""}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         )}
 

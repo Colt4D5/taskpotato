@@ -20,12 +20,14 @@ interface EntryRowProps {
   projects: Project[];
   tasks: Task[];
   allTags?: string[];
+  allEntries?: TimeEntry[];  // for overlap detection in editor
   onResume?: (entry: TimeEntry) => void;
   onDuplicate?: (entry: TimeEntry) => void;
   onSplit?: (id: string, splitAt: number, secondProjectId: string | null, secondTaskId: string | null) => void;
   hasRunning?: boolean;
   searchQuery?: string;
   showDate?: boolean;  // show date label in the time line (used in project-grouped view)
+  isOverlapping?: boolean;  // true when this entry's range overlaps with another entry
   // bulk selection
   selectable?: boolean;
   selected?: boolean;
@@ -41,12 +43,14 @@ export function EntryRow({
   projects,
   tasks,
   allTags,
+  allEntries,
   onResume,
   onDuplicate,
   onSplit,
   hasRunning,
   searchQuery = "",
   showDate = false,
+  isOverlapping = false,
   selectable,
   selected,
   onToggleSelect,
@@ -108,6 +112,14 @@ export function EntryRow({
             )}
             {entry.invoiceId && (
               <span className="text-xs bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded-full border border-green-500/30" title="Included in an invoice">invoiced</span>
+            )}
+            {isOverlapping && (
+              <span
+                className="text-xs bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full border border-amber-500/30"
+                title="This entry's time range overlaps with another entry. Open Edit to review."
+              >
+                ⚠ overlap
+              </span>
             )}
           </div>
           <div className="text-xs text-zinc-500 mt-0.5">
@@ -205,6 +217,7 @@ export function EntryRow({
         projects={projects}
         tasks={tasks}
         allTags={allTags}
+        allEntries={allEntries}
         onSave={(patch) => {
           onUpdate(entry.id, patch);
           setEditing(false);

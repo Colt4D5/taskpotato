@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development — Night 32 complete**
+🚧 **Active Development — Night 33 complete**
 
 ## Features
 
@@ -83,6 +83,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Per-project weekly targets — set a target hours/week on any project (Settings > Projects or the inline project form on the Timer page); Reports page shows a "Project Weekly Targets" card in weekly mode with per-project progress bars; bars color-code green when done, amber at 75%+, and muted below; over-goal and near-target badges; remaining or over-goal time shown below each bar; projects sorted by progress percentage descending so the most-advanced targets surface first; `Nh/wk` badge shown next to project name in Settings; stored as `weeklyTargetHours` on the project record and fully backward-compatible
 - ✅ Weekday distribution chart — Reports page section showing time tracked broken down by day of week (Mon–Sun); 7-bar chart with the peak day highlighted in orange; summary chips for peak day, active days, and empty days; hover tooltip per bar shows total time, percentage of range total, and average per occurrence; toggle between Total and Avg/week views when the selected range spans more than one week; no new storage keys — pure derivation from existing entries
 - ✅ Pinned projects — star any project in Settings to float it to the top of every project dropdown across the app (timer, log filter, entry editor, quick log, split modal, template form, bulk reassign); pinned projects surface in a ⭐ Pinned optgroup above all others; flat list is preserved when nothing is pinned; stored directly on the project record, zero new storage keys, round-trips through JSON export/import
+- ✅ Time entry overlap detection — entries flagged with an ⚠ overlap badge in the Log when their time range conflicts with another entry; amber warning banner at the top of the Log page when any overlaps exist in the full dataset; live overlap advisory in the entry editor that updates reactively as start/stop times are changed, listing each conflicting entry with its time range, project, and description; non-blocking — save is not prevented, conflicts are surfaced for manual resolution; uses the full unfiltered dataset so conflicts outside the current filter are still detected
 
 ## Tech Stack
 

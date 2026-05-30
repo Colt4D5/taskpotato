@@ -1,3 +1,18 @@
+## [4.9.0] — 2026-05-30
+
+### Added
+- **Time entry overlap detection** — silent data-quality guardrail that flags completed entries whose time ranges conflict with each other, preventing double-counted time without blocking the user's workflow
+  - `lib/overlapDetection.ts` — three pure utilities:
+    - `entriesOverlap(a, b)` — returns `true` when two completed entries strictly intersect (touching start/stop boundaries are **not** flagged — back-to-back entries are valid); excludes running entries and self-comparison
+    - `findOverlappingIds(entries)` — O(n²) scan of all completed entries; returns a `Set<string>` of every entry ID that participates in at least one overlap; practical for local-first entry counts
+    - `findProposedOverlaps(start, stop, excludeId, entries)` — returns all existing entries that would conflict with a proposed `[start, stop)` range; used for live feedback in the entry editor as the user adjusts times
+  - **`⚠ overlap` badge on `EntryRow`** — amber pill badge rendered next to existing status badges (`invoiced`, `non-billable`, etc.) whenever the entry's time range conflicts with another entry; tooltip instructs the user to open the editor to resolve; hidden when no conflict exists
+  - **`EntryList` overlap wiring** — `overlappingIds` set computed via `useMemo` from the full unfiltered `allEntries` prop so entries flagged outside the current filter range are still correctly identified; each `EntryRow` receives `isOverlapping` derived from this set
+  - **`ProjectGroupedList` overlap wiring** — same `allEntries` / `overlappingIds` pattern applied to the By-Project view; project-grouped entries flag overlaps correctly regardless of filter state
+  - **Overlap advisory in `EntryEditor`** — non-blocking warning block renders inside the edit modal whenever the currently-entered start/stop times would conflict with another entry; updates reactively as the user changes the time fields so they get instant feedback before saving; lists each conflicting entry with its time range, project badge, and description snippet; a note clarifies the save is not blocked — the conflict is surfaced for manual resolution, not enforced
+  - **Log page banner** — amber informational banner at the top of the Log page when the full dataset contains any overlapping entries; shows a count (e.g. "3 entries with overlapping time ranges") and directs the user to the `⚠ overlap` badges below; banner disappears automatically once all overlaps are resolved; hidden in bulk-select mode
+  - No new localStorage keys; purely derived from existing `taskpotato:entries` data at render time; zero migration required; zero storage overhead
+
 ## [4.8.0] — 2026-05-29
 
 ### Added

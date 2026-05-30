@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { TimeEntry, Project, Task } from "@/types";
 import { groupByDay, formatDayLabel } from "@/lib/dateUtils";
 import { elapsedMs, formatDurationShort } from "@/lib/duration";
@@ -8,9 +8,11 @@ import { EntryRow } from "./EntryRow";
 import { DayTimeline } from "./DayTimeline";
 import { DayNote } from "./DayNote";
 import { renderMarkdown } from "@/lib/markdown";
+import { findOverlappingIds } from "@/lib/overlapDetection";
 
 interface EntryListProps {
   entries: TimeEntry[];
+  allEntries?: TimeEntry[];  // full unfiltered set for cross-filter overlap detection
   projects: Project[];
   tasks: Task[];
   allTags?: string[];
@@ -44,6 +46,7 @@ function todayKey(): string {
 
 export function EntryList({
   entries,
+  allEntries,
   projects,
   tasks,
   allTags,
@@ -68,6 +71,13 @@ export function EntryList({
   const grouped = groupByDay(completed);
   const sortedDays = Array.from(grouped.keys()).sort((a, b) =>
     b.localeCompare(a)
+  );
+
+  // Overlap detection uses the full unfiltered set so we flag overlaps even when
+  // one of the conflicting entries is outside the current filter range.
+  const overlappingIds = useMemo(
+    () => findOverlappingIds(allEntries ?? entries),
+    [allEntries, entries]
   );
 
   const today = todayKey();
@@ -218,6 +228,7 @@ export function EntryList({
                     projects={projects}
                     tasks={tasks}
                     allTags={allTags}
+                    allEntries={allEntries ?? entries}
                     onResume={onResume}
                     hasRunning={hasRunning}
                     onSplit={onSplit}
@@ -225,6 +236,7 @@ export function EntryList({
                     selected={selectedIds?.has(entry.id)}
                     onToggleSelect={onToggleSelect}
                     searchQuery={searchQuery}
+                    isOverlapping={overlappingIds.has(entry.id)}
                   />
                 ))}
               </div>
