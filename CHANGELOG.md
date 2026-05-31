@@ -1,4 +1,20 @@
-## [4.9.0] — 2026-05-30
+## [5.0.0] — 2026-05-31
+
+### Added
+- **Week-over-week comparison** — Reports page section (weekly mode only) that places the current week's tracked time directly alongside the previous week's, so you can see at a glance whether you're ahead or behind without manually flipping back one week
+  - `lib/weekComparison.ts` — two pure computation functions:
+    - `computeWeekComparison(currentEntries, previousEntries)` — aggregates each set of completed entries into a `WeekComparisonData` record containing overall totals (`currentMs`, `previousMs`, `deltaMs`, `deltaPct`) and a per-project breakdown (`ProjectComparisonRow[]`); project rows are sorted by the larger of the two week values so the most significant projects surface first; `deltaPct` is `null` when `previousMs === 0` (no baseline to compute a percentage against)
+    - `aggregateByProject()` — internal helper that maps `projectId | null → ms` in a single pass over the entries; null key represents unassigned entries ("No project")
+  - `WeekComparison` component (`components/reports/WeekComparison.tsx`) — visually rich comparison panel:
+    - **Header summary** — section title with an overall `DeltaPill` badge showing the net change; green arrow + duration + percentage when ahead, red when behind, `—` when equal
+    - **Totals row** — side-by-side previous vs. current week totals with proportional fill bars; previous week rendered in zinc, current week in orange; bars are scaled relative to whichever week is larger so visual proportions are always accurate
+    - **Per-project dual-bar rows** — for every project that appeared in either week, two stacked bars (labeled `prev` and `this`) are rendered with monospace durations at the right edge; bar widths are scaled relative to the overall weekly totals (not per-row max) so widths remain directly comparable across projects; project color is used on the current-week bar; `No project` shown in italic for unassigned entries
+    - **Per-row `DeltaPill`** — each project row carries its own delta badge (absolute duration change + percentage) so you can immediately identify which projects gained or lost time
+    - Returns `null` when both weeks have zero tracked time — no empty-state noise
+    - Footer note clarifies that only completed entries are counted and flags when the previous week has no data
+  - Reports page — `WeekComparison` mounted after `TagGoalProgress` / `ProjectWeeklyTargets` sections and before `PeakHoursChart`; rendered in weekly mode only (hidden in custom range mode where a fixed "previous week" has no clear meaning); previous-week entries computed via `useMemo` with `rangeStart` as the anchor — stepping `rangeStart` back 7 days gives the correct predecessor regardless of which historical week is being viewed; previous-week label formatted in the same `Mon D – Mon D` style as the current week label
+  - No new localStorage keys; purely derived from the existing completed entries array; zero migration required
+
 
 ### Added
 - **Time entry overlap detection** — silent data-quality guardrail that flags completed entries whose time ranges conflict with each other, preventing double-counted time without blocking the user's workflow

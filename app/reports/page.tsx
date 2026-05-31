@@ -25,6 +25,7 @@ import { PeakHoursChart } from "@/components/reports/PeakHoursChart";
 import { WeekdayDistribution } from "@/components/reports/WeekdayDistribution";
 import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { ProjectWeeklyTargets } from "@/components/reports/ProjectWeeklyTargets";
+import { WeekComparison } from "@/components/reports/WeekComparison";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -130,6 +131,21 @@ export default function ReportsPage() {
   const rangeEntries = completedEntries.filter(
     (e) => e.startedAt >= rangeStart.getTime() && e.startedAt <= rangeEnd.getTime()
   );
+
+  // Previous-week entries (weekly mode only — used for week-over-week comparison)
+  const { previousEntries, previousLabel } = useMemo(() => {
+    if (mode !== "week") return { previousEntries: [], previousLabel: "" };
+    const prevWs = addWeeks(rangeStart, -1);
+    const prevWe = new Date(prevWs);
+    prevWe.setDate(prevWe.getDate() + 7);
+    const label = `${prevWs.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(prevWe.getTime() - 1).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+    return {
+      previousEntries: completedEntries.filter(
+        (e) => e.startedAt >= prevWs.getTime() && e.startedAt < prevWe.getTime()
+      ),
+      previousLabel: label,
+    };
+  }, [mode, rangeStart, completedEntries]);
 
   // Current calendar month entries (for client retainer budget tracking)
   const { monthEntries, monthLabel } = useMemo(() => {
@@ -543,6 +559,14 @@ export default function ReportsPage() {
           </section>
 
           {/* Peak hours */}
+          <WeekComparison
+            currentEntries={rangeEntries}
+            previousEntries={previousEntries}
+            projects={projects}
+            currentLabel={weekLabel}
+            previousLabel={previousLabel}
+          />
+
           <PeakHoursChart entries={rangeEntries} />
 
           {/* Weekday distribution */}
