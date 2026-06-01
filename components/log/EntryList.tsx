@@ -7,6 +7,7 @@ import { elapsedMs, formatDurationShort } from "@/lib/duration";
 import { EntryRow } from "./EntryRow";
 import { DayTimeline } from "./DayTimeline";
 import { DayNote } from "./DayNote";
+import { DayGaps } from "./DayGaps";
 import { renderMarkdown } from "@/lib/markdown";
 import { findOverlappingIds } from "@/lib/overlapDetection";
 
@@ -34,6 +35,9 @@ interface EntryListProps {
   // Day notes
   getDayNote?: (dateKey: string) => string;
   onSaveDayNote?: (dateKey: string, content: string) => void;
+  // Gap filling — when provided, untracked gap rows are shown between entries
+  onFillGap?: (entry: Omit<TimeEntry, "id">) => void;
+  showGaps?: boolean;
 }
 
 function todayKey(): string {
@@ -66,6 +70,8 @@ export function EntryList({
   timelineMode,
   getDayNote,
   onSaveDayNote,
+  onFillGap,
+  showGaps = false,
 }: EntryListProps) {
   const completed = entries.filter((e) => e.stoppedAt !== null && !hiddenIds?.has(e.id));
   const grouped = groupByDay(completed);
@@ -240,6 +246,17 @@ export function EntryList({
                   />
                 ))}
               </div>
+            )}
+
+            {/* Gap rows — shown below the entry list in list mode when gap detection is on */}
+            {!isCollapsed && !timelineMode && !bulkMode && showGaps && onFillGap && dayEntries.length >= 2 && (
+              <DayGaps
+                dayEntries={dayEntries}
+                projects={projects}
+                tasks={tasks}
+                allTags={allTags}
+                onFill={onFillGap}
+              />
             )}
 
             {/* Timeline view */}

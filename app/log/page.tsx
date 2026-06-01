@@ -61,6 +61,7 @@ export default function LogPage() {
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
   const [timelineMode, setTimelineMode] = useState(false);
   const [groupBy, setGroupBy] = useState<"day" | "project">("day");
+  const [showGaps, setShowGaps] = useState(false);
 
   // Bulk selection state
   const [bulkMode, setBulkMode] = useState(false);
@@ -342,6 +343,20 @@ export default function LogPage() {
                 Timeline
               </button>
               <button
+                onClick={() => setShowGaps((v) => !v)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors font-medium ${
+                  showGaps
+                    ? "bg-orange-500/20 border-orange-500/50 text-orange-300"
+                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border-zinc-700"
+                }`}
+                title={showGaps ? "Hide untracked gaps" : "Show untracked gaps between entries"}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Gaps
+              </button>
+              <button
                 onClick={() => setBulkMode(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
                 title="Select multiple entries for bulk actions"
@@ -571,6 +586,8 @@ export default function LogPage() {
           onDeselectDay={deselectDay}
           getDayNote={getDayNote}
           onSaveDayNote={saveDayNote}
+          showGaps={showGaps}
+          onFillGap={(entry) => addEntry(entry)}
         />
       )}
       {undoPending && (
