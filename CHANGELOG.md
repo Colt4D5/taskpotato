@@ -1,3 +1,19 @@
+## [5.1.0] — 2026-06-01
+
+### Added
+- **Untracked gap detection** — the Log page can now surface the dead time between consecutive entries in a day and let you fill any gap with a single click
+  - `lib/gapDetection.ts` — two pure utilities:
+    - `findDayGaps(dayEntries, minGapMs?)` — takes all completed entries for a single day (unsorted), sorts them by `startedAt`, and returns every `TimeGap` (start, end, duration, adjacent entry ids) larger than the configurable `minGapMs` threshold (default 1 minute); touching or overlapping entries produce no gap — back-to-back sessions are correctly ignored; open-ended time before the first entry and after the last is intentionally excluded (those are legitimate non-work periods, not tracking gaps)
+    - `totalGapMs(dayEntries, minGapMs?)` — convenience aggregator summing all gap durations for a day; available for future use in stats
+  - `components/log/DayGaps.tsx` — renders compactly below each expanded day section when gap mode is active:
+    - **Gap rows** — one dashed-border row per detected gap; shows a clock icon, the exact time range in monospace (`HH:MM AM – HH:MM AM`), duration pill, and an italic "untracked" label
+    - **Fill gap button** — a `+ Fill gap` button revealed on row hover; clicking opens `FillGapModal` pre-seeded with the gap's exact start and end times, ready for description, project, task, tags, and billable toggle
+    - `FillGapModal` — compact version of `QuickEntryForm` embedded inline in `DayGaps`; start and end time fields are editable (in case the user wants to partially fill the gap); description textarea gets `autoFocus` so you can type immediately; all project/task/tag/billable fields present; validation rejects inverted time ranges; saves and dismisses cleanly
+  - **`Gaps` toggle button** in the Log page header toolbar — clock icon, same visual style as the Timeline / By Project toggles; orange when active; hover tooltip explains the feature; independent of all other view modes (gaps work alongside list, timeline, and filter state)
+  - `EntryList` — two new optional props: `showGaps?: boolean` and `onFillGap?: (entry) => void`; when both are provided and the day has 2+ entries, `DayGaps` is mounted below each day's entry list in non-bulk, non-timeline list mode; no changes to any existing rendering path when the props are absent
+  - Log page wires `showGaps` state and `addEntry` into `EntryList` so a filled gap entry lands in the correct day group immediately via existing reactive storage
+  - No new localStorage keys; purely derived from the existing `taskpotato:entries` array at render time; zero migration, zero storage overhead
+
 ## [5.0.0] — 2026-05-31
 
 ### Added
