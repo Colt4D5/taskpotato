@@ -7,6 +7,7 @@ const SHORTCUTS = [
   { key: "T", description: "Go to Timer" },
   { key: "L", description: "Go to Log" },
   { key: "R", description: "Go to Reports" },
+  { key: "C", description: "Resume most recent entry (on Timer page)" },
   { key: "N", description: "Log time manually (on Log page)" },
   { key: "J", description: "Open today's day note (on Log page)" },
   { key: "G", description: "Toggle group by project (on Log page)" },
