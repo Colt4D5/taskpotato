@@ -1,3 +1,19 @@
+## [5.2.0] — 2026-06-02
+
+### Added
+- **Quick resume on the Timer page** — a "Continue" strip below the template quick-start chips shows the 3 most recently used distinct entry configurations as one-click resume buttons, so you can pick up previous work without navigating away from the timer
+  - `components/timer/RecentEntries.tsx` — new component rendering up to 3 deduplicated recent entry buttons:
+    - Each button shows the project color dot, description (italic placeholder when empty), project badge, task name, tag chips, duration pill, and a "time ago" label (`5m ago`, `2h ago`, `yesterday`, etc.)
+    - Entries are deduplicated by `(notes, projectId, taskId)` — so if you logged "Stand-up" three times today, you see it once; the three buttons represent three distinct types of work
+    - The most-recent entry gets an orange-tinted `▶` play button; other entries use a muted style — visual priority matches recency
+    - Clicking any button calls `handleResumeEntry`, which pre-fills all five timer fields (description, project, task, tags, billable flag) and immediately calls `toggle()` to start the timer — one click, no intermediate steps
+    - Duration and time-ago labels are visible on `sm:` breakpoint and above; layout degrades cleanly on narrow screens
+    - Returns `null` when no completed entries exist (no empty-state noise for new users)
+  - `handleResumeEntry(entry)` — new handler in `TimerWidget`; sets all five timer state values from the source entry, then toggles the timer; guard prevents double-start if somehow called while running
+  - **`C` keyboard shortcut** — press `C` anywhere on the Timer page (when not in an input) to immediately resume the most recently stopped entry; leverages the existing `useKeyboardShortcuts` hook; does nothing when a timer is already running; `KeyboardShortcutsHelp` updated with the new shortcut
+  - Strip is hidden entirely while a timer is running — the Continue panel only makes sense when you're idle
+  - Zero new localStorage keys; purely derived from the existing `completedEntries` array already in scope in `TimerWidget`; zero migration, zero storage overhead
+
 ## [5.1.0] — 2026-06-01
 
 ### Added

@@ -17,6 +17,7 @@ import { sortedProjectGroups } from "@/lib/projectSort";
 import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { IdleAlert } from "@/components/timer/IdleAlert";
 import { TemplateQuickStart } from "@/components/timer/TemplateQuickStart";
+import { RecentEntries } from "@/components/timer/RecentEntries";
 import { useTemplates } from "@/hooks/useTemplates";
 import { EntryTemplate } from "@/types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -59,12 +60,32 @@ export function TimerWidget() {
     timeRounding,
   } = useTimer();
 
-  useKeyboardShortcuts({ onToggleTimer: toggle });
+  useKeyboardShortcuts({
+    onToggleTimer: toggle,
+    onResumeRecent: () => {
+      // Resume the most recent completed entry (first in completedEntries, already sorted newest-first)
+      const mostRecent = completedEntries.find((e) => e.stoppedAt !== null);
+      if (mostRecent && !isRunning) {
+        handleResumeEntry(mostRecent);
+      }
+    },
+  });
 
   const [showPomodoro, setShowPomodoro] = useState(false);
   const [showIdleAlert, setShowIdleAlert] = useState(false);
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const { completedEntries, updateEntry, entries, allTags } = useEntries();
+
+  // Populate timer fields from an entry and start a new timer entry
+  const handleResumeEntry = (entry: typeof completedEntries[number]) => {
+    if (isRunning) return;
+    setSelectedProjectId(entry.projectId);
+    setSelectedTaskId(entry.taskId);
+    setNotes(entry.notes);
+    setTags(entry.tags ?? []);
+    setBillable(entry.billable ?? true);
+    toggle();
+  };
   const allTasks = projectTasksList; // same array, no second hook call needed
   const { addProject } = useProjects();
 
@@ -133,6 +154,16 @@ export function TimerWidget() {
         onApply={applyTemplate}
         disabled={isRunning}
       />
+
+      {/* Quick resume — recent entries (hidden while timer running) */}
+      {!isRunning && (
+        <RecentEntries
+          entries={completedEntries}
+          projects={activeProjects}
+          tasks={allTasks}
+          onResume={handleResumeEntry}
+        />
+      )}
 
       {/* Description input with autocomplete */}
       <DescriptionAutocomplete

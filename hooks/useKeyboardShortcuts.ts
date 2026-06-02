@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 interface UseKeyboardShortcutsOptions {
   onToggleTimer?: () => void;
+  onResumeRecent?: () => void;
   timerInputFocused?: boolean;
 }
 
@@ -18,6 +19,7 @@ interface UseKeyboardShortcutsOptions {
  */
 export function useKeyboardShortcuts({
   onToggleTimer,
+  onResumeRecent,
   timerInputFocused = false,
 }: UseKeyboardShortcutsOptions = {}) {
   const router = useRouter();
@@ -31,6 +33,12 @@ export function useKeyboardShortcuts({
       if (e.metaKey || e.ctrlKey || e.altKey) return;
 
       switch (e.key.toLowerCase()) {
+        case "c":
+          if (onResumeRecent) {
+            e.preventDefault();
+            onResumeRecent();
+          }
+          break;
         case "t":
           e.preventDefault();
           router.push("/timer");
@@ -58,5 +66,5 @@ export function useKeyboardShortcuts({
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [router, onToggleTimer, timerInputFocused]);
+  }, [router, onToggleTimer, onResumeRecent, timerInputFocused]);
 }
