@@ -1,3 +1,29 @@
+## [5.3.0] — 2026-06-03
+
+### Added
+- **Daily goal tracking with per-day calendar chart** — set a target tracked hours per day in Settings and see hit/miss performance across any date range on the Reports page
+  - `AppSettings.dailyGoalHours: number` — new preference field; default `0` (disabled); any positive value enables the feature; max 24h
+  - Settings page — new **Daily goal** preference row in the Preferences section (immediately after the Weekly goal row); numeric input (0–24h, step 0.5h); `0` disables the feature; help text explains that it is shown in Reports and also governs the sidebar ring when no weekly goal is set
+  - `lib/dailyGoal.ts` — two pure computation utilities:
+    - `computeDailyGoal(entries, rangeStart, rangeEnd, dailyGoalHours)` — enumerates every calendar day in the range, buckets completed entry time by day (respecting `offsetMs` for resumed entries), and returns a `DailyGoalStats` object with per-day data plus aggregates: `metCount`, `missedCount`, `totalCount`, `currentStreak`, `bestStreak`, and `totalTrackedMs`
+    - Each `DailyGoalDay` carries: `dateKey`, `trackedMs`, `goalMs`, `pct` (0–1+), `met`, `isToday`, and `isFuture` so the component has everything it needs to render without re-computing
+    - Current streak counts consecutive days (ending today or most recent evaluated day) where the goal was met; best streak scans all evaluated days in the range
+    - Future days within the range are enumerated but not evaluated (no hit/miss assigned to them)
+  - `DailyGoalCalendar` component (`components/reports/DailyGoalCalendar.tsx`) — per-day bar chart with rich visual encoding:
+    - **One bar per day** in the range, proportionally scaled to `max(maxTracked, goalMs)` so bars never overflow and the goal line always sits within the chart area
+    - **Color coding**: green bar when goal met, orange when today (in progress), muted orange-red when under goal on a past day, dim zinc when no data, zinc-40 for future days
+    - **Dashed goal marker** — a horizontal dashed line overlaid on each bar at the exact goal height so you can see at a glance whether you cleared it; omitted on future days
+    - **Today indicator** — small orange dot above the today bar
+    - **Stats chips** above the chart: days met / total, success rate percentage (green ≥80%, orange ≥50%, red <50%), and miss count when any exist
+    - **Streak badges** in the section header: 🔥 current streak when > 0; best streak in muted zinc when it exceeds the current streak
+    - **Day label** below each bar in short format (`Jun 3`); orange and bold for today, green-tinted for met days, dim for future
+    - **Duration label** below the day label in monospace; `—` for future or zero days
+    - **Legend strip** at the bottom explaining the color scheme and goal marker
+    - Returns `null` when `dailyGoalHours <= 0` (no noise for users who haven't configured a goal)
+  - Reports page — `DailyGoalCalendar` mounted immediately after the `WeeklyGoalProgress` card; visible in **both Weekly and Custom Range modes** (unlike WeeklyGoalProgress which is weekly-only) because a daily target makes sense over any range; receives `completedEntries`, `rangeStart`, `rangeEnd`, and `settings.dailyGoalHours` from the already-computed page state; no additional data fetching
+  - `TodayProgress` (sidebar ring) — updated to prefer an explicit `dailyGoalHours` goal over the `weeklyGoalHours / 5` fallback; if `dailyGoalHours > 0` the ring fills against the explicit daily target; if only a weekly goal is set, the original `/ 5` division is used as before; if neither is set, the ring reverts to the static muted-orange no-goal style
+  - No new localStorage keys; `dailyGoalHours` is stored inline on the existing `taskpotato:settings` object; zero migration required; round-trips automatically through the JSON export/import path
+
 ## [5.2.0] — 2026-06-02
 
 ### Added

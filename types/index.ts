@@ -62,6 +62,7 @@ export interface AppSettings {
   timeRounding: 0 | 5 | 10 | 15;
   weeklyGoalHours: number; // 0 = disabled
   tagGoals?: Record<string, number>; // tag name → hours/week; omit or 0 = no goal
+  dailyGoalHours: number; // 0 = disabled; tracked hours target per day
 }
 
 export interface FilterPreset {
@@ -100,4 +101,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   timeRounding: 0,
   weeklyGoalHours: 0,
   tagGoals: {},
+  dailyGoalHours: 0,
 };

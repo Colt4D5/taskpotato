@@ -26,7 +26,13 @@ export function TodayProgress() {
 
   const todayMs = useTodayTotal(entries);
   const weeklyGoalMs = (settings.weeklyGoalHours ?? 0) * 60 * 60 * 1000;
-  const dailyGoalMs = weeklyGoalMs > 0 ? weeklyGoalMs / 5 : 0;
+  // Explicit daily goal takes precedence; fall back to weeklyGoal / 5
+  const dailyGoalMs =
+    (settings.dailyGoalHours ?? 0) > 0
+      ? (settings.dailyGoalHours ?? 0) * 3_600_000
+      : weeklyGoalMs > 0
+      ? weeklyGoalMs / 5
+      : 0;
 
   const hasGoal = dailyGoalMs > 0;
   const pct = hasGoal ? Math.min(1, todayMs / dailyGoalMs) : 0;
