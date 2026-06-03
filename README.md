@@ -51,6 +51,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Streak tracking - current streak, longest streak, active days, and a 16-week activity heatmap on the Reports page
 - ✅ Time rounding on stop - round stop time to nearest 5/10/15 minutes (configurable in Settings)
 - ✅ Weekly goal tracking - set a target hours/week in Settings; Reports page shows a progress bar, time remaining, and completion status
+- ✅ Daily goal tracking - set a target tracked hours/day in Settings; Reports page shows a per-day bar chart with hit/miss color coding, dashed goal markers, streak counter, and success rate for any date range
 - ✅ Collapsible day sections in the log - click any day header to expand/collapse; today expands by default, older days collapse
 - ✅ Date range filter on the log page - preset quick-selects (Today, This Week, Last Week, Last 7 Days, This Month, Last Month, Last 30 Days) plus custom from/to date pickers; integrates with existing project/task/tag filters
 - ✅ Markdown notes - entry descriptions support full Markdown syntax; Write/Preview tab toggle in the entry editor; inline markdown rendering in the log view with an `md` badge indicator; powered by `marked` + `@tailwindcss/typography`

@@ -26,6 +26,7 @@ import { WeekdayDistribution } from "@/components/reports/WeekdayDistribution";
 import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { ProjectWeeklyTargets } from "@/components/reports/ProjectWeeklyTargets";
 import { WeekComparison } from "@/components/reports/WeekComparison";
+import { DailyGoalCalendar } from "@/components/reports/DailyGoalCalendar";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -434,6 +435,16 @@ export default function ReportsPage() {
               totalMs={totalRangeMs}
               goalHours={settings.weeklyGoalHours}
               isCurrentWeek={isCurrentWeek}
+            />
+          )}
+
+          {/* Daily goal calendar — shown in both modes when daily goal is configured */}
+          {(settings.dailyGoalHours ?? 0) > 0 && (
+            <DailyGoalCalendar
+              entries={completedEntries}
+              rangeStart={rangeStart}
+              rangeEnd={rangeEnd}
+              dailyGoalHours={settings.dailyGoalHours}
             />
           )}
 
