@@ -1,4 +1,26 @@
-## [5.3.0] — 2026-06-03
+## [5.4.0] — 2026-06-04
+
+### Added
+- **CSV Import** — bring time entries into TaskPotato from any compatible CSV source, including prior TaskPotato exports, Toggl, Clockify, and any CSV that has a parseable start/end time or duration column
+  - `lib/csvImport.ts` — full CSV parsing and import pipeline:
+    - `parseCSVText(text)` — RFC-4180-compliant CSV parser; handles quoted fields with embedded commas/newlines, escaped double-quotes, and CRLF/LF line endings; returns a `string[][]` matrix
+    - `analyzeCSV(text, existingProjects, existingTasks)` — reads the header row and maps any of 30+ recognized column name aliases to canonical fields (start, end, date, duration_ms, duration_h, project, task, notes, tags, billable); builds a `CSVImportAnalysis` object with all parsed rows, valid/error split, new vs matched project names, and a 10-row preview slice; performs no writes — safe to call as a dry-run inspection step
+    - `buildImportOutput(validRows, existingProjects, existingTasks)` — constructs `TimeEntry[]`, `Project[]` (new only), and `Task[]` (new only) from validated rows; matches existing projects/tasks by case-insensitive name so re-importing the same CSV never duplicates; assigns a round-robin color to newly created projects
+    - **Supported start/end patterns:** full ISO timestamps (`2026-05-01T10:00:00Z`), space-separated local datetime (`2026-05-01 10:00:00`), date-only (`2026-05-01`), time-only with a separate Date column (`HH:MM:SS` / `HH:MM`)
+    - **Duration fallback:** if no end time column is found, `Duration (ms)` or `Duration (h)` (Clockify `0:30:00` format) is used to compute `endMs` from `startMs`
+    - **Toggl compatibility:** `Date` + `Start` (time-only) + `End` (time-only) three-column pattern detected and merged automatically
+    - **Clockify compatibility:** `Start Date` + `Start Time` + `End Date` + `End Time` four-column pattern detected and merged; `Duration (h)` accepted as alternative
+    - **Tag normalization:** tags split on `;`, `,`, or `|`; each tag lowercased and trimmed
+    - **Billable resolution:** column absent → billable; `No`, `false`, `0` → non-billable; anything else → billable
+    - Rows with unparseable start time, unparseable end time (and no duration fallback), or `endMs ≤ startMs` are collected as error rows with a descriptive message; they are skipped on import without blocking valid rows
+  - `components/settings/CSVImportModal.tsx` — three-step import wizard:
+    - **Step 1 (Upload)** — drag-and-drop zone or click-to-browse; accepts `.csv` files; on selection, reads the file as text and runs `analyzeCSV`; a recognized-column-names reference panel lists all accepted header aliases for quick troubleshooting
+    - **Step 2 (Preview)** — stats strip: rows to import (orange), rows to skip (red, when any), new projects to create (blue), matched projects (green); new project names shown as pills in an info callout; skipped-row detail list (row number + error + description snippet) toggled by click; 10-row preview table with date, time range, duration, description, project, and billable indicator columns; Change file link resets to step 1 without re-opening the file picker; Import button shows exact count and is disabled when no valid rows exist
+    - **Step 3 (Success)** — confirms imported count with an option to import another file or close
+  - Settings page — new **Import from CSV** row in the Data section (between "Export as CSV" and the existing JSON import); opens `CSVImportModal`; `handleCSVImport` receives the three arrays from the modal and merges them into the existing localStorage state via function-updater calls — existing entries and projects are preserved; new items are appended
+  - Imported entries appear immediately in the Log and Reports pages via the existing `taskpotato:storage-update` reactive bus — no page reload required
+  - No new localStorage keys; imported data lands in the existing `taskpotato:entries`, `taskpotato:projects`, and `taskpotato:tasks` stores
+
 
 ### Added
 - **Daily goal tracking with per-day calendar chart** — set a target tracked hours per day in Settings and see hit/miss performance across any date range on the Reports page

@@ -16,6 +16,7 @@ import { useTemplates } from "@/hooks/useTemplates";
 import { useInvoices } from "@/hooks/useInvoices";
 import { Button } from "@/components/ui/Button";
 import { exportCSV } from "@/lib/csvExport";
+import { CSVImportModal } from "@/components/settings/CSVImportModal";
 
 export default function SettingsPage() {
   const { projects, addProject, updateProject, deleteProject, togglePin } = useProjects();
@@ -34,6 +35,7 @@ export default function SettingsPage() {
   const [, setStoredClients] = useStorage<Client[]>("clients", []);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [csvImportOpen, setCsvImportOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // suppress unused warning — updateEntry/deleteEntry consumed by EntryList elsewhere
@@ -64,6 +66,22 @@ export default function SettingsPage() {
 
   const handleExportCSV = () => {
     exportCSV(entries, projects, tasks);
+  };
+
+  const handleCSVImport = (
+    newEntries: TimeEntry[],
+    newProjects: Project[],
+    newTasks: Task[]
+  ) => {
+    if (newProjects.length > 0) {
+      setStoredProjects((prev) => [...prev, ...newProjects]);
+    }
+    if (newTasks.length > 0) {
+      setStoredTasks((prev) => [...prev, ...newTasks]);
+    }
+    if (newEntries.length > 0) {
+      setStoredEntries((prev) => [...prev, ...newEntries]);
+    }
   };
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,6 +346,17 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between px-4 py-3">
             <div>
+              <p className="text-sm font-medium text-zinc-200">Import from CSV</p>
+              <p className="text-xs text-zinc-500">
+                Import entries from TaskPotato, Toggl, Clockify, or any compatible CSV
+              </p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setCsvImportOpen(true)}>
+              Import CSV
+            </Button>
+          </div>
+          <div className="flex items-center justify-between px-4 py-3">
+            <div>
               <p className="text-sm font-medium text-zinc-200">Import data</p>
               <p className="text-xs text-zinc-500">
                 Restore from a previous export — overwrites current data
@@ -358,6 +387,17 @@ export default function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {/* CSV Import Modal */}
+      {csvImportOpen && (
+        <CSVImportModal
+          open={csvImportOpen}
+          onClose={() => setCsvImportOpen(false)}
+          existingProjects={projects}
+          existingTasks={tasks}
+          onImport={handleCSVImport}
+        />
+      )}
     </div>
   );
 }
