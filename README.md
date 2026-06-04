@@ -45,6 +45,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Command palette - ⌘K (or Ctrl+K) to open a global search palette; search entries by notes, project, task, and tags; keyboard-navigable with ↑↓ and ↵; shows duration, tags, and billable status per result
 - ✅ Tags on entries - tag input on timer, filter by tag on log page, tag breakdown on reports
 - ✅ CSV export - download all completed entries as a spreadsheet (Settings > Data)
+- ✅ CSV import - import entries from TaskPotato, Toggl, Clockify, or any compatible CSV; drag-and-drop wizard with column detection, preview table, error reporting, and automatic project matching/creation (Settings > Data)
 - ✅ Pomodoro mode - 🍅 toggle on timer page, configurable work/break durations, ring countdown, session tracking
 - ✅ Idle detection - configurable alert (1/2/4/8h) if timer runs too long; dismiss, stop, or adjust start time
 - ✅ Billable / non-billable flag on entries - toggle on timer, edit in entry editor, badge in log, breakdown in reports, column in CSV export
