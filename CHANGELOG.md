@@ -1,3 +1,29 @@
+## [5.5.0] — 2026-06-05
+
+### Added
+- **Session notepad** — a collapsible live-notes panel on the Timer page that lets you annotate a running session without stopping the timer
+  - `components/timer/SessionNotesPanel.tsx` — new component, only visible while a timer is running:
+    - **Toggle button** — a compact `📝 Session Notes` bar below the billable toggle; muted when empty, amber-tinted when annotations exist (shows annotation count badge); chevron indicates open/closed state
+    - **Description editor** — an editable `<textarea>` for the entry's base description (the part you see in the log); changes are debounced 600 ms and auto-saved to the running entry via `updateEntry`; previously, description was locked while the timer was running — it is now fully editable mid-session
+    - **Timestamped notes** — an annotation input field at the bottom of the panel; type a quick note and press `Enter` (or click `+ Add`); each note is stamped with the elapsed session time (`HH:MM:SS` since start, e.g. `00:23:41`) and appended to an internal annotation block; useful for capturing decisions, blockers, context switches, and outcomes without stopping the timer
+    - **Annotation list** — all notes for the current session are shown above the input in a scrollable list; monospace elapsed-time labels in orange; hover reveals a `×` delete button per annotation
+    - Annotations are stored as an HTML comment block appended to the entry's `notes` field:
+      ```
+      <!-- session-annotations
+      [00:23:41|1421000] decided to use Redis
+      [00:47:02|2822000] blocked on auth — asked Jake
+      -->
+      ```
+      This keeps storage in the existing `notes` string — no new localStorage key, no schema change, backward-compatible
+    - Auto-saves via debounce on description edits; annotation add/delete saves immediately
+    - Panel closes and becomes invisible when the timer is stopped; the annotations remain in the completed entry
+  - **`EntryEditor` annotation display** — completed entries that have session annotations now show a dedicated **Session Notes** panel in the edit modal:
+    - The description textarea shows only the base notes (the comment block is stripped from the editable area so you don't see raw HTML)
+    - The annotation block is rendered below the description as a clean, scrollable list of `[elapsed] text` rows with per-row delete buttons
+    - On save, the base notes and any remaining annotations are re-serialized back into the `notes` field; deleted annotations are permanently removed
+    - Annotation parsing and serialization logic lives inline in `EntryEditor` (mirrors `SessionNotesPanel`) — no shared module needed since the two use cases are slightly different (one edits annotations, the other just displays/deletes them)
+  - No new localStorage keys; everything is stored on the existing `notes` field of `TimeEntry`; no migration required; JSON export/import round-trips cleanly
+
 ## [5.4.0] — 2026-06-04
 
 ### Added

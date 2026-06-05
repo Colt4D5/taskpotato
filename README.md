@@ -8,7 +8,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 
 ## Status
 
-🚧 **Active Development - Night 34 complete**
+🚧 **Active Development - Night 35 complete**
 
 ## Features
 
@@ -33,6 +33,7 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Custom date range on Reports - toggle between weekly navigation and an arbitrary date range picker with Today / This week / This month quick-selects; all report sections update reactively
 - ✅ Settings - preferences (week start, default view), full JSON export (projects + tasks + entries), JSON import
 - ✅ Daily summary panel on timer page (total time, project bar chart, entry list)
+- ✅ Session notepad - collapsible 📝 panel on the Timer page, only visible while a timer is running; edit the running entry's description live (previously locked mid-session); add timestamped annotations (stamped with elapsed session time, e.g. `00:23:41`) for decisions, blockers, and context without stopping the timer; completed entries with annotations show a clean Session Notes panel in the entry editor with per-note delete; stored as an HTML comment block in the entry's notes field — no new localStorage key, no schema change
 - ✅ Description autocomplete - typing in the timer's description field shows a ranked dropdown of previously-used descriptions; selecting one auto-fills project, task, tags, and billable flag; query match highlighted in amber; keyboard-navigable (↑/↓/Enter/Tab/Escape)
 - ✅ Tag autocomplete - typing in any tag field (timer, entry editor, Quick Log, template form) shows a live dropdown of previously-used tags filtered by the current input; prefix matches surface first; query highlighted in amber; keyboard-navigable (↑/↓/Enter/Tab/Escape); suggestions ranked by usage frequency so your most-used tags come first
 - ✅ Inline project creation from timer page (+ New Project button → auto-select)
