@@ -18,6 +18,7 @@ import { PomodoroWidget } from "@/components/timer/PomodoroWidget";
 import { IdleAlert } from "@/components/timer/IdleAlert";
 import { TemplateQuickStart } from "@/components/timer/TemplateQuickStart";
 import { RecentEntries } from "@/components/timer/RecentEntries";
+import { SessionNotesPanel } from "@/components/timer/SessionNotesPanel";
 import { useTemplates } from "@/hooks/useTemplates";
 import { EntryTemplate } from "@/types";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -75,6 +76,14 @@ export function TimerWidget() {
   const [showIdleAlert, setShowIdleAlert] = useState(false);
   const [settings] = useStorage<AppSettings>("settings", DEFAULT_SETTINGS);
   const { completedEntries, updateEntry, entries, allTags } = useEntries();
+
+  // Live-update the running entry's notes from SessionNotesPanel
+  const handleSessionNotesChange = (updatedNotes: string) => {
+    if (runningEntry) {
+      updateEntry(runningEntry.id, { notes: updatedNotes });
+      setNotes(updatedNotes);
+    }
+  };
 
   // Populate timer fields from an entry and start a new timer entry
   const handleResumeEntry = (entry: typeof completedEntries[number]) => {
@@ -263,6 +272,14 @@ export function TimerWidget() {
           </span>
         </div>
       )}
+
+      {/* Session Notes Panel — live notepad while timer is running */}
+      <SessionNotesPanel
+        currentNotes={notes}
+        onNotesChange={handleSessionNotesChange}
+        isRunning={isRunning}
+        startedAt={runningEntry?.startedAt ?? null}
+      />
 
       {/* Tags */}
       <div className="w-full">

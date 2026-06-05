@@ -8,6 +8,53 @@ import { Input } from "@/components/ui/Input";
 import { TagInput } from "@/components/ui/TagInput";
 import { renderMarkdown } from "@/lib/markdown";
 import { sortedProjectGroups } from "@/lib/projectSort";
+
+// --- Session annotation helpers (mirrors SessionNotesPanel logic) ---
+interface SessionAnnotation {
+  timestampMs: number;
+  text: string;
+}
+
+function parseAnnotationBlock(raw: string): {
+  baseNotes: string;
+  annotations: SessionAnnotation[];
+} {
+  const OPEN = "<!-- session-annotations";
+  const CLOSE = "-->";
+  const startIdx = raw.indexOf(OPEN);
+  if (startIdx === -1) return { baseNotes: raw, annotations: [] };
+  const closeIdx = raw.indexOf(CLOSE, startIdx + OPEN.length);
+  if (closeIdx === -1) return { baseNotes: raw, annotations: [] };
+  const baseNotes = raw.slice(0, startIdx).trimEnd();
+  const block = raw.slice(startIdx + OPEN.length, closeIdx);
+  const annotations: SessionAnnotation[] = [];
+  for (const line of block.split("\n")) {
+    const match = line.match(/^\[(\d{2}:\d{2}:\d{2})\|(\d+)\]\s?(.*)$/);
+    if (match) {
+      annotations.push({ timestampMs: parseInt(match[2], 10), text: match[3] });
+    }
+  }
+  return { baseNotes, annotations };
+}
+
+function buildNotesWithAnnotations(
+  baseNotes: string,
+  annotations: SessionAnnotation[]
+): string {
+  if (annotations.length === 0) return baseNotes;
+  const lines = annotations
+    .map((a) => {
+      const t = a.timestampMs;
+      const h = Math.floor(t / 3_600_000).toString().padStart(2, "0");
+      const m = Math.floor((t % 3_600_000) / 60_000).toString().padStart(2, "0");
+      const s = Math.floor((t % 60_000) / 1_000).toString().padStart(2, "0");
+      return `[${h}:${m}:${s}|${t}] ${a.text}`;
+    })
+    .join("\n");
+  const base = baseNotes.trimEnd();
+  return `${base}${base ? "\n\n" : ""}<!-- session-annotations\n${lines}\n-->`;
+}
+// --- end annotation helpers ---
 import { findProposedOverlaps } from "@/lib/overlapDetection";
 import { formatTime } from "@/lib/dateUtils";
 
@@ -56,7 +103,10 @@ export function EntryEditor({
   onSave,
   onClose,
 }: EntryEditorProps) {
-  const [notes, setNotes] = useState(entry.notes);
+  // Split notes into base + annotations on open; merge back on save
+  const { baseNotes: initialBase, annotations: initialAnnotations } = parseAnnotationBlock(entry.notes);
+  const [notes, setNotes] = useState(initialBase);
+  const [annotations, setAnnotations] = useState<SessionAnnotation[]>(initialAnnotations);
   const [projectId, setProjectId] = useState<string>(entry.projectId ?? "");
   const [taskId, setTaskId] = useState<string>(entry.taskId ?? "");
   const [startDate, setStartDate] = useState(toDateInput(entry.startedAt));
@@ -74,7 +124,9 @@ export function EntryEditor({
 
   useEffect(() => {
     if (open) {
-      setNotes(entry.notes);
+      const { baseNotes: b, annotations: a } = parseAnnotationBlock(entry.notes);
+      setNotes(b);
+      setAnnotations(a);
       setProjectId(entry.projectId ?? "");
       setTaskId(entry.taskId ?? "");
       setStartDate(toDateInput(entry.startedAt));
@@ -128,7 +180,7 @@ export function EntryEditor({
     }
 
     onSave({
-      notes,
+      notes: buildNotesWithAnnotations(notes, annotations),
       projectId: projectId || null,
       taskId: taskId || null,
       startedAt: newStartedAt,
@@ -183,8 +235,42 @@ export function EntryEditor({
               rows={3}
               className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 w-full resize-none"
             />
-          )}
+          )}        
         </div>
+
+        {/* Session annotations — rendered when present */}
+        {annotations.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-zinc-400">Session Notes</label>
+              <span className="text-xs text-zinc-600">{annotations.length} timestamped note{annotations.length !== 1 ? "s" : ""}</span>
+            </div>
+            <div className="flex flex-col gap-1 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2 max-h-40 overflow-y-auto">
+              {annotations.map((a, idx) => {
+                const t = a.timestampMs;
+                const h = Math.floor(t / 3_600_000).toString().padStart(2, "0");
+                const m = Math.floor((t % 3_600_000) / 60_000).toString().padStart(2, "0");
+                const s = Math.floor((t % 60_000) / 1_000).toString().padStart(2, "0");
+                const label = `${h}:${m}:${s}`;
+                return (
+                  <div key={idx} className="group flex items-start gap-2 text-xs py-0.5">
+                    <span className="font-mono text-orange-400/80 flex-shrink-0 pt-0.5">{label}</span>
+                    <span className="text-zinc-300 flex-1">{a.text}</span>
+                    <button
+                      type="button"
+                      onClick={() => setAnnotations((prev) => prev.filter((_, i) => i !== idx))}
+                      className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all flex-shrink-0"
+                      title="Remove this note"
+                      aria-label="Delete annotation"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-zinc-400">Tags</label>
