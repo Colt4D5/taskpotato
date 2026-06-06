@@ -42,7 +42,8 @@ A local-first time tracking web application. No backend. No accounts. No data le
 - ✅ Log page filters - by project and task name
 - ✅ Reactive state - all UI updates instantly without page reload (custom storage event bus)
 - ✅ Theme toggle (light/dark/system)
-- ✅ Keyboard shortcuts — T/L/R to navigate, **C to resume most recent entry (Timer page)**, Space to toggle timer, N to log time, J to open today's day note, G to toggle project grouping, V to toggle timeline, / to focus search, ? for help modal, ⌘K for command palette
+- ✅ Keyboard shortcuts — T/L/R to navigate, **C to resume most recent entry (Timer page)**, **F to enter/exit focus mode (Timer page, when running)**, Space to toggle timer, N to log time, J to open today's day note, G to toggle project grouping, V to toggle timeline, / to focus search, ? for help modal, ⌘K for command palette
+- ✅ Focus Mode — press `F` while a timer is running to enter a full-screen, distraction-free overlay: giant elapsed clock, project/task context, description, scrolling session annotations (if any), and a single Stop button; ambient today stats in a discreet footer; `F` or Esc to exit; no accidental close on backdrop click
 - ✅ Command palette - ⌘K (or Ctrl+K) to open a global search palette; search entries by notes, project, task, and tags; keyboard-navigable with ↑↓ and ↵; shows duration, tags, and billable status per result
 - ✅ Tags on entries - tag input on timer, filter by tag on log page, tag breakdown on reports
 - ✅ CSV export - download all completed entries as a spreadsheet (Settings > Data)

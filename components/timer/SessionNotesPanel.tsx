@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { formatTime } from "@/lib/dateUtils";
-
-interface SessionAnnotation {
-  timestampMs: number;
-  text: string;
-}
+import {
+  SessionAnnotation,
+  parseAnnotations,
+  buildAnnotatedNotes,
+  formatAnnotationElapsed,
+} from "@/lib/sessionAnnotations";
 
 interface SessionNotesPanelProps {
   /** Current notes on the running entry */
@@ -19,71 +20,7 @@ interface SessionNotesPanelProps {
   startedAt: number | null;
 }
 
-/**
- * Parse the structured session annotations block out of entry notes.
- * Annotations live at the end of the notes in a fenced block:
- *
- *   <!-- session-annotations
- *   [HH:MM:SS] some text
- *   [HH:MM:SS] more text
- *   -->
- *
- * Returns { baseNotes, annotations }.
- */
-function parseAnnotationBlock(raw: string): {
-  baseNotes: string;
-  annotations: SessionAnnotation[];
-} {
-  const OPEN = "<!-- session-annotations";
-  const CLOSE = "-->";
-  const startIdx = raw.indexOf(OPEN);
-  if (startIdx === -1) return { baseNotes: raw, annotations: [] };
 
-  const closeIdx = raw.indexOf(CLOSE, startIdx + OPEN.length);
-  if (closeIdx === -1) return { baseNotes: raw, annotations: [] };
-
-  const baseNotes = raw.slice(0, startIdx).trimEnd();
-  const block = raw.slice(startIdx + OPEN.length, closeIdx);
-  const annotations: SessionAnnotation[] = [];
-
-  for (const line of block.split("\n")) {
-    const match = line.match(/^\[(\d{2}:\d{2}:\d{2})\|(\d+)\]\s?(.*)$/);
-    if (match) {
-      annotations.push({
-        timestampMs: parseInt(match[2], 10),
-        text: match[3],
-      });
-    }
-  }
-
-  return { baseNotes, annotations };
-}
-
-function buildNotesWithAnnotations(
-  baseNotes: string,
-  annotations: SessionAnnotation[]
-): string {
-  if (annotations.length === 0) return baseNotes;
-
-  const lines = annotations
-    .map((a) => {
-      const elapsed = formatElapsed(a.timestampMs);
-      return `[${elapsed}|${a.timestampMs}] ${a.text}`;
-    })
-    .join("\n");
-
-  const base = baseNotes.trimEnd();
-  return `${base}${base ? "\n\n" : ""}<!-- session-annotations\n${lines}\n-->`;
-}
-
-/** Format a duration (ms since session start) as HH:MM:SS */
-function formatElapsed(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
-}
 
 export function SessionNotesPanel({
   currentNotes,
@@ -99,7 +36,7 @@ export function SessionNotesPanel({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const flushRef = useRef<(() => void) | null>(null);
 
-  const { baseNotes, annotations } = parseAnnotationBlock(currentNotes);
+  const { baseNotes, annotations } = parseAnnotations(currentNotes);
 
   // Sync base notes draft when notes change externally (e.g. on open)
   useEffect(() => {
@@ -120,7 +57,7 @@ export function SessionNotesPanel({
     (nextBase: string, nextAnnotations: SessionAnnotation[]) => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
       const doUpdate = () => {
-        onNotesChange(buildNotesWithAnnotations(nextBase, nextAnnotations));
+        onNotesChange(buildAnnotatedNotes(nextBase, nextAnnotations));
         flushRef.current = null;
       };
       flushRef.current = doUpdate;
@@ -145,7 +82,7 @@ export function SessionNotesPanel({
       text: trimmed,
     };
     const next = [...annotations, annotation];
-    onNotesChange(buildNotesWithAnnotations(baseNotes, next));
+    onNotesChange(buildAnnotatedNotes(baseNotes, next));
     setNewAnnotation("");
     inputRef.current?.focus();
   };
@@ -153,7 +90,7 @@ export function SessionNotesPanel({
   const handleDeleteAnnotation = (idx: number) => {
     const next = annotations.filter((_, i) => i !== idx);
     // Immediate save — deletion doesn't need debounce
-    onNotesChange(buildNotesWithAnnotations(baseNotes, next));
+    onNotesChange(buildAnnotatedNotes(baseNotes, next));
   };
 
   const handleAnnotationKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -238,7 +175,7 @@ export function SessionNotesPanel({
                     className="group flex items-start gap-2 px-2 py-1 rounded bg-zinc-800/50 text-xs"
                   >
                     <span className="font-mono text-orange-400/80 flex-shrink-0 pt-0.5 text-[10px]">
-                      {formatElapsed(a.timestampMs)}
+                      {formatAnnotationElapsed(a.timestampMs)}
                     </span>
                     <span className="text-zinc-300 flex-1 leading-relaxed">{a.text}</span>
                     <button
