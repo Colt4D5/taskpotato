@@ -9,52 +9,12 @@ import { TagInput } from "@/components/ui/TagInput";
 import { renderMarkdown } from "@/lib/markdown";
 import { sortedProjectGroups } from "@/lib/projectSort";
 
-// --- Session annotation helpers (mirrors SessionNotesPanel logic) ---
-interface SessionAnnotation {
-  timestampMs: number;
-  text: string;
-}
-
-function parseAnnotationBlock(raw: string): {
-  baseNotes: string;
-  annotations: SessionAnnotation[];
-} {
-  const OPEN = "<!-- session-annotations";
-  const CLOSE = "-->";
-  const startIdx = raw.indexOf(OPEN);
-  if (startIdx === -1) return { baseNotes: raw, annotations: [] };
-  const closeIdx = raw.indexOf(CLOSE, startIdx + OPEN.length);
-  if (closeIdx === -1) return { baseNotes: raw, annotations: [] };
-  const baseNotes = raw.slice(0, startIdx).trimEnd();
-  const block = raw.slice(startIdx + OPEN.length, closeIdx);
-  const annotations: SessionAnnotation[] = [];
-  for (const line of block.split("\n")) {
-    const match = line.match(/^\[(\d{2}:\d{2}:\d{2})\|(\d+)\]\s?(.*)$/);
-    if (match) {
-      annotations.push({ timestampMs: parseInt(match[2], 10), text: match[3] });
-    }
-  }
-  return { baseNotes, annotations };
-}
-
-function buildNotesWithAnnotations(
-  baseNotes: string,
-  annotations: SessionAnnotation[]
-): string {
-  if (annotations.length === 0) return baseNotes;
-  const lines = annotations
-    .map((a) => {
-      const t = a.timestampMs;
-      const h = Math.floor(t / 3_600_000).toString().padStart(2, "0");
-      const m = Math.floor((t % 3_600_000) / 60_000).toString().padStart(2, "0");
-      const s = Math.floor((t % 60_000) / 1_000).toString().padStart(2, "0");
-      return `[${h}:${m}:${s}|${t}] ${a.text}`;
-    })
-    .join("\n");
-  const base = baseNotes.trimEnd();
-  return `${base}${base ? "\n\n" : ""}<!-- session-annotations\n${lines}\n-->`;
-}
-// --- end annotation helpers ---
+import {
+  SessionAnnotation,
+  parseAnnotations as parseAnnotationBlock,
+  buildAnnotatedNotes as buildNotesWithAnnotations,
+  formatAnnotationElapsed,
+} from "@/lib/sessionAnnotations";
 import { findProposedOverlaps } from "@/lib/overlapDetection";
 import { formatTime } from "@/lib/dateUtils";
 
@@ -247,11 +207,7 @@ export function EntryEditor({
             </div>
             <div className="flex flex-col gap-1 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2 max-h-40 overflow-y-auto">
               {annotations.map((a, idx) => {
-                const t = a.timestampMs;
-                const h = Math.floor(t / 3_600_000).toString().padStart(2, "0");
-                const m = Math.floor((t % 3_600_000) / 60_000).toString().padStart(2, "0");
-                const s = Math.floor((t % 60_000) / 1_000).toString().padStart(2, "0");
-                const label = `${h}:${m}:${s}`;
+                const label = formatAnnotationElapsed(a.timestampMs);
                 return (
                   <div key={idx} className="group flex items-start gap-2 text-xs py-0.5">
                     <span className="font-mono text-orange-400/80 flex-shrink-0 pt-0.5">{label}</span>

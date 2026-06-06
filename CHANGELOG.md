@@ -1,3 +1,28 @@
+## [5.6.0] — 2026-06-06
+
+### Added
+- **Focus Mode** — a full-screen, distraction-free overlay for the Timer page that strips away navigation, sidebar, and all ambient UI, leaving only what matters: the running clock, project/task context, description, session annotations, and a Stop button
+  - `components/timer/FocusMode.tsx` — new full-screen overlay component:
+    - **Giant elapsed clock** — `DurationDisplay` rendered at `clamp(4rem, 14vw, 10rem)` with `font-thin tracking-tighter` monospace; fills the screen without being garish; fades and scales down briefly on stop for a satisfying visual acknowledgement before the overlay auto-closes
+    - **Project badge + task** — compact row below the clock; project color dot and name as a `Badge`, task name prefixed with `/` when present; hidden when neither is set (no empty-row noise)
+    - **Description** — base notes text (annotation block stripped) shown below at `text-xl`; centered, max-width capped at `max-w-lg` so long descriptions don't span the full width uncomfortably
+    - **Session annotations** — if the running entry has timestamped session notes, they float as a compact scrollable list between the description and the Stop button; monospace elapsed labels in orange, text in zinc-400; auto-scrolls to the bottom as new annotations arrive; hidden when no annotations exist
+    - **Stop button** — large, prominent `bg-orange-500` rounded-2xl; on click, stops the timer, briefly shows "Stopped" state, then dismisses focus mode after 600ms — one action, zero extra clicks
+    - **Ambient today stats** — a discreet monospace footer (bottom of screen) shows today's entry count, total tracked time, and a running "with this" total including the current session; subtle enough to not break focus, useful enough to glance at
+    - **Focus pill** — top-left orange `FOCUS` badge with an animated pulse dot confirms the mode is active
+    - **Exit affordance** — top-right `exit focus` button with Esc hint; intentionally does not close on backdrop click (accidental exits are annoying when you're in the zone)
+    - Body scroll is locked while focus mode is open; restored on close or unmount
+    - Returns `null` when `open=false` — zero render cost when inactive
+  - **`F` keyboard shortcut** — press `F` anywhere on the Timer page (when not in an input) to enter focus mode when a timer is running; press `F` or `Escape` inside focus mode to exit; `onToggleFocus` callback added to `useKeyboardShortcuts` options and dependency array; no-op when no timer is running so `F` doesn't accidentally open an empty overlay
+  - **Focus button in TimerWidget** — a compact expand-arrows icon button labeled "Focus" appears next to the Pomodoro toggle when a timer is running; hidden when idle (no ghost affordances)
+  - **`lib/sessionAnnotations.ts`** — new shared module extracted from the inline annotation helpers that were duplicated in `SessionNotesPanel.tsx` and `EntryEditor.tsx`:
+    - `parseAnnotations(raw)` — parses the `<!-- session-annotations ... -->` block out of a notes string; returns `{ baseNotes, annotations }` where each annotation carries `elapsed`, `timestampMs`, and `text`
+    - `buildAnnotatedNotes(baseNotes, annotations)` — serializes base notes + annotation array back into the combined notes string
+    - `formatAnnotationElapsed(ms)` — formats a duration (ms since session start) as `HH:MM:SS`
+    - `SessionNotesPanel.tsx` and `EntryEditor.tsx` both refactored to import from this shared module; all three previously-duplicate implementations replaced by a single source of truth; no behavior changes
+  - `KeyboardShortcutsHelp` — `F` shortcut added to the reference modal with scope note "on Timer page, when running"
+  - No new localStorage keys; focus mode is purely ephemeral UI state; zero storage overhead
+
 ## [5.5.0] — 2026-06-05
 
 ### Added
