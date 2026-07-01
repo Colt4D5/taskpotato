@@ -307,9 +307,9 @@ export default function LogPage() {
 
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold text-zinc-100">Time Log</h1>
-        <div className="flex items-center gap-2">
+      <h1 className="text-2xl font-semibold mb-4 text-zinc-100">Time Log</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+        <div className="flex flex-wrap items-center gap-2.5">
           {bulkMode ? (
             <button
               onClick={exitBulkMode}

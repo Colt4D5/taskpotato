@@ -172,7 +172,7 @@ export function TimerWidget() {
       />
 
       {/* Quick resume — recent entries (hidden while timer running) */}
-      {!isRunning && (
+      {false && !isRunning && (
         <RecentEntries
           entries={completedEntries}
           projects={activeProjects}
@@ -334,39 +334,6 @@ export function TimerWidget() {
         <p className="text-xs text-zinc-500 -mt-3">
           ⏱ Stop time rounds to nearest {timeRounding} min
         </p>
-      )}
-
-      {/* Keyboard hint + Pomodoro toggle + Focus mode */}
-      <div className="flex items-center justify-between w-full">
-        <p className="text-xs text-zinc-600">
-          Press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400">Enter</kbd> to start/stop
-        </p>
-        <div className="flex items-center gap-3">
-          {isRunning && (
-            <button
-              onClick={() => setShowFocusMode(true)}
-              className="text-xs text-zinc-500 hover:text-orange-400 transition-colors flex items-center gap-1"
-              title="Enter focus mode (F)"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
-              </svg>
-              Focus
-            </button>
-          )}
-          <button
-            onClick={() => setShowPomodoro((s) => !s)}
-            className="text-xs text-zinc-500 hover:text-orange-400 transition-colors"
-            title="Toggle Pomodoro timer"
-          >
-            🍅 Pomodoro
-          </button>
-        </div>
-      </div>
-
-      {/* Pomodoro widget */}
-      {showPomodoro && (
-        <PomodoroWidget onClose={() => setShowPomodoro(false)} />
       )}
 
       {/* Today's Summary */}
