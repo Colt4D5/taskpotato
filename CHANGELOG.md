@@ -1,4 +1,37 @@
-## [5.6.0] — 2026-06-06
+## [5.8.0] — 2026-07-01
+
+### Added
+- **Stand-up summary generator** — generate a formatted "what I worked on" summary from the Log page in one click, ready to paste into Slack, Discord, or any standup tool
+  - `lib/standupSummary.ts` — pure computation module:
+    - `computeStandupSummary(entries, projects, tasks, period)` — filters completed entries to the target period (yesterday, today, or both), groups them by date then by project (most time first; no-project last), deduplicates entries with identical descriptions within each project group, and returns a `StandupSummaryData` object with per-day sections, per-project groups, totals, and entry counts
+    - `formatStandupText(data, format)` — renders the summary as a formatted string in one of three output styles: `markdown` (bold project names, `- ` bullets), `bullets` (plain text with `- ` bullets, email/notes friendly), or `slack` (bold + `•` bullets, works in Slack/Discord); multi-day summaries include section headers and an overall total line
+    - Annotation comment blocks (`<!-- session-annotations ... -->`) are automatically stripped from descriptions before output — no raw HTML leaks into your standup message
+  - `components/log/StandupSummaryModal.tsx` — two-panel modal with full format and period controls:
+    - **Period selector** — three buttons: `Yesterday`, `Today`, and `Yesterday + Today`; default is `Yesterday` (the most common standup use case — "what did I do yesterday"); switching period instantly recomputes without any loading state
+    - **Format selector** — three buttons: `Markdown` (GitHub/Linear/Notion), `Plain bullets` (email, plain text), `Slack / Discord`; labels include a tooltip hint with example destinations
+    - **Preview tab** — visual preview of the summary: each project shown with its color dot, name, and total duration (monospace); entries listed as bullets with cleaned descriptions and per-entry durations; multi-day summaries include a dated section divider; cleans up annotation noise automatically
+    - **Raw text tab** — the exact text that will be copied, in the selected format; a single click on the textarea selects all for manual copy; useful for verifying the output before pasting
+    - **Copy to clipboard button** — prominent orange button copies the formatted text via the Clipboard API; transitions to a green "Copied!" state for 2 seconds before resetting; disabled when no entries exist for the period
+    - **Empty state** — a tasteful placeholder when no entries exist for the selected period so the modal never feels broken for new users or quiet days
+    - `Escape` closes the modal; backdrop click closes
+  - **Toolbar button** in the Log page header — speech-bubble icon, labeled "Stand-up", same visual style as the existing toolbar buttons; appears alongside By Project / Timeline / Gaps / Select; positioned before the Select button so it stays visible without triggering bulk mode
+  - **`S` keyboard shortcut** on the Log page (when not typing in an input) — opens the stand-up modal instantly; added to `KeyboardShortcutsHelp` reference panel with scope note "on Log page"
+  - No new localStorage keys; purely derived from the existing `taskpotato:entries`, `taskpotato:projects`, and `taskpotato:tasks` stores; zero migration, zero storage overhead
+
+### Added
+- **Tag distribution chart** — new Reports page section showing how tracked time is distributed across all tags used in the selected period, no configuration required
+  - `lib/tagDistribution.ts` — pure computation module:
+    - `computeTagDistribution(entries)` — iterates all completed entries in the provided set, accumulates `totalMs`, `billableMs`, `nonBillableMs`, and `entryCount` per tag, then computes each tag's `pct` (percentage share of total tagged time); multi-tagged entries contribute their full duration to each of their tags (tags are not mutually exclusive — the footer note explains this); rows sorted by `totalMs` descending; also surfaces `totalRangeMs`, `totalTaggedMs`, `untaggedMs`, and `untaggedEntryCount` for context
+    - Returns an empty `rows` array when no tags exist, so the component can cleanly skip rendering for tag-free users
+  - `TagDistribution` component (`components/reports/TagDistribution.tsx`) — visually rich breakdown panel:
+    - **Stacked proportional summary bar** — a single `h-5` bar at the top of the section shows all tags as colored slices proportional to their share of total range time, with the untagged remainder as a dim gray slice; hovering a slice dims all others to 25% opacity for immediate isolation; a legend below the bar shows tag names with color swatches (top 6 shown, overflow count displayed when more exist)
+    - **Per-tag rows** — one row per tag, ordered by the active sort mode; each row shows:
+      - Color swatch (deterministic 12-color palette, cycles predictably)
+      - Tag name + entry count
+      - Percentage share of tagged time (monospace, right-aligned)
+      - Total duration (monospace, bold)
+      - Proportional horizontal fill bar (width relative to the highest-time tag so bars fill visually even if one tag dominates)
+    - **Billable split toggle** — an optional overlay sub-bar per tag (green, proportional to billable fraction) with billable duration, percentage, and non-billable duration; toggled by the 
 
 ### Added
 - **Focus Mode** — a full-screen, distraction-free overlay for the Timer page that strips away navigation, sidebar, and all ambient UI, leaving only what matters: the running clock, project/task context, description, session annotations, and a Stop button

@@ -21,6 +21,7 @@ import { useDayNotes } from "@/hooks/useDayNotes";
 import { DayNote } from "@/components/log/DayNote";
 import { sortedProjectGroups } from "@/lib/projectSort";
 import { findOverlappingIds } from "@/lib/overlapDetection";
+import { StandupSummaryModal } from "@/components/log/StandupSummaryModal";
 
 export default function LogPage() {
   const { completedEntries, runningEntry, updateEntry, updateEntries, deleteEntry, deleteEntries, resumeEntry, duplicateEntry, addEntry, splitEntry, allTags: entriesAllTags } = useEntries();
@@ -62,6 +63,7 @@ export default function LogPage() {
   const [timelineMode, setTimelineMode] = useState(false);
   const [groupBy, setGroupBy] = useState<"day" | "project">("day");
   const [showGaps, setShowGaps] = useState(false);
+  const [showStandup, setShowStandup] = useState(false);
 
   // Bulk selection state
   const [bulkMode, setBulkMode] = useState(false);
@@ -93,6 +95,12 @@ export default function LogPage() {
         if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
         e.preventDefault();
         setQuickEntryOpen(true);
+      }
+      if (e.key === "s" || e.key === "S") {
+        const tagS = (e.target as HTMLElement).tagName;
+        if (tagS === "INPUT" || tagS === "TEXTAREA" || tagS === "SELECT") return;
+        e.preventDefault();
+        setShowStandup(true);
       }
       // / shortcut: focus notes search
       if (e.key === "/") {
@@ -357,6 +365,16 @@ export default function LogPage() {
                 Gaps
               </button>
               <button
+                onClick={() => setShowStandup(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
+                title="Generate stand-up summary (S)"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                Stand-up
+              </button>
+              <button
                 onClick={() => setBulkMode(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors font-medium"
                 title="Select multiple entries for bulk actions"
@@ -597,6 +615,13 @@ export default function LogPage() {
           onDismiss={commitDelete}
         />
       )}
+      <StandupSummaryModal
+        open={showStandup}
+        onClose={() => setShowStandup(false)}
+        entries={completedEntries}
+        projects={projects}
+        tasks={tasks}
+      />
     </div>
   );
 }

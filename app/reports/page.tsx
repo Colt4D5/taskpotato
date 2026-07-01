@@ -27,6 +27,7 @@ import { TagGoalProgress } from "@/components/reports/TagGoalProgress";
 import { ProjectWeeklyTargets } from "@/components/reports/ProjectWeeklyTargets";
 import { WeekComparison } from "@/components/reports/WeekComparison";
 import { DailyGoalCalendar } from "@/components/reports/DailyGoalCalendar";
+import { TagDistribution } from "@/components/reports/TagDistribution";
 import { buildReportSummaryData } from "@/lib/reportSummary";
 import { useStorage } from "@/hooks/useStorage";
 import { AppSettings, DEFAULT_SETTINGS } from "@/types";
@@ -588,6 +589,9 @@ export default function ReportsPage() {
             weekStartsOn={settings.weekStartsOn as 0 | 1}
             totalRangeMs={totalRangeMs}
           />
+
+          {/* Tag distribution */}
+          <TagDistribution entries={rangeEntries} />
 
           {/* Earnings breakdown */}
           <EarningsBreakdown projects={projects} entries={rangeEntries} onCreateInvoice={() => setCreateInvoiceOpen(true)} />
