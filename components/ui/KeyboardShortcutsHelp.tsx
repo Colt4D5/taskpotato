@@ -10,6 +10,7 @@ const SHORTCUTS = [
   { key: "C", description: "Resume most recent entry (on Timer page)" },
   { key: "F", description: "Enter / exit focus mode (on Timer page, when running)" },
   { key: "N", description: "Log time manually (on Log page)" },
+  { key: "S", description: "Open stand-up summary (on Log page)" },
   { key: "J", description: "Open today's day note (on Log page)" },
   { key: "G", description: "Toggle group by project (on Log page)" },
   { key: "V", description: "Toggle timeline view (on Log page)" },
